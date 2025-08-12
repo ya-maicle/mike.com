@@ -4,4 +4,4 @@
  * This file exists to ensure tsc emits a build artifact from src/.
  */
 
-export {}
+export * from './components/Button'

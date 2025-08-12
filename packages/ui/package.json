@@ -28,6 +28,7 @@
   "devDependencies": {
     "typescript": "^5",
     "storybook": "^8",
+    "@storybook/react": "^8",
     "@storybook/react-vite": "^8",
     "@storybook/addon-essentials": "^8",
     "@storybook/addon-interactions": "^8",
@@ -35,6 +36,8 @@
     "@storybook/test": "^8",
     "vite": "^5",
     "@types/react": "^18",
-    "@types/react-dom": "^18"
+    "@types/react-dom": "^18",
+    "@types/node": "^20",
+    "@maicle/config": "workspace:*"
   }
 }
