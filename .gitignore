@@ -1,0 +1,21 @@
+# Node/Next
+node_modules
+.pnpm-store
+dist
+.next
+out
+coverage
+*.log
+*.tsbuildinfo
+
+# Env and vendor
+.env
+.env.*.local
+.vercel
+.supabase
+
+# OS
+.DS_Store
+
+# Storybook
+storybook-static
