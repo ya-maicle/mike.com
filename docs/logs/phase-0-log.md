@@ -110,8 +110,38 @@ Next planned step: Verify Storybook runs locally and add a placeholder story to 
 
 ---
 
+## 0.7 Storybook Verification and Placeholder Component (completed)
+
+- **Added Placeholder Button Component:** Created a basic, unstyled `Button` component in `packages/ui/src/components/Button.tsx` to serve as a test case for Storybook.
+- **Added Button Story:** Created `packages/ui/src/components/Button.stories.tsx` with primary and secondary variants to test Storybook's autodocs and a11y addons.
+- **Configured Storybook:**
+  - Created `packages/ui/.storybook/preview.ts` to import global token styles and configure addon parameters.
+  - Updated `packages/ui/tsconfig.json` to include `react-jsx` and `node` types, resolving build errors.
+  - Added `@storybook/react` and `@types/node` as dev dependencies to `packages/ui`.
+- **Verified Build:** Ran `pnpm --filter @maicle/ui build-storybook` and confirmed that the Storybook static build completes successfully.
+- **Outcome:** Storybook is correctly configured for the `@maicle/ui` package, and the build process is verified.
+
+## 0.8 CI Workflow Scaffolding (completed)
+
+- **Created PR Workflow:** Added a new GitHub Actions workflow at `.github/workflows/pr.yml`.
+- **Workflow Steps:** The workflow triggers on pull requests to `main` and includes jobs for:
+  - Checking out the repository.
+  - Setting up Node.js and pnpm.
+  - Installing dependencies.
+  - Running `typecheck`, `lint`, and `build` scripts across the monorepo.
+  - Building the Storybook for the `@maicle/ui` package.
+- **Outcome:** A baseline CI process is in place to validate code quality and build integrity for all future pull requests.
+
+## 0.9 Environment Documentation (completed)
+
+- **Created `ENVIRONMENT.md`:** Added a new file to document all required environment variables across different environments (Local, Preview, Staging, Production).
+- **Created `.env.example`:** Added a new file at the root to provide a template for local development, listing all required variables.
+- **Verified `.gitignore`:** Confirmed that `.env.*.local` is present in the root `.gitignore` file to prevent accidental commits of local secrets.
+- **Outcome:** The project now has clear documentation for environment variable management, fulfilling a key deliverable of Phase 0.
+
 ## Next Steps Summary:
 
-1.  Verify Storybook locally for `@maicle/ui` (`pnpm --filter @maicle/ui storybook`) and add a minimal placeholder story using autodocs + a11y.
-2.  Push branch and open a draft PR to start CI checks on the current Phase 0 progress.
-3.  Begin CI scaffolding: add baseline PR workflow (typecheck, lint, test, build; Storybook build optional) aligned with Phase 0 plan.
+1.  Commit all changes to the `feat/phase-0-setup` branch.
+2.  Push the branch to the remote repository.
+3.  Open a draft Pull Request to `main` to verify the CI workflow runs successfully.
+4.  Proceed with Vercel and Supabase setup as per the Phase 0 plan.
