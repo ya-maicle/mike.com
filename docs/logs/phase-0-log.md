@@ -74,12 +74,44 @@ Next planned step: Commit the current state of the repository to the `feat/phase
 
 ---
 
+## 0.5 Shared ESLint, TypeScript, Tailwind, and UI Package Scaffolding (completed)
+
+- **Initial Git Commit:** Committed all baseline files to `feat/phase-0-setup` branch.
+- **Configured Shared ESLint and TypeScript (`packages/config`):**
+  - Created `packages/config/package.json` for the `@maicle/config` workspace package.
+  - Created `packages/config/eslint/index.mjs` with a base ESLint configuration extending `next/core-web-vitals` and `next/typescript`.
+  - Created `packages/config/tsconfig/base.json` with a strict base TypeScript configuration.
+- **Integrated Shared Configs (`apps/web`):**
+  - Updated `apps/web/eslint.config.mjs` to extend `@maicle/config/eslint`.
+  - Updated `apps/web/tsconfig.json` to extend `@maicle/config/tsconfig/base`.
+  - Added `@maicle/config` and `@maicle/ui` as workspace dependencies in `apps/web/package.json`.
+- **Configured Tailwind CSS for Design Tokens:**
+  - Created `packages/ui/styles/tokens.css` with core CSS variables for colors, radii, and spacing.
+  - Updated `apps/web/src/app/globals.css` to import `@maicle/ui/styles/tokens.css` and map the CSS variables to Tailwind's `@theme inline` directive.
+- **Scaffolded `packages/ui`:**
+  - Created `packages/ui/package.json` for the `@maicle/ui` workspace package.
+  - Created `packages/ui/tsconfig.json` extending `@maicle/config/tsconfig/base`.
+  - Created `packages/ui/.storybook/main.ts` for Storybook setup.
+
+Next planned step: Install Storybook dependencies, create UI source directory, run root `pnpm install`, update build log, and commit changes.
+
+---
+
+## 0.6 UI Storybook dependencies and src scaffolding (completed)
+
+- Installed Storybook devDependencies in `packages/ui`:
+  - `storybook`, `@storybook/react-vite`, `@storybook/addon-essentials`, `@storybook/addon-interactions`, `@storybook/addon-a11y`, `@storybook/test`, plus `vite` and type packages.
+- Created `packages/ui/src` with an `index.ts` entrypoint (skeleton export) to enable TS builds.
+- Ran `pnpm install` at repo root to link and install workspace dependencies.
+  - Notes: peer dependency warnings observed (eslint 9 vs. some plugins expecting 8; tailwindcss peer warning from eslint-plugin-tailwindcss). Will address during linting config consolidation in a later step.
+- Outcome: `@maicle/ui` Storybook baseline is in place with required dev dependencies; the UI package has a proper `src` entry and can be built.
+
+Next planned step: Verify Storybook runs locally and add a placeholder story to validate Docs and a11y addons.
+
+---
+
 ## Next Steps Summary:
 
-1.  **Initial Git Commit:** Commit all the newly created and modified files to the `feat/phase-0-setup` branch.
-2.  **Configure Shared ESLint and TypeScript:** Set up shared ESLint and TypeScript configurations in `packages/config`.
-3.  **Integrate Shared Configs:** Update `apps/web` to utilize these new shared configurations.
-4.  **Configure Tailwind CSS:** Adjust Tailwind CSS in `apps/web` for design tokens using CSS variables.
-5.  **Scaffold `packages/ui`:** Create the basic structure for the `packages/ui` design system, including `package.json`, `tsconfig.json`, and Storybook setup.
-6.  **Update Build Log (again):** Document these configuration steps in `docs/logs/phase-0-log.md`.
-7.  **Commit Configuration Changes:** Commit these configuration changes to the `feat/phase-0-setup` branch.
+1.  Verify Storybook locally for `@maicle/ui` (`pnpm --filter @maicle/ui storybook`) and add a minimal placeholder story using autodocs + a11y.
+2.  Push branch and open a draft PR to start CI checks on the current Phase 0 progress.
+3.  Begin CI scaffolding: add baseline PR workflow (typecheck, lint, test, build; Storybook build optional) aligned with Phase 0 plan.
