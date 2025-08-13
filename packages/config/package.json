@@ -1,0 +1,16 @@
+{
+  "name": "@maicle/config",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./eslint": "./eslint/index.mjs",
+    "./tsconfig/base": "./tsconfig/base.json"
+  },
+  "peerDependencies": {
+    "@eslint/eslintrc": "^3.0.0",
+    "eslint": ">=8.57.0",
+    "eslint-config-next": "^15.0.0",
+    "typescript": ">=5.0.0"
+  }
+}

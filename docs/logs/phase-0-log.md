@@ -74,12 +74,80 @@ Next planned step: Commit the current state of the repository to the `feat/phase
 
 ---
 
+## 0.5 Shared ESLint, TypeScript, Tailwind, and UI Package Scaffolding (completed)
+
+- **Initial Git Commit:** Committed all baseline files to `feat/phase-0-setup` branch.
+- **Configured Shared ESLint and TypeScript (`packages/config`):**
+  - Created `packages/config/package.json` for the `@maicle/config` workspace package.
+  - Created `packages/config/eslint/index.mjs` with a base ESLint configuration extending `next/core-web-vitals` and `next/typescript`.
+  - Created `packages/config/tsconfig/base.json` with a strict base TypeScript configuration.
+- **Integrated Shared Configs (`apps/web`):**
+  - Updated `apps/web/eslint.config.mjs` to extend `@maicle/config/eslint`.
+  - Updated `apps/web/tsconfig.json` to extend `@maicle/config/tsconfig/base`.
+  - Added `@maicle/config` and `@maicle/ui` as workspace dependencies in `apps/web/package.json`.
+- **Configured Tailwind CSS for Design Tokens:**
+  - Created `packages/ui/styles/tokens.css` with core CSS variables for colors, radii, and spacing.
+  - Updated `apps/web/src/app/globals.css` to import `@maicle/ui/styles/tokens.css` and map the CSS variables to Tailwind's `@theme inline` directive.
+- **Scaffolded `packages/ui`:**
+  - Created `packages/ui/package.json` for the `@maicle/ui` workspace package.
+  - Created `packages/ui/tsconfig.json` extending `@maicle/config/tsconfig/base`.
+  - Created `packages/ui/.storybook/main.ts` for Storybook setup.
+
+Next planned step: Install Storybook dependencies, create UI source directory, run root `pnpm install`, update build log, and commit changes.
+
+---
+
+## 0.6 UI Storybook dependencies and src scaffolding (completed)
+
+- Installed Storybook devDependencies in `packages/ui`:
+  - `storybook`, `@storybook/react-vite`, `@storybook/addon-essentials`, `@storybook/addon-interactions`, `@storybook/addon-a11y`, `@storybook/test`, plus `vite` and type packages.
+- Created `packages/ui/src` with an `index.ts` entrypoint (skeleton export) to enable TS builds.
+- Ran `pnpm install` at repo root to link and install workspace dependencies.
+  - Notes: peer dependency warnings observed (eslint 9 vs. some plugins expecting 8; tailwindcss peer warning from eslint-plugin-tailwindcss). Will address during linting config consolidation in a later step.
+- Outcome: `@maicle/ui` Storybook baseline is in place with required dev dependencies; the UI package has a proper `src` entry and can be built.
+
+Next planned step: Verify Storybook runs locally and add a placeholder story to validate Docs and a11y addons.
+
+---
+
+## 0.7 Storybook Verification and Placeholder Component (completed)
+
+- **Added Placeholder Button Component:** Created a basic, unstyled `Button` component in `packages/ui/src/components/Button.tsx` to serve as a test case for Storybook.
+- **Added Button Story:** Created `packages/ui/src/components/Button.stories.tsx` with primary and secondary variants to test Storybook's autodocs and a11y addons.
+- **Configured Storybook:**
+  - Created `packages/ui/.storybook/preview.ts` to import global token styles and configure addon parameters.
+  - Updated `packages/ui/tsconfig.json` to include `react-jsx` and `node` types, resolving build errors.
+  - Added `@storybook/react` and `@types/node` as dev dependencies to `packages/ui`.
+- **Verified Build:** Ran `pnpm --filter @maicle/ui build-storybook` and confirmed that the Storybook static build completes successfully.
+- **Outcome:** Storybook is correctly configured for the `@maicle/ui` package, and the build process is verified.
+
+## 0.8 CI Workflow Scaffolding (completed)
+
+- **Created PR Workflow:** Added a new GitHub Actions workflow at `.github/workflows/pr.yml`.
+- **Workflow Steps:** The workflow triggers on pull requests to `main` and includes jobs for:
+  - Checking out the repository.
+  - Setting up Node.js and pnpm.
+  - Installing dependencies.
+  - Running `typecheck`, `lint`, and `build` scripts across the monorepo.
+  - Building the Storybook for the `@maicle/ui` package.
+- **Outcome:** A baseline CI process is in place to validate code quality and build integrity for all future pull requests.
+
+## 0.9 Environment Documentation (completed)
+
+- **Created `ENVIRONMENT.md`:** Added a new file to document all required environment variables across different environments (Local, Preview, Staging, Production).
+- **Created `.env.example`:** Added a new file at the root to provide a template for local development, listing all required variables.
+- **Verified `.gitignore`:** Confirmed that `.env.*.local` is present in the root `.gitignore` file to prevent accidental commits of local secrets.
+- **Outcome:** The project now has clear documentation for environment variable management, fulfilling a key deliverable of Phase 0.
+
+## 0.10 Git Remote Push & PR Readiness (completed)
+
+- **Committed All Changes:** All work from steps 0.5 to 0.9 was committed into logical, conventional commits on the `feat/phase-0-setup` branch.
+- **Pushed to Remote:** Added the GitHub remote `origin` (`https://github.com/ya-maicle/mike.com.git`) and pushed the `feat/phase-0-setup` branch successfully.
+- **Outcome:** The local repository is now synced with the remote, and the project is ready for its first pull request to verify the CI pipeline.
+
 ## Next Steps Summary:
 
-1.  **Initial Git Commit:** Commit all the newly created and modified files to the `feat/phase-0-setup` branch.
-2.  **Configure Shared ESLint and TypeScript:** Set up shared ESLint and TypeScript configurations in `packages/config`.
-3.  **Integrate Shared Configs:** Update `apps/web` to utilize these new shared configurations.
-4.  **Configure Tailwind CSS:** Adjust Tailwind CSS in `apps/web` for design tokens using CSS variables.
-5.  **Scaffold `packages/ui`:** Create the basic structure for the `packages/ui` design system, including `package.json`, `tsconfig.json`, and Storybook setup.
-6.  **Update Build Log (again):** Document these configuration steps in `docs/logs/phase-0-log.md`.
-7.  **Commit Configuration Changes:** Commit these configuration changes to the `feat/phase-0-setup` branch.
+1.  **Open a draft Pull Request** from `feat/phase-0-setup` to `main` on GitHub to verify the CI workflow runs as expected.
+2.  **Set up Vercel Project:** Create a new project on Vercel, connect it to the GitHub repository, and configure the domains (`maicle.co.uk` and `staging.maicle.co.uk`).
+3.  **Set up Supabase Projects:** Create two projects on Supabase (`maicle-staging` and `maicle-prod`) and retrieve the API URL and anon keys.
+4.  **Configure Local Supabase CLI:** Use the project credentials to link the local environment to the remote Supabase projects and prepare for database migrations.
