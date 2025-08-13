@@ -139,9 +139,15 @@ Next planned step: Verify Storybook runs locally and add a placeholder story to 
 - **Verified `.gitignore`:** Confirmed that `.env.*.local` is present in the root `.gitignore` file to prevent accidental commits of local secrets.
 - **Outcome:** The project now has clear documentation for environment variable management, fulfilling a key deliverable of Phase 0.
 
+## 0.10 Git Remote Push & PR Readiness (completed)
+
+- **Committed All Changes:** All work from steps 0.5 to 0.9 was committed into logical, conventional commits on the `feat/phase-0-setup` branch.
+- **Pushed to Remote:** Added the GitHub remote `origin` (`https://github.com/ya-maicle/mike.com.git`) and pushed the `feat/phase-0-setup` branch successfully.
+- **Outcome:** The local repository is now synced with the remote, and the project is ready for its first pull request to verify the CI pipeline.
+
 ## Next Steps Summary:
 
-1.  Commit all changes to the `feat/phase-0-setup` branch.
-2.  Push the branch to the remote repository.
-3.  Open a draft Pull Request to `main` to verify the CI workflow runs successfully.
-4.  Proceed with Vercel and Supabase setup as per the Phase 0 plan.
+1.  **Open a draft Pull Request** from `feat/phase-0-setup` to `main` on GitHub to verify the CI workflow runs as expected.
+2.  **Set up Vercel Project:** Create a new project on Vercel, connect it to the GitHub repository, and configure the domains (`maicle.co.uk` and `staging.maicle.co.uk`).
+3.  **Set up Supabase Projects:** Create two projects on Supabase (`maicle-staging` and `maicle-prod`) and retrieve the API URL and anon keys.
+4.  **Configure Local Supabase CLI:** Use the project credentials to link the local environment to the remote Supabase projects and prepare for database migrations.
