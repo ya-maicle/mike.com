@@ -18,8 +18,11 @@ Prereqs: Node LTS (≥18), pnpm, Git. Optional CLIs for later phases: Vercel, Su
 
 Bootstrap:
 
-- pnpm i
-- pnpm dev (after apps/web is created)
+- `pnpm i`
+- `pnpm db:start` (runs local Supabase in Docker)
+- `pnpm dev`
+
+See `supabase/README.md` for detailed instructions on setting up the Supabase CLI, linking to remote projects, and managing database migrations.
 
 ## Git & CI
 
