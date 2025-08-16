@@ -31,3 +31,51 @@ See `supabase/README.md` for detailed instructions on setting up the Supabase CL
 - main deploys to staging; manual promotion to production.
 
 See PRD for detailed environments and pipelines.
+
+## 🚀 Deployment & Operations
+
+### Domain Model
+
+- **staging.mikeiu.com**: Automatically deploys latest `main` branch
+- **mikeiu.com**: Manual promotion from staging required
+
+### Main Pipeline
+
+Push to `main` triggers:
+
+1. Quality checks (typecheck, lint, build)
+2. Deploy to staging with database migrations
+3. Run smoke tests against staging
+4. Manual approval gate for production
+5. Promote same build to production
+
+### Quick Commands
+
+```bash
+# Local development
+pnpm dev                    # Start development server
+pnpm build                  # Build all packages
+pnpm typecheck              # Run TypeScript checks
+pnpm lint                   # Run ESLint
+
+# Database operations
+pnpm db:start              # Start local Supabase
+pnpm db:stop               # Stop local Supabase
+pnpm db:reset              # Reset local database
+
+# Testing (placeholders)
+pnpm e2e:smoke             # Run smoke tests locally
+pnpm e2e:smoke:ci          # Run smoke tests in CI
+```
+
+### Manual Operations
+
+- **Trigger deployment**: Push to `main` or use GitHub Actions UI
+- **Approve production**: Review and approve in GitHub Actions workflow
+- **Emergency rollback**: See [docs/operations/deployment-rollback.md](docs/operations/deployment-rollback.md)
+
+### Documentation
+
+- [Deployment Pipeline](docs/operations/deployment-pipeline.md) - Complete pipeline documentation
+- [Phase 0 Log](docs/logs/phase-0-log.md) - Infrastructure setup history
+- [PRD](docs/product_requirements_document.md) - Complete product requirements

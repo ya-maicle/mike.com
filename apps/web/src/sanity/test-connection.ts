@@ -2,7 +2,7 @@ import { createClient } from 'next-sanity'
 import { config } from 'dotenv'
 
 // Load environment variables from .env.local
-config({ path: '.env.local' })
+config({ path: '../../.env.local' })
 
 export async function testSanityConnection(): Promise<boolean> {
   try {

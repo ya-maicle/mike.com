@@ -1,0 +1,23 @@
+# GitHub Environment Configuration for Production
+# This file documents the production environment requirements
+# Note: GitHub environments must be configured via the GitHub UI/API, not via files
+
+name: production
+description: "Production environment for mikeiu.com"
+
+# Protection rules (configure via GitHub UI):
+# - Required reviewers: 1
+# - Deployment branches: main only  
+# - Environment secrets required:
+#   - VERCEL_TOKEN
+#   - VERCEL_ORG_ID
+#   - VERCEL_PROJECT_ID
+#   - SUPABASE_ACCESS_TOKEN
+#   - SUPABASE_PROD_PROJECT_REF
+
+# Manual approval gate configuration:
+# 1. Go to repository Settings > Environments
+# 2. Create 'production' environment
+# 3. Add required reviewers
+# 4. Configure deployment branch restrictions
+# 5. Add environment secrets

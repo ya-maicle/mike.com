@@ -16,6 +16,8 @@
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
+    "e2e:smoke": "echo 'Smoke tests not yet implemented - placeholder for pipeline'",
+    "e2e:smoke:ci": "echo 'Smoke tests not yet implemented - placeholder for pipeline'",
     "db:start": "pnpm exec supabase start",
     "db:stop": "pnpm exec supabase stop",
     "db:reset": "pnpm exec supabase reset --no-backup --force",
