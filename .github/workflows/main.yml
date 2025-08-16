@@ -95,8 +95,8 @@ jobs:
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
-  staging-validation:
-    name: "Validate Staging"
+  smoke-tests:
+    name: "Run Staging Smoke Tests"
     runs-on: ubuntu-latest
     needs: staging-deployment
     steps:
@@ -116,7 +116,7 @@ jobs:
         run: pnpm install
 
       - name: Install Playwright browsers
-        run: pnpm exec playwright install chromium
+        run: pnpm exec playwright install --with-deps chromium
 
       - name: Wait for staging deployment
         run: |
@@ -146,7 +146,7 @@ jobs:
   production-promotion:
     name: "Promote to Production"
     runs-on: ubuntu-latest
-    needs: staging-validation
+    needs: smoke-tests
     environment: production
     steps:
       - name: Install Vercel CLI
