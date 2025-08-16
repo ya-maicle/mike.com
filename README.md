@@ -66,16 +66,51 @@ pnpm db:reset              # Reset local database
 # Testing (placeholders)
 pnpm e2e:smoke             # Run smoke tests locally
 pnpm e2e:smoke:ci          # Run smoke tests in CI
+
+# Health checks and verification
+./scripts/health-check.sh   # Quick health check (both domains)
+./scripts/verify-domains.sh # Comprehensive domain verification
 ```
+
+### Post-Deploy Health Checks
+
+After any deployment, verify service health:
+
+```bash
+# Quick health check
+./scripts/health-check.sh
+
+# Manual verification
+curl https://mikeiu.com/api/health
+curl https://staging.mikeiu.com/api/health
+
+# Expected response:
+# {"status":"ok","service":"web","timestamp":"2025-08-16T11:38:43.571Z"}
+```
+
+### Emergency Rollback
+
+If production issues are detected:
+
+1. Go to [Vercel dashboard](https://vercel.com/mikeiu-com/mike-com-web) → Deployments
+2. Find last stable deployment (marked "Production")
+3. Click "Promote to Production"
+4. Verify with `./scripts/health-check.sh`
+
+For detailed procedures, see [docs/operations/deployment-rollback.md](docs/operations/deployment-rollback.md)
 
 ### Manual Operations
 
 - **Trigger deployment**: Push to `main` or use GitHub Actions UI
 - **Approve production**: Review and approve in GitHub Actions workflow
-- **Emergency rollback**: See [docs/operations/deployment-rollback.md](docs/operations/deployment-rollback.md)
+- **Health monitoring**: Use automated scripts for regular verification
+- **Domain verification**: Run domain checks after DNS or configuration changes
 
-### Documentation
+### Operational Documentation
 
+- [Health Checks](docs/operations/health-checks.md) - Health monitoring procedures
+- [Deployment Rollback](docs/operations/deployment-rollback.md) - Emergency rollback procedures
+- [Domain Verification](docs/operations/domain-verification.md) - DNS and SSL verification
 - [Deployment Pipeline](docs/operations/deployment-pipeline.md) - Complete pipeline documentation
 - [Phase 0 Log](docs/logs/phase-0-log.md) - Infrastructure setup history
 - [PRD](docs/product_requirements_document.md) - Complete product requirements
