@@ -16,8 +16,10 @@
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
-    "e2e:smoke": "echo 'Smoke tests not yet implemented - placeholder for pipeline'",
-    "e2e:smoke:ci": "echo 'Smoke tests not yet implemented - placeholder for pipeline'",
+    "e2e:install-browsers": "playwright install --with-deps chromium",
+    "e2e:smoke": "playwright test --config=playwright.config.ts",
+    "e2e:smoke:debug": "PWDEBUG=1 playwright test --config=playwright.config.ts",
+    "e2e:smoke:ci": "playwright test --config=playwright.config.ts --reporter=html",
     "db:start": "pnpm exec supabase start",
     "db:stop": "pnpm exec supabase stop",
     "db:reset": "pnpm exec supabase reset --no-backup --force",
@@ -43,6 +45,7 @@
     "lint-staged": "^15.2.9",
     "prettier": "^3.3.3",
     "supabase": "^1.183.5",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "@playwright/test": "^1.49.0"
   }
 }
