@@ -1,0 +1,13 @@
+# CODEOWNERS
+# Docs: https://docs.github.com/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+# Purpose: Auto-request reviews and establish ownership for critical areas.
+# Note: Solo-maintainer repo — entries still help future-proof and keep governance explicit.
+
+/apps/web/*           @ya-maicle
+/packages/ui/*        @ya-maicle
+/supabase/*           @ya-maicle
+/.github/workflows/*  @ya-maicle
+/.github/*            @ya-maicle
+
+# Fallback owner for everything else
+*                     @ya-maicle

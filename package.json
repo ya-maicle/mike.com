@@ -2,6 +2,11 @@
   "name": "maicle-co-monorepo",
   "private": true,
   "packageManager": "pnpm@10.6.5",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "supabase"
+    ]
+  },
   "engines": {
     "node": ">=18"
   },
@@ -11,6 +16,14 @@
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
+    "e2e:smoke": "echo 'Smoke tests not yet implemented - placeholder for pipeline'",
+    "e2e:smoke:ci": "echo 'Smoke tests not yet implemented - placeholder for pipeline'",
+    "db:start": "pnpm exec supabase start",
+    "db:stop": "pnpm exec supabase stop",
+    "db:reset": "pnpm exec supabase reset --no-backup --force",
+    "db:diff": "sh -c 'mkdir -p supabase/migrations && pnpm exec supabase db diff --use-migra --file supabase/migrations/$(date -u +%Y%m%d%H%M%S)_schema.sql'",
+    "db:link:staging": "dotenv -e .env.local -- sh -c 'test -n \"$SUPABASE_STAGING_PROJECT_REF\" && pnpm exec supabase link --project-ref $SUPABASE_STAGING_PROJECT_REF || (echo \"Missing SUPABASE_STAGING_PROJECT_REF\" && exit 1)'",
+    "db:link:prod": "dotenv -e .env.local -- sh -c 'test -n \"$SUPABASE_PROD_PROJECT_REF\" && pnpm exec supabase link --project-ref $SUPABASE_PROD_PROJECT_REF || (echo \"Missing SUPABASE_PROD_PROJECT_REF\" && exit 1)'",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -19,15 +32,17 @@
     ]
   },
   "devDependencies": {
-    "typescript": "^5.5.4",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "dotenv-cli": "^10.0.0",
     "eslint": "^9.8.0",
-    "@typescript-eslint/eslint-plugin": "^8.0.0",
-    "@typescript-eslint/parser": "^8.0.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-tailwindcss": "^3.18.0",
     "husky": "^9.1.6",
     "lint-staged": "^15.2.9",
-    "prettier": "^3.3.3"
+    "prettier": "^3.3.3",
+    "supabase": "^1.183.5",
+    "typescript": "^5.5.4"
   }
 }
