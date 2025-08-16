@@ -1,18 +1,28 @@
-# Supabase Setup (Phase 0)
+# Supabase Database Management
 
-This folder holds local database tooling and versioned SQL migrations for Supabase (Postgres + Auth).
+This folder holds local database tooling and versioned SQL migrations for Supabase (Postgres + Auth) across our two-environment deployment model.
 
-Phase 0 goals:
+## Environment Architecture
 
-- Run Supabase locally for development (`supabase start`)
-- Version schema changes under `supabase/migrations/`
-- Prepare to link local CLI to remote staging/production projects (created in Supabase Dashboard)
-- Seed Vercel Environment Variables with Supabase credentials per environment
+| Environment     | Database Project | Project Reference      | Purpose                                 |
+| --------------- | ---------------- | ---------------------- | --------------------------------------- |
+| **Development** | mike-staging     | `qijxfigergpnuqbaxtjv` | Local development + Preview deployments |
+| **Production**  | mike-prod        | `pzgczflyltjyxwqyteuj` | Live production application             |
 
-Important:
+## Migration Workflow
 
-- Do NOT commit secrets. Only commit SQL migrations and non-secret config.
-- Service role keys are server-only; never expose to the client or commit to the repo.
+```
+Local Development → Staging (CI) → Production (Manual Promotion)
+     ↓                   ↓                    ↓
+Docker Supabase    mike-staging         mike-prod
+(Schema changes)   (Auto migration)     (Same migration)
+```
+
+**Security Principles:**
+
+- ✅ Only commit SQL migrations and non-secret config
+- ❌ Never commit secrets, service role keys, or passwords
+- ✅ All remote migrations executed via CI/CD, not manually
 
 ---
 
@@ -30,24 +40,25 @@ If you prefer not to install globally, see: https://supabase.com/docs/guides/cli
 
 ---
 
-## 2) Create remote projects (Dashboard)
+## 2) Remote Projects (Already Created)
 
-Create two managed projects in the Supabase Dashboard:
+Two managed projects exist in the Supabase Dashboard:
 
-- maicle-staging (EU/UK region recommended)
-- maicle-prod (same region as staging)
+| Project         | Name         | Reference              | Region  | Status    |
+| --------------- | ------------ | ---------------------- | ------- | --------- |
+| **Development** | mike-staging | `qijxfigergpnuqbaxtjv` | EU West | ✅ Active |
+| **Production**  | mike-prod    | `pzgczflyltjyxwqyteuj` | EU West | ✅ Active |
 
-For each project, record:
+**Credentials Location:**
 
-- Project Reference (Settings → API → Project Reference)
-- API URL (Settings → API → URL)
-- anon (public) key (Settings → API → anon key)
-- service_role key (Settings → API → service_role key — server-only)
+- 🔒 API URLs, anon keys, service role keys stored in Vercel environment variables
+- 🔒 Project references stored in GitHub repository secrets (for CI/CD)
+- 🔒 Local project references in `.env.local` (for CLI linking)
 
-These values will be used to:
+**Usage:**
 
-- Link the CLI to each project (via Project Reference)
-- Seed Vercel environment variables (URL + keys)
+- **mike-staging**: Used by preview deployments and local CLI linking
+- **mike-prod**: Used by production deployments only
 
 ---
 
@@ -67,94 +78,374 @@ Notes:
 
 ---
 
-## 4) Migrations workflow
+## 4) Migration Workflow
+
+### Available Scripts
 
 Use these npm scripts from the repo root (see package.json):
 
-- pnpm db:start
-  Starts local Supabase (same as `supabase start`).
+| Script                 | Command                      | Purpose                                |
+| ---------------------- | ---------------------------- | -------------------------------------- |
+| `pnpm db:start`        | `supabase start`             | Start local Supabase Docker containers |
+| `pnpm db:stop`         | `supabase stop`              | Stop local Supabase services           |
+| `pnpm db:reset`        | `supabase reset`             | Reset local DB (⚠️ destroys data)      |
+| `pnpm db:diff`         | `supabase db diff`           | Generate migration from schema changes |
+| `pnpm db:link:staging` | Link to mike-staging project | For testing migrations remotely        |
+| `pnpm db:link:prod`    | Link to mike-prod project    | For emergency operations only          |
 
-- pnpm db:stop
-  Stops local Supabase (`supabase stop`).
+### Local Development Workflow
 
-- pnpm db:reset
-  Resets local DB (drops data; no backup). Use sparingly.
+**Step-by-step process for schema changes:**
 
-- pnpm db:diff
-  Creates a new timestamped SQL migration file under `supabase/migrations/` based on differences between your local DB and current migrations.
+1. **Start Local Environment**
 
-Handy flow:
+   ```bash
+   pnpm db:start
+   # Access Supabase Studio at http://localhost:54323
+   ```
 
-1. Start local: `pnpm db:start`
-2. Apply any pending migrations automatically on start (CLI manages this)
-3. Make schema changes locally (e.g., via SQL or psql)
-4. Generate migration: `pnpm db:diff`
-5. Commit the new migration file
+2. **Make Schema Changes**
+   - Use Supabase Studio UI for table/column creation
+   - Or connect directly with psql/SQL client
+   - Or write raw SQL in Studio SQL editor
+
+3. **Generate Migration**
+
+   ```bash
+   pnpm db:diff
+   # Creates timestamped migration file in supabase/migrations/
+   ```
+
+4. **Review and Test Migration**
+
+   ```bash
+   # Reset local DB to test migration from scratch
+   pnpm db:reset
+   pnpm db:start
+   # Verify migration applies cleanly
+   ```
+
+5. **Commit Migration**
+   ```bash
+   git add supabase/migrations/
+   git commit -m "feat(db): add user_profiles table"
+   ```
+
+### CI/CD Migration Workflow
+
+**Automatic process when code is pushed:**
+
+#### Staging Deployment (Automatic)
+
+When code is pushed to `main` branch:
+
+1. **Quality Checks**: TypeScript, linting, tests pass
+2. **Migration to Staging**:
+   ```bash
+   # GitHub Actions runs:
+   supabase link --project-ref qijxfigergpnuqbaxtjv
+   supabase db push --dry-run  # Validate first
+   supabase db push            # Apply to mike-staging
+   ```
+3. **Deployment**: Vercel deploys to preview with staging database
+4. **Smoke Tests**: Verify application works with new schema
+5. **Approval Gate**: Manual approval required for production
+
+#### Production Promotion (Manual)
+
+After manual approval:
+
+1. **Same Migration Applied**: Identical migration runs against mike-prod
+2. **Zero-Downtime**: Same tested artifacts promoted
+3. **Health Checks**: Verify production application functionality
+
+### Migration Safety Rules
+
+#### ✅ Safe Operations (OK for production)
+
+- Adding new tables
+- Adding new columns (with defaults)
+- Adding indexes
+- Creating new functions/triggers
+- Adding constraints that don't conflict with existing data
+
+#### ⚠️ Dangerous Operations (Requires careful planning)
+
+- Renaming columns/tables
+- Dropping columns/tables
+- Changing column types
+- Adding constraints that might fail on existing data
+
+#### 🚫 Emergency Procedures
+
+If a migration breaks production:
+
+1. **Immediate Rollback**: Revert deployment in Vercel
+2. **Database Rollback**: Apply compensating migration
+3. **Fix and Redeploy**: Create fix migration and redeploy
+
+### Remote Migration Commands (Manual Override)
+
+⚠️ **Use only in emergencies** when CI/CD is unavailable:
+
+```bash
+# Link to staging project
+pnpm db:link:staging
+
+# Apply migration manually to staging
+supabase db push --dry-run  # Always dry-run first
+supabase db push
+
+# Link to production project (EMERGENCY ONLY)
+pnpm db:link:prod
+supabase db push --dry-run
+supabase db push
+```
+
+**Security Note**: Manual production migrations should be avoided. Always use CI/CD pipeline for consistency and safety.
 
 ---
 
-## 5) Link CLI to remote projects
+## 5) Link CLI to Remote Projects
 
-Export your project refs (from Dashboard → Settings → API):
+### Prerequisites
 
-- export SUPABASE_STAGING_PROJECT_REF=<your-staging-project-ref>
-- export SUPABASE_PROD_PROJECT_REF=<your-prod-project-ref>
+Ensure you have project references in your `.env.local` file:
 
-Then link:
+```bash
+# These should already be in your .env.local from vercel env pull
+SUPABASE_STAGING_PROJECT_REF=qijxfigergpnuqbaxtjv
+SUPABASE_PROD_PROJECT_REF=pzgczflyltjyxwqyteuj
+```
 
-- pnpm db:link:staging
-- pnpm db:link:prod
+### Linking Commands
 
-This stores the remote link in your local `.supabase` config for future CLI operations (no secrets committed).
+Link your local CLI to remote projects for testing and emergency operations:
 
-Important:
+```bash
+# Link to staging project (for migration testing)
+pnpm db:link:staging
 
-- Migrations to managed environments will be executed by CI (Phase 0/1), not manually from laptops.
+# Link to production project (emergency use only)
+pnpm db:link:prod
+```
 
----
+### What Linking Does
 
-## 6) Vercel environment variables
+- ✅ Stores remote project configuration in local `.supabase/` directory
+- ✅ Enables `supabase db push` to apply migrations remotely
+- ✅ Allows `supabase db pull` to sync schema from remote
+- ❌ Does NOT commit any secrets to repository
 
-Set these per environment in the Vercel project (Development, Preview, Production):
+### When to Use Manual Linking
 
-Client (safe to expose):
+| Scenario              | Command                | Purpose                                       |
+| --------------------- | ---------------------- | --------------------------------------------- |
+| **Migration Testing** | `pnpm db:link:staging` | Test migrations against staging before CI/CD  |
+| **Schema Sync**       | `supabase db pull`     | Sync remote schema to local development       |
+| **Emergency Fix**     | `pnpm db:link:prod`    | Apply hotfix migration when CI/CD unavailable |
 
-- NEXT_PUBLIC_SUPABASE_URL
-- NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-Server-only:
-
-- SUPABASE_SERVICE_ROLE_KEY
-- DATABASE_URL (optional; if you need a direct connection string for server jobs)
-
-Recommended mapping:
-
-- Local (Development): local URL/keys from `supabase start` or pulled via `vercel env pull`
-- Preview (PRs): use staging URL/key to share a common schema
-- Staging: staging project
-- Production: production project
-
-After seeding Vercel:
-
-- Pull local envs with `vercel env pull .env.local` (do not commit `.env.local`)
+**⚠️ Important**: Production migrations should normally go through CI/CD pipeline, not manual linking.
 
 ---
 
-## 7) Security and RLS baseline
+## 6) Environment Variables Configuration
 
-- Phase 0: keep schema simple, prepare the pipeline. RLS deny-all will be enforced in Phase 1 when tables exist.
-- Never place service_role or DATABASE_URL in client-exposed variables.
-- Treat each environment (staging/production) as separate credentials; never reuse across envs.
+### Current State (✅ Already Configured)
+
+Vercel environment variables are already set up for the two-environment model:
+
+| Variable                        | Development (Preview)    | Production            | Notes           |
+| ------------------------------- | ------------------------ | --------------------- | --------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`      | mike-staging URL         | mike-prod URL         | Client-safe     |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | mike-staging anon key    | mike-prod anon key    | Client-safe     |
+| `SUPABASE_SERVICE_ROLE_KEY`     | mike-staging service key | mike-prod service key | **Server-only** |
+| `DATABASE_URL`                  | mike-staging DB URL      | mike-prod DB URL      | **Server-only** |
+
+### Local Development Setup
+
+Pull environment variables for local development:
+
+```bash
+# Pull Vercel environment variables to .env.local
+vercel env pull
+
+# Verify you have the required variables
+grep SUPABASE .env.local
+```
+
+Your `.env.local` should contain:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=http://localhost:54321  # Local Docker
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<local-anon-key>  # From local Docker
+SUPABASE_SERVICE_ROLE_KEY=<local-service-key>   # From local Docker
+SUPABASE_STAGING_PROJECT_REF=qijxfigergpnuqbaxtjv
+SUPABASE_PROD_PROJECT_REF=pzgczflyltjyxwqyteuj
+```
+
+### Environment Mapping Summary
+
+```
+┌─────────────────┬──────────────────┬──────────────────┐
+│   Environment   │    Database      │     Dataset      │
+├─────────────────┼──────────────────┼──────────────────┤
+│ Local           │ Docker Supabase  │ development      │
+│ Preview (PRs)   │ mike-staging     │ development      │
+│ Production      │ mike-prod        │ production       │
+└─────────────────┴──────────────────┴──────────────────┘
+```
+
+---
+
+## 7) Security and RLS Guidelines
+
+### Current Security Status
+
+- ✅ **Environment Separation**: Staging and production use separate databases
+- ✅ **Secret Management**: All credentials stored in Vercel, not in repository
+- ✅ **CI/CD Security**: Migrations applied via secure GitHub Actions
+- ⏳ **RLS Implementation**: To be implemented in Phase 1 when tables are created
+
+### Security Rules
+
+#### ✅ Always Do
+
+- Use separate credentials for each environment
+- Store service role keys server-side only
+- Apply migrations via CI/CD pipeline
+- Test RLS policies in staging before production
+- Use `anon` role for client-side database access
+
+#### ❌ Never Do
+
+- Commit secrets, passwords, or service keys to repository
+- Use production credentials in development/staging
+- Expose `service_role` key to client-side code
+- Apply production migrations manually without testing
+- Share database credentials between environments
+
+### RLS Implementation (Phase 1)
+
+When implementing Row Level Security:
+
+1. **Default Deny**: Start with deny-all policies
+2. **Test in Staging**: Verify policies work with real data
+3. **Gradual Rollout**: Enable RLS table by table
+4. **Monitor**: Watch for permission errors after deployment
+
+```sql
+-- Example RLS policy (Phase 1)
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own profile" ON profiles
+    FOR SELECT USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own profile" ON profiles
+    FOR UPDATE USING (auth.uid() = user_id);
+```
 
 ---
 
 ## 8) Troubleshooting
 
-- supabase: command not found
-  Install the CLI (see Section 1) and ensure your shell PATH includes Homebrew binary paths.
+### Common Issues
 
-- Docker not running
-  The CLI needs Docker for `supabase start`. Start Docker Desktop first.
+#### `supabase: command not found`
 
-- Migrations not detected
-  Ensure you generated a migration file with `pnpm db:diff` and committed it under `supabase/migrations/`.
+**Cause**: CLI not installed or not in PATH  
+**Solution**:
+
+```bash
+# Install via Homebrew (macOS)
+brew install supabase/tap/supabase
+
+# Verify installation
+supabase --version
+```
+
+#### `Docker not running` / `Cannot connect to Docker daemon`
+
+**Cause**: Docker Desktop not started  
+**Solution**:
+
+```bash
+# Start Docker Desktop application
+# Then retry:
+pnpm db:start
+```
+
+#### `No migrations found` / `Migrations not detected`
+
+**Cause**: No migration files generated or committed  
+**Solution**:
+
+```bash
+# Generate migration from schema changes
+pnpm db:diff
+
+# Commit the migration file
+git add supabase/migrations/
+git commit -m "feat(db): add new migration"
+```
+
+#### `Link project failed` / `Invalid project reference`
+
+**Cause**: Missing or incorrect project references  
+**Solution**:
+
+```bash
+# Verify project references in .env.local
+grep SUPABASE_.*_PROJECT_REF .env.local
+
+# Should show:
+# SUPABASE_STAGING_PROJECT_REF=qijxfigergpnuqbaxtjv
+# SUPABASE_PROD_PROJECT_REF=pzgczflyltjyxwqyteuj
+```
+
+#### `Permission denied` / `Unauthorized access`
+
+**Cause**: Incorrect access token or project permissions  
+**Solution**:
+
+1. Verify Supabase access token in GitHub secrets
+2. Check project permissions in Supabase dashboard
+3. Ensure token has access to both mike-staging and mike-prod projects
+
+#### `Migration failed` / `Schema conflict`
+
+**Cause**: Migration conflicts with existing schema  
+**Solution**:
+
+```bash
+# Test migration locally first
+pnpm db:reset
+pnpm db:start
+# Verify migration applies cleanly
+
+# Check for conflicting changes in remote
+supabase db pull --linked
+```
+
+### CI/CD Pipeline Issues
+
+#### GitHub Actions failing with "Secret not found"
+
+**Cause**: Missing GitHub repository secrets  
+**Solution**: Follow the [GitHub Pipeline Setup Guide](../operations/github-pipeline-setup.md) to configure all required secrets.
+
+#### Staging migration successful but production fails
+
+**Cause**: Schema differences between staging and production  
+**Solution**:
+
+1. **Never** apply migrations manually to production
+2. Always test migrations in staging first via CI/CD
+3. Use compensating migrations to fix production issues
+
+### Getting Help
+
+- **Supabase CLI Docs**: https://supabase.com/docs/guides/cli
+- **Migration Guide**: https://supabase.com/docs/guides/database/migrations
+- **GitHub Actions**: Check workflow logs in Actions tab
+- **Project Status**: See `docs/logs/phase-0-log.md` for setup history

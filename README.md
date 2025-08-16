@@ -34,20 +34,37 @@ See PRD for detailed environments and pipelines.
 
 ## 🚀 Deployment & Operations
 
-### Domain Model
+### Two-Environment Model
 
-- **staging.mikeiu.com**: Automatically deploys latest `main` branch
-- **mikeiu.com**: Manual promotion from staging required
+| Environment     | Purpose                                       | Domain                                                        | Database                                        | Deployment       |
+| --------------- | --------------------------------------------- | ------------------------------------------------------------- | ----------------------------------------------- | ---------------- |
+| **Development** | Feature development, testing, content staging | Local: `localhost:3000`<br>Preview: `mike-com-web.vercel.app` | Local: Docker Supabase<br>Preview: mike-staging | Auto (PRs)       |
+| **Production**  | Live public application                       | `mikeiu.com`                                                  | mike-prod                                       | Manual promotion |
 
-### Main Pipeline
+### Environment Configuration
 
-Push to `main` triggers:
+- **Development Environment**:
+  - **Local**: Docker Supabase + development Sanity dataset
+  - **Preview**: mike-staging database + development Sanity dataset
+  - **Vendor Keys**: Test/sandbox mode (Stripe, Mux, etc.)
 
-1. Quality checks (typecheck, lint, build)
-2. Deploy to staging with database migrations
-3. Run smoke tests against staging
-4. Manual approval gate for production
-5. Promote same build to production
+- **Production Environment**:
+  - **Live**: mike-prod database + production Sanity dataset
+  - **Vendor Keys**: Live production keys
+
+### CI/CD Pipeline Status
+
+✅ **Fully Configured**: All GitHub secrets and environment protection rules are set up
+
+**Main Pipeline** (Push to `main` triggers):
+
+1. **Quality Checks**: TypeScript, ESLint, tests, build
+2. **Staging Deployment**:
+   - Apply Supabase migrations to mike-staging
+   - Deploy to Vercel with staging alias
+   - Run comprehensive smoke tests
+3. **Manual Approval Gate**: Production deployment requires approval
+4. **Production Promotion**: Same build promoted to `mikeiu.com`
 
 ### Quick Commands
 
@@ -76,6 +93,32 @@ pnpm e2e:smoke:ci          # Run smoke tests in CI
 
 ### Documentation
 
-- [Deployment Pipeline](docs/operations/deployment-pipeline.md) - Complete pipeline documentation
-- [Phase 0 Log](docs/logs/phase-0-log.md) - Infrastructure setup history
-- [PRD](docs/product_requirements_document.md) - Complete product requirements
+- 📖 [Deployment Runbook](docs/operations/deployment-runbook.md) - Complete deployment procedures and troubleshooting
+- ⚙️ [GitHub Pipeline Setup](docs/operations/github-pipeline-setup.md) - CI/CD configuration guide
+- 🗄️ [Database Management](supabase/README.md) - Migration workflows and database operations
+- 🌍 [Environment Variables](ENVIRONMENT.md) - Complete environment configuration guide
+- 📝 [Phase 0 Log](docs/logs/phase-0-log.md) - Infrastructure setup history
+- 📋 [PRD](docs/product_requirements_document.md) - Complete product requirements
+
+### Status & Health
+
+- **Pipeline Status**: 🟢 Fully operational
+- **Environments**: 2 (Development, Production)
+- **Database Projects**: 2 (mike-staging, mike-prod)
+- **GitHub Secrets**: ✅ 6/6 configured
+- **Environment Protection**: ✅ Manual approval required for production
+
+### Quick Health Check
+
+```bash
+# Local development
+curl http://localhost:3000/api/health
+
+# Staging (after deployment)
+curl https://staging.mikeiu.com/api/health
+
+# Production
+curl https://mikeiu.com/api/health
+```
+
+Expected response: `{"status":"ok","service":"web","timestamp":"..."}`
