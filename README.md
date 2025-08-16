@@ -66,6 +66,9 @@ pnpm db:reset              # Reset local database
 # Testing (placeholders)
 pnpm e2e:smoke             # Run smoke tests locally
 pnpm e2e:smoke:ci          # Run smoke tests in CI
+
+# Health checks
+./scripts/health-check.sh   # Quick health check (both domains)
 ```
 
 ### Manual Operations
