@@ -12,7 +12,7 @@ export default defineConfig({
   reporter: 'html',
   outputDir: 'test-results',
   use: {
-    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'https://staging.mikeiu.com',
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'https://mikeiu.com',
     headless: true,
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
