@@ -10,12 +10,17 @@ test.skip(
 test.beforeEach(async ({ page }) => {
   const bypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET
   if (bypassSecret) {
-    // The cookie name `__prerender_bypass` is used by Vercel to bypass the authentication layer.
+    // Get the base URL from Playwright config
+    const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'https://mikeiu.com'
+    const domain = new URL(baseURL).hostname
+
+    // The correct cookie name is `__vercel_bypass` for Vercel deployment protection
     await page.context().addCookies([
       {
-        name: '__prerender_bypass',
+        name: '__vercel_bypass',
         value: bypassSecret,
-        url: new URL(page.url()).origin,
+        domain: domain,
+        path: '/',
       },
     ])
   }
@@ -34,14 +39,21 @@ test.describe('Preview Smoke', () => {
     expect(body).toHaveProperty('service', 'web')
   })
 
-  test('Homepage renders the main heading', async ({ page }) => {
+  test('Homepage renders expected content', async ({ page }) => {
     await page.goto('/')
     await page.waitForLoadState('networkidle')
 
-    // Check for a stable, top-level heading.
-    // This is a more robust check than the default Next.js template text.
-    const mainHeading = page.locator('h1')
-    await expect(mainHeading).toBeVisible()
-    await expect(mainHeading).not.toBeEmpty()
+    // Check for the Next.js logo (reliable indicator the page loaded)
+    await expect(page.getByAltText('Next.js logo')).toBeVisible()
+
+    // Check for the "Get started by editing" text
+    await expect(page.getByText('Get started by editing')).toBeVisible()
+
+    // Check for the E2E pipeline test indicator
+    await expect(page.getByText('✅ E2E Branching Pipeline Test')).toBeVisible()
+
+    // Check for main action buttons
+    await expect(page.getByRole('link', { name: /deploy now/i })).toBeVisible()
+    await expect(page.getByRole('link', { name: /read our docs/i })).toBeVisible()
   })
 })
