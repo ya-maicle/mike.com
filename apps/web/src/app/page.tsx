@@ -21,6 +21,9 @@ export default function Home() {
             .
           </li>
           <li className="tracking-[-.01em]">Save and see your changes instantly.</li>
+          <li className="tracking-[-.01em]">
+            ✅ E2E Branching Pipeline Test: Feature → Preview → Production (2025-08-17)
+          </li>
         </ol>
 
         <div className="flex gap-4 items-center flex-col sm:flex-row">
