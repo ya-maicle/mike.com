@@ -60,17 +60,37 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm playwright install --with-deps
 
-      - name: Wait for Vercel Preview Deployment
-        uses: patrickedqvist/wait-for-vercel-preview@v1.3.1
-        id: waitForDeploy
+      - name: Get Vercel Preview URL
+        uses: zentered/vercel-preview-url@v1.1.9
+        id: vercel_preview_url
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          max_timeout: 600
+          vercel_project_id: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: Wait for deployment to be ready
+        run: |
+          url="${{ steps.vercel_preview_url.outputs.preview_url }}"
+          echo "Waiting for deployment: $url"
+          
+          # Wait up to 10 minutes for deployment to be ready
+          for i in {1..60}; do
+            if curl -s -o /dev/null -w "%{http_code}" \
+              -H "x-vercel-bypass-secret: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}" \
+              "$url" | grep -q "200"; then
+              echo "Deployment is ready!"
+              break
+            fi
+            echo "Attempt $i: Deployment not ready yet, waiting 10s..."
+            sleep 10
+          done
+        env:
+          DEPLOYMENT_URL: ${{ steps.vercel_preview_url.outputs.preview_url }}
 
       - name: Run smoke tests
         run: pnpm playwright test
         env:
-          PLAYWRIGHT_BASE_URL: ${{ steps.waitForDeploy.outputs.url }}
+          PLAYWRIGHT_BASE_URL: ${{ steps.vercel_preview_url.outputs.preview_url }}
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
 
       - name: Upload Playwright report
