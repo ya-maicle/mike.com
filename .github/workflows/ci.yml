@@ -41,6 +41,9 @@ jobs:
     name: "Smoke Tests"
     runs-on: ubuntu-latest
     needs: quality-checks
+    permissions:
+      deployments: read
+      pull-requests: read
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -60,58 +63,12 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm playwright install --with-deps
 
-      - name: Get Vercel deployment URL and wait for it to be ready
+      - name: Wait for Vercel preview
         id: vercel_preview_url
-        run: |
-          echo "Waiting for Vercel deployment..."
-          
-          # Wait for deployment to appear in GitHub API (up to 5 minutes)
-          for i in {1..30}; do
-            echo "Checking for deployments... (attempt $i/30)"
-            
-            # Get the latest deployment for this PR
-            DEPLOYMENT_URL=$(curl -s \
-              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              -H "Accept: application/vnd.github.v3+json" \
-              "https://api.github.com/repos/${{ github.repository }}/deployments" \
-              | jq -r '.[] | select(.ref == "${{ github.head_ref }}") | .statuses_url' \
-              | head -1)
-            
-            if [ "$DEPLOYMENT_URL" != "null" ] && [ -n "$DEPLOYMENT_URL" ]; then
-              # Get the environment URL from the deployment status
-              ENV_URL=$(curl -s \
-                -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-                -H "Accept: application/vnd.github.v3+json" \
-                "$DEPLOYMENT_URL" \
-                | jq -r '.[] | select(.state == "success") | .environment_url' \
-                | head -1)
-              
-              if [ "$ENV_URL" != "null" ] && [ -n "$ENV_URL" ]; then
-                echo "Found deployment URL: $ENV_URL"
-                echo "url=$ENV_URL" >> $GITHUB_OUTPUT
-                
-                # Test if deployment is ready with bypass secret
-                echo "Testing deployment readiness..."
-                if curl -s -f \
-                  -H "x-vercel-bypass-secret: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}" \
-                  "$ENV_URL" > /dev/null; then
-                  echo "Deployment is ready!"
-                  break
-                else
-                  echo "Deployment found but not ready yet..."
-                fi
-              fi
-            fi
-            
-            echo "Waiting 10 seconds before retry..."
-            sleep 10
-          done
-          
-          # Final check
-          if [ -z "$(cat $GITHUB_OUTPUT | grep url=)" ]; then
-            echo "No deployment URL found after 5 minutes"
-            exit 1
-          fi
+        uses: Co-qn/wait-for-vercel-preview@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          max_timeout: 300 # 5 minutes
 
       - name: Run smoke tests
         run: pnpm playwright test

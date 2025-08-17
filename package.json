@@ -34,6 +34,8 @@
     ]
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.0",
+    "@types/node": "^20",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "dotenv-cli": "^10.0.0",
@@ -45,7 +47,6 @@
     "lint-staged": "^15.2.9",
     "prettier": "^3.3.3",
     "supabase": "^1.183.5",
-    "typescript": "^5.5.4",
-    "@playwright/test": "^1.49.0"
+    "typescript": "^5.5.4"
   }
 }
