@@ -1,0 +1,89 @@
+name: Feature Preview Deployment
+
+on:
+  pull_request:
+    branches: [preview]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  deploy-preview:
+    name: Deploy Feature Preview
+    runs-on: ubuntu-latest
+    environment: Preview
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build application
+        run: pnpm build
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Deploy to Vercel Preview
+        id: deploy
+        run: |
+          echo "🚀 Deploying feature branch preview..."
+          
+          # Deploy to Vercel (auto-detects project from current directory)
+          DEPLOYMENT_URL=$(vercel --token ${{ secrets.VERCEL_TOKEN }} --yes)
+          
+          echo "deployment_url=$DEPLOYMENT_URL" >> $GITHUB_OUTPUT
+          echo "✅ Preview deployed to: $DEPLOYMENT_URL"
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
+      - name: Comment PR with preview URL
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const deploymentUrl = '${{ steps.deploy.outputs.deployment_url }}';
+            const comment = `🔍 **Feature Preview Deployed!**
+            
+            **Preview URL**: ${deploymentUrl}
+            
+            This preview uses:
+            - **Database**: mike-staging (development data)
+            - **Sanity Dataset**: development (safe test content)
+            - **Vendor Keys**: Test/sandbox mode
+            
+            Perfect for testing your changes before merging to staging! 🎯`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+      - name: Verify preview deployment
+        run: |
+          echo "🏥 Verifying preview deployment..."
+          sleep 30  # Allow time for deployment to propagate
+          
+          DEPLOYMENT_URL="${{ steps.deploy.outputs.deployment_url }}"
+          
+          for i in {1..10}; do
+            if curl -f "$DEPLOYMENT_URL/api/health" > /dev/null 2>&1; then
+              echo "✅ Preview health check passed"
+              exit 0
+            fi
+            echo "Attempt $i: Health check failed, retrying in 15 seconds..."
+            sleep 15
+          done
+          
+          echo "⚠️ Preview deployment health check failed after 10 attempts"
+          echo "Preview URL may still be accessible, but health endpoint is not responding"
+          exit 1

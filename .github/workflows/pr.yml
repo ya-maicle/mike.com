@@ -3,7 +3,7 @@ name: PR Checks
 on:
   pull_request:
     branches:
-      - main
+      - preview
   workflow_dispatch:
 
 jobs:
