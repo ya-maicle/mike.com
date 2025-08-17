@@ -21,6 +21,9 @@ export default function Home() {
             .
           </li>
           <li className="tracking-[-.01em]">Save and see your changes instantly.</li>
+          <li className="tracking-[-.01em]">
+            ✅ Testing new branching strategy: Feature → Preview → Production
+          </li>
         </ol>
 
         <div className="flex gap-4 items-center flex-col sm:flex-row">
