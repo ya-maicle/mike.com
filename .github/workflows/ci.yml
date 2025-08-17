@@ -60,37 +60,63 @@ jobs:
       - name: Install Playwright browsers
         run: pnpm playwright install --with-deps
 
-      - name: Get Vercel Preview URL
-        uses: zentered/vercel-preview-url@v1.1.9
+      - name: Get Vercel deployment URL and wait for it to be ready
         id: vercel_preview_url
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        with:
-          vercel_project_id: ${{ secrets.VERCEL_PROJECT_ID }}
-
-      - name: Wait for deployment to be ready
         run: |
-          url="${{ steps.vercel_preview_url.outputs.preview_url }}"
-          echo "Waiting for deployment: $url"
+          echo "Waiting for Vercel deployment..."
           
-          # Wait up to 10 minutes for deployment to be ready
-          for i in {1..60}; do
-            if curl -s -o /dev/null -w "%{http_code}" \
-              -H "x-vercel-bypass-secret: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}" \
-              "$url" | grep -q "200"; then
-              echo "Deployment is ready!"
-              break
+          # Wait for deployment to appear in GitHub API (up to 5 minutes)
+          for i in {1..30}; do
+            echo "Checking for deployments... (attempt $i/30)"
+            
+            # Get the latest deployment for this PR
+            DEPLOYMENT_URL=$(curl -s \
+              -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+              -H "Accept: application/vnd.github.v3+json" \
+              "https://api.github.com/repos/${{ github.repository }}/deployments" \
+              | jq -r '.[] | select(.ref == "${{ github.head_ref }}") | .statuses_url' \
+              | head -1)
+            
+            if [ "$DEPLOYMENT_URL" != "null" ] && [ -n "$DEPLOYMENT_URL" ]; then
+              # Get the environment URL from the deployment status
+              ENV_URL=$(curl -s \
+                -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+                -H "Accept: application/vnd.github.v3+json" \
+                "$DEPLOYMENT_URL" \
+                | jq -r '.[] | select(.state == "success") | .environment_url' \
+                | head -1)
+              
+              if [ "$ENV_URL" != "null" ] && [ -n "$ENV_URL" ]; then
+                echo "Found deployment URL: $ENV_URL"
+                echo "url=$ENV_URL" >> $GITHUB_OUTPUT
+                
+                # Test if deployment is ready with bypass secret
+                echo "Testing deployment readiness..."
+                if curl -s -f \
+                  -H "x-vercel-bypass-secret: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}" \
+                  "$ENV_URL" > /dev/null; then
+                  echo "Deployment is ready!"
+                  break
+                else
+                  echo "Deployment found but not ready yet..."
+                fi
+              fi
             fi
-            echo "Attempt $i: Deployment not ready yet, waiting 10s..."
+            
+            echo "Waiting 10 seconds before retry..."
             sleep 10
           done
-        env:
-          DEPLOYMENT_URL: ${{ steps.vercel_preview_url.outputs.preview_url }}
+          
+          # Final check
+          if [ -z "$(cat $GITHUB_OUTPUT | grep url=)" ]; then
+            echo "No deployment URL found after 5 minutes"
+            exit 1
+          fi
 
       - name: Run smoke tests
         run: pnpm playwright test
         env:
-          PLAYWRIGHT_BASE_URL: ${{ steps.vercel_preview_url.outputs.preview_url }}
+          PLAYWRIGHT_BASE_URL: ${{ steps.vercel_preview_url.outputs.url }}
           VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
 
       - name: Upload Playwright report
