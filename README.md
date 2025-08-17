@@ -24,30 +24,51 @@ Bootstrap:
 
 See `supabase/README.md` for detailed instructions on setting up the Supabase CLI, linking to remote projects, and managing database migrations.
 
-## Git & CI
+## Git & Branching Strategy
 
-- Trunk-based with feature branches (feat/_, fix/_).
-- PRs run typecheck/lint/tests/build; preview deploys via Vercel.
-- main deploys to staging; manual promotion to production.
+### **Two-Environment Branching Model**
 
-See PRD for detailed environments and pipelines.
+```
+Feature Branches → Preview Branch → Main Branch
+     ↓                   ↓              ↓
+Feature Previews → Staging Deploy → Production Deploy
+```
+
+- **Default Branch**: `preview` (feature branches target this)
+- **Production Branch**: `main` (requires manual promotion from preview)
+- **Feature Branches**: `feat/*`, `fix/*`, `chore/*` (merge to preview)
+
+### **Quality Gates**
+
+- **Feature PRs**: TypeScript, ESLint, build, Storybook + PR review
+- **Preview Branch**: Auto-deploy to staging after merge
+- **Main Branch**: Manual approval required for production
 
 ## 🚀 Deployment & Operations
 
-### Domain Model
+### **Environment Mapping**
 
-- **staging.mikeiu.com**: Automatically deploys latest `main` branch
-- **mikeiu.com**: Manual promotion from staging required
+| Environment    | Git Branch | Domain               | Purpose            | Deployment |
+| -------------- | ---------- | -------------------- | ------------------ | ---------- |
+| **Local**      | any        | `localhost:3000`     | Development        | Manual     |
+| **Preview**    | `preview`  | `staging.mikeiu.com` | Staging validation | Auto       |
+| **Production** | `main`     | `mikeiu.com`         | Live application   | Manual     |
 
-### Main Pipeline
+### **Developer Workflow**
 
-Push to `main` triggers:
+1. **Create Feature Branch**: `git checkout -b feat/my-feature`
+2. **Target Preview**: Feature branches automatically target `preview` branch
+3. **Feature Preview**: Get dynamic preview URLs for testing changes
+4. **Merge to Preview**: PR review required, triggers staging deployment
+5. **Promote to Production**: Create PR from `preview` to `main`, requires approval
 
-1. Quality checks (typecheck, lint, build)
-2. Deploy to staging with database migrations
-3. Run smoke tests against staging
-4. Manual approval gate for production
-5. Promote same build to production
+### **Pipeline Status**: ✅ **READY**
+
+- ✅ GitHub environments configured (Preview, Production)
+- ✅ Vercel projects mapped (stagining → staging, mike-com-web → production)
+- ✅ Quality checks enforced at all levels
+- ✅ Manual approval gates for production
+- ✅ Database migration workflows operational
 
 ### Quick Commands
 

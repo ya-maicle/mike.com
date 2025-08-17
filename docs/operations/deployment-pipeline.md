@@ -2,21 +2,57 @@
 
 ## Overview
 
-The main deployment pipeline automatically deploys to staging, validates the deployment, then requires manual approval before promoting to production.
+The deployment pipeline implements a **two-environment branching strategy** with controlled promotion from preview to production. Feature branches target the `preview` branch, which automatically deploys to staging for validation before manual promotion to production.
 
-## Pipeline Flow
+## Branching Strategy
+
+```mermaid
+graph LR
+    A[Feature Branch] --> B[Preview Branch]
+    B --> C[Main Branch]
+    A --> D[Feature Preview URL]
+    B --> E[staging.mikeiu.com]
+    C --> F[mikeiu.com]
+```
+
+### **Git Workflow:**
+
+- **Default Branch**: `preview` (feature branches target this)
+- **Production Branch**: `main` (requires manual promotion)
+- **Feature Branches**: `feat/*`, `fix/*`, `chore/*`
+
+## Pipeline Flows
+
+### 1. Feature Branch Pipeline (feature-preview.yml)
 
 ```mermaid
 graph TD
-    A[Push to main] --> B[Quality Checks]
+    A[Feature Branch PR] --> B[Quality Checks]
+    B --> C[Deploy Feature Preview]
+    C --> D[Comment Preview URL on PR]
+```
+
+### 2. Preview Branch Pipeline (staging-deploy.yml)
+
+```mermaid
+graph TD
+    A[Push to preview] --> B[Quality Checks]
     B --> C[Deploy to Staging]
     C --> D[Apply Migrations]
     D --> E[Alias to staging.mikeiu.com]
     E --> F[Run Smoke Tests]
-    F --> G[Manual Approval Gate]
-    G --> H[Promote to Production]
-    H --> I[Alias to mikeiu.com]
-    I --> J[Health Check]
+```
+
+### 3. Production Pipeline (production-deploy.yml)
+
+```mermaid
+graph TD
+    A[Push to main] --> B[Manual Approval Gate]
+    B --> C[Verify Staging Health]
+    C --> D[Deploy to Production]
+    D --> E[Apply Production Migrations]
+    E --> F[Alias to mikeiu.com]
+    F --> G[Health Check]
 ```
 
 ## Stages
