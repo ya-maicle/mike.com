@@ -10,14 +10,21 @@ test.describe('Production Smoke', () => {
     expect(body).toHaveProperty('service', 'web')
   })
 
-  test('Homepage renders the main heading', async ({ page }) => {
+  test('Homepage renders expected content', async ({ page }) => {
     await page.goto('/')
     await page.waitForLoadState('networkidle')
 
-    // Check for a stable, top-level heading.
-    // Replace this with a selector that is unique and stable for your homepage.
-    const mainHeading = page.locator('h1')
-    await expect(mainHeading).toBeVisible()
-    await expect(mainHeading).not.toBeEmpty()
+    // Check for the Next.js logo (reliable indicator the page loaded)
+    await expect(page.getByAltText('Next.js logo')).toBeVisible()
+
+    // Check for the "Get started by editing" text
+    await expect(page.getByText('Get started by editing')).toBeVisible()
+
+    // Check for the E2E pipeline test indicator
+    await expect(page.getByText('✅ E2E Branching Pipeline Test')).toBeVisible()
+
+    // Check for main action buttons
+    await expect(page.getByRole('link', { name: /deploy now/i })).toBeVisible()
+    await expect(page.getByRole('link', { name: /read our docs/i })).toBeVisible()
   })
 })
