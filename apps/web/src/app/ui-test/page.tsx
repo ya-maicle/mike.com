@@ -1,16 +1,8 @@
 import { Button } from '@maicle/ui'
-import type { ButtonProps } from '@maicle/ui'
 
 export default function UITestPage() {
-  const variants: NonNullable<ButtonProps['variant']>[] = [
-    'default',
-    'secondary',
-    'outline',
-    'ghost',
-    'destructive',
-  ]
-  const sizes: NonNullable<ButtonProps['size']>[] = ['sm', 'md', 'lg']
-
+  const variants = ['default', 'secondary', 'outline', 'ghost', 'destructive'] as const
+  const sizes = ['sm', 'md', 'lg'] as const
   return (
     <div className="container mx-auto p-8 space-y-8">
       <h1 className="text-3xl font-bold mb-8">UI Component Test Page</h1>
