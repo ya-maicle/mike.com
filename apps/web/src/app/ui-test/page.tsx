@@ -1,10 +1,20 @@
 import { Button } from '@maicle/ui'
+import type { ButtonProps } from '@maicle/ui'
 
 export default function UITestPage() {
+  const variants: NonNullable<ButtonProps['variant']>[] = [
+    'default',
+    'secondary',
+    'outline',
+    'ghost',
+    'destructive',
+  ]
+  const sizes: NonNullable<ButtonProps['size']>[] = ['sm', 'md', 'lg']
+
   return (
     <div className="container mx-auto p-8 space-y-8">
       <h1 className="text-3xl font-bold mb-8">UI Component Test Page</h1>
-      
+
       <section>
         <h2 className="text-2xl font-semibold mb-4">Button Variants</h2>
         <div className="flex flex-wrap gap-4">
@@ -33,19 +43,21 @@ export default function UITestPage() {
           <Button disabled>Disabled</Button>
           <Button leftIcon="←">With Left Icon</Button>
           <Button rightIcon="→">With Right Icon</Button>
-          <Button leftIcon="←" rightIcon="→">Both Icons</Button>
+          <Button leftIcon="←" rightIcon="→">
+            Both Icons
+          </Button>
         </div>
       </section>
 
       <section>
         <h2 className="text-2xl font-semibold mb-4">Variant × Size Matrix</h2>
         <div className="grid grid-cols-4 gap-4">
-          {['default', 'secondary', 'outline', 'ghost', 'destructive'].map((variant) =>
-            ['sm', 'md', 'lg'].map((size) => (
-              <Button key={`${variant}-${size}`} variant={variant as any} size={size as any}>
+          {variants.map((variant) =>
+            sizes.map((size) => (
+              <Button key={`${variant}-${size}`} variant={variant} size={size}>
                 {variant} {size}
               </Button>
-            ))
+            )),
           )}
         </div>
       </section>
