@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
+    "dev": "pnpm --filter @maicle/ui build && next dev --turbopack",
+    "build": "pnpm --filter @maicle/ui build && next build",
     "start": "next start",
     "lint": "next lint",
     "test:sanity": "tsx src/sanity/test-connection.ts"
