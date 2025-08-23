@@ -1,7 +1,8 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Ensure Next/Turbopack transpiles the internal UI package from the monorepo
+  transpilePackages: ['@maicle/ui'],
 }
 
 export default nextConfig

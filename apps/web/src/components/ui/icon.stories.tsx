@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 import { Icon } from './icon'
 import * as Icons from './icons'
 import { Button } from './button'
@@ -333,7 +333,7 @@ export const IconGrid: Story = {
           </div>
           {filteredIcons.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">
-              No icons found matching "{searchTerm}"
+              No icons found matching &quot;{searchTerm}&quot;
             </div>
           )}
         </CardContent>

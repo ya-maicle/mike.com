@@ -1,7 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 import { Label } from './label'
 import { Input } from './input'
-import { Checkbox } from './checkbox'
 
 const meta: Meta<typeof Label> = {
   title: 'UI/Label',

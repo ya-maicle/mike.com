@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 import * as React from 'react'
 import { Textarea } from './textarea'
 import { Label } from './label'
@@ -114,7 +114,7 @@ export const CharacterLimit: Story = {
 
     return (
       <div className="grid w-full gap-1.5">
-        <Label htmlFor="tweet">What's happening?</Label>
+        <Label htmlFor="tweet">What&apos;s happening?</Label>
         <Textarea
           id="tweet"
           placeholder="Share your thoughts..."

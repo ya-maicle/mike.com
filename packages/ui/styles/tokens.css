@@ -7,7 +7,17 @@
   --color-background: #ffffff;
   --color-foreground: #111827; /* gray-900 */
   --color-primary: #0ea5e9; /* sky-500 */
-  --color-muted: #6b7280; /* gray-500 */
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #f1f5f9; /* slate-100 */
+  --color-secondary-foreground: #0f172a; /* slate-900 */
+  --color-muted: #f1f5f9; /* slate-100 */
+  --color-muted-foreground: #64748b; /* slate-500 */
+  --color-accent: #f1f5f9; /* slate-100 */
+  --color-accent-foreground: #0f172a; /* slate-900 */
+  --color-destructive: #ef4444; /* red-500 */
+  --color-destructive-foreground: #ffffff;
+  --color-border: #e2e8f0; /* slate-200 */
+  --color-ring: #0ea5e9; /* sky-500 */
 
   /* Radii */
   --radius-sm: 0.25rem;
@@ -26,6 +36,16 @@
     --color-background: #0b0b0f;
     --color-foreground: #e5e7eb; /* gray-200 */
     --color-primary: #38bdf8; /* sky-400 */
-    --color-muted: #9ca3af; /* gray-400 */
+    --color-primary-foreground: #0f172a; /* slate-900 */
+    --color-secondary: #1e293b; /* slate-800 */
+    --color-secondary-foreground: #f1f5f9; /* slate-100 */
+    --color-muted: #1e293b; /* slate-800 */
+    --color-muted-foreground: #94a3b8; /* slate-400 */
+    --color-accent: #1e293b; /* slate-800 */
+    --color-accent-foreground: #f1f5f9; /* slate-100 */
+    --color-destructive: #dc2626; /* red-600 */
+    --color-destructive-foreground: #ffffff;
+    --color-border: #334155; /* slate-700 */
+    --color-ring: #38bdf8; /* sky-400 */
   }
 }

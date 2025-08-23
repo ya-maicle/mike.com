@@ -1,9 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react'
+import type { Meta, StoryObj } from '@storybook/nextjs-vite-vite'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './card'
 import { Button } from './button'
-import { Badge } from './badge'
-import { Progress } from './progress'
-import { Avatar, AvatarFallback, AvatarImage } from './avatar'
 
 // First let me add the missing badge, progress, and avatar components
 const meta: Meta<typeof Card> = {
