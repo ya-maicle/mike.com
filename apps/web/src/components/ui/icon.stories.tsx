@@ -47,12 +47,12 @@ export const Sizes: Story = {
 export const Colors: Story = {
   render: () => (
     <div className="flex items-center gap-4">
-      <Icon icon={Icons.Heart} className="text-red-500" />
-      <Icon icon={Icons.Heart} className="text-green-500" />
-      <Icon icon={Icons.Heart} className="text-blue-500" />
-      <Icon icon={Icons.Heart} className="text-purple-500" />
-      <Icon icon={Icons.Heart} className="text-yellow-500" />
-      <Icon icon={Icons.Heart} className="text-pink-500" />
+      <Icon icon={Icons.Heart} className="text-destructive" />
+      <Icon icon={Icons.Heart} className="text-success" />
+      <Icon icon={Icons.Heart} className="text-info" />
+      <Icon icon={Icons.Heart} className="text-accent" />
+      <Icon icon={Icons.Heart} className="text-warning" />
+      <Icon icon={Icons.Heart} className="text-accent" />
     </div>
   ),
 }
@@ -116,14 +116,14 @@ export const StatusIcons: Story = {
   render: () => (
     <div className="grid grid-cols-6 gap-4 p-4">
       {[
-        { icon: Icons.Check, name: 'Check', color: 'text-green-500' },
-        { icon: Icons.CheckCircle, name: 'CheckCircle', color: 'text-green-500' },
-        { icon: Icons.AlertCircle, name: 'AlertCircle', color: 'text-yellow-500' },
-        { icon: Icons.AlertTriangle, name: 'AlertTriangle', color: 'text-yellow-500' },
-        { icon: Icons.XCircle, name: 'XCircle', color: 'text-red-500' },
-        { icon: Icons.Info, name: 'Info', color: 'text-blue-500' },
-        { icon: Icons.HelpCircle, name: 'HelpCircle', color: 'text-gray-500' },
-        { icon: Icons.Spinner, name: 'Spinner', color: 'text-blue-500 animate-spin' },
+        { icon: Icons.Check, name: 'Check', color: 'text-success' },
+        { icon: Icons.CheckCircle, name: 'CheckCircle', color: 'text-success' },
+        { icon: Icons.AlertCircle, name: 'AlertCircle', color: 'text-warning' },
+        { icon: Icons.AlertTriangle, name: 'AlertTriangle', color: 'text-warning' },
+        { icon: Icons.XCircle, name: 'XCircle', color: 'text-destructive' },
+        { icon: Icons.Info, name: 'Info', color: 'text-info' },
+        { icon: Icons.HelpCircle, name: 'HelpCircle', color: 'text-muted-foreground' },
+        { icon: Icons.Spinner, name: 'Spinner', color: 'text-info animate-spin' },
       ].map((item) => (
         <div key={item.name} className="flex flex-col items-center gap-2">
           <Icon icon={item.icon} size="lg" className={item.color} />
@@ -164,12 +164,12 @@ export const ThemeIcons: Story = {
   render: () => (
     <div className="grid grid-cols-6 gap-4 p-4">
       {[
-        { icon: Icons.Sun, name: 'Sun', color: 'text-yellow-500' },
-        { icon: Icons.Moon, name: 'Moon', color: 'text-blue-500' },
-        { icon: Icons.Monitor, name: 'Monitor', color: 'text-gray-500' },
+        { icon: Icons.Sun, name: 'Sun', color: 'text-warning' },
+        { icon: Icons.Moon, name: 'Moon', color: 'text-info' },
+        { icon: Icons.Monitor, name: 'Monitor', color: 'text-muted-foreground' },
         { icon: Icons.Eye, name: 'Eye' },
         { icon: Icons.EyeOff, name: 'EyeOff' },
-        { icon: Icons.Palette, name: 'Palette', color: 'text-purple-500' },
+        { icon: Icons.Palette, name: 'Palette', color: 'text-accent' },
       ].map((item) => (
         <div key={item.name} className="flex flex-col items-center gap-2">
           <Icon icon={item.icon} size="lg" className={item.color} />

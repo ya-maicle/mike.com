@@ -1,0 +1,14 @@
+# Heavy dev/build outputs that should not be synced
+node_modules
+.pnpm-store
+.next
+.turbo
+dist
+storybook-static
+coverage
+playwright-report/
+test-results/
+blob-report/
+.vercel
+supabase/.temp
+

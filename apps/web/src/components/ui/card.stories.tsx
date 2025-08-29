@@ -185,21 +185,21 @@ export const Notification: Story = {
       </CardHeader>
       <CardContent className="grid gap-4">
         <div className="flex items-center space-x-4 rounded-md border p-4">
-          <div className="w-2 h-2 bg-blue-600 rounded-full" />
+          <div className="w-2 h-2 bg-chart-1 rounded-full" />
           <div className="flex-1 space-y-1">
             <p className="text-sm font-medium leading-none">Push Notifications</p>
             <p className="text-sm text-muted-foreground">Send notifications to device.</p>
           </div>
         </div>
         <div className="flex items-center space-x-4 rounded-md border p-4">
-          <div className="w-2 h-2 bg-green-600 rounded-full" />
+          <div className="w-2 h-2 bg-chart-2 rounded-full" />
           <div className="flex-1 space-y-1">
             <p className="text-sm font-medium leading-none">Email Notifications</p>
             <p className="text-sm text-muted-foreground">Send notifications via email.</p>
           </div>
         </div>
         <div className="flex items-center space-x-4 rounded-md border p-4">
-          <div className="w-2 h-2 bg-yellow-600 rounded-full" />
+          <div className="w-2 h-2 bg-chart-3 rounded-full" />
           <div className="flex-1 space-y-1">
             <p className="text-sm font-medium leading-none">SMS Notifications</p>
             <p className="text-sm text-muted-foreground">Send notifications via SMS.</p>
