@@ -5,10 +5,12 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./src/index.ts",
+      "development": "./src/index.ts",
       "default": "./dist/index.js"
     },
-    "./styles/tokens.css": "./styles/tokens.css"
+    "./styles/primitives.css": "./styles/primitives.css",
+    "./styles/semantic.css": "./styles/semantic.css"
   },
   "files": [
     "dist",
@@ -16,10 +18,12 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "build:watch": "tsc -p tsconfig.json --watch --preserveWatchOutput",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build -o storybook-static"
+    "build-storybook": "storybook build -o storybook-static",
+    "prepublishOnly": "pnpm run build"
   },
   "peerDependencies": {
     "react": "^18 || ^19",
@@ -27,6 +31,7 @@
   },
   "devDependencies": {
     "@maicle/config": "workspace:*",
+    "geist": "^1.4.2",
     "@storybook/addon-a11y": "^8",
     "@storybook/addon-essentials": "^8",
     "@storybook/addon-interactions": "^8",

@@ -100,3 +100,4 @@ pnpm e2e:smoke:ci          # Run smoke tests in CI
 - [Deployment Pipeline](docs/operations/deployment-pipeline.md) - Complete pipeline documentation
 - [Phase 0 Log](docs/logs/phase-0-log.md) - Infrastructure setup history
 - [PRD](docs/product_requirements_document.md) - Complete product requirements
+- [Development Stability Plan](docs/development/dev-stabilization.md) - Steps to stabilize local/UI dev
