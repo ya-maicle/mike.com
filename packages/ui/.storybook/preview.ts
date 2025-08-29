@@ -3,8 +3,7 @@ import React from 'react'
 
 import '../styles/primitives.css'
 import '../styles/semantic.css'
-import 'geist/font/sans'
-import 'geist/font/mono'
+import './fonts.css'
 
 const preview: Preview = {
   parameters: {
