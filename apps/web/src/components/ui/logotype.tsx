@@ -89,21 +89,50 @@ const Logotype = React.forwardRef<
   as = "div",
   ...props 
 }, ref) => {
-  const Component = as === "a" ? "a" : as === "button" ? "button" : "div"
-  const linkProps = href ? { href } : {}
+  const baseClassName = cn(logotypeVariants({ size, variant, className }))
+  
+  if (as === "a" && href) {
+    return (
+      <a 
+        className={baseClassName}
+        href={href}
+        ref={ref as any} // eslint-disable-line @typescript-eslint/no-explicit-any
+        {...(props as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
+      >
+        <LogoMark size={size!} />
+        {showText && (
+          <span className="font-inherit leading-none">{text}</span>
+        )}
+      </a>
+    )
+  }
+  
+  if (as === "button") {
+    return (
+      <button 
+        className={baseClassName}
+        ref={ref as any} // eslint-disable-line @typescript-eslint/no-explicit-any
+        {...(props as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
+      >
+        <LogoMark size={size!} />
+        {showText && (
+          <span className="font-inherit leading-none">{text}</span>
+        )}
+      </button>
+    )
+  }
   
   return (
-    <Component
-      className={cn(logotypeVariants({ size, variant, className }))}
-      ref={ref as React.Ref<HTMLElement>}
-      {...linkProps}
+    <div 
+      className={baseClassName}
+      ref={ref}
       {...props}
     >
       <LogoMark size={size!} />
       {showText && (
         <span className="font-inherit leading-none">{text}</span>
       )}
-    </Component>
+    </div>
   )
 })
 Logotype.displayName = "Logotype"
