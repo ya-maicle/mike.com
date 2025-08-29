@@ -95,7 +95,7 @@ const Logotype = React.forwardRef<
   return (
     <Component
       className={cn(logotypeVariants({ size, variant, className }))}
-      ref={ref as any}
+      ref={ref as React.Ref<HTMLElement>}
       {...linkProps}
       {...props}
     >

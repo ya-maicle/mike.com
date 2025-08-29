@@ -63,7 +63,7 @@ export const EditProfile: Story = {
         <DialogHeader>
           <DialogTitle>Edit profile</DialogTitle>
           <DialogDescription>
-            Make changes to your profile here. Click save when you're done.
+            Make changes to your profile here. Click save when you&apos;re done.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -283,7 +283,7 @@ export const AlertDialog: Story = {
           </DialogTitle>
           <DialogDescription>
             This action will permanently delete all your data and cannot be undone. Please type
-            "DELETE" below to confirm.
+            &quot;DELETE&quot; below to confirm.
           </DialogDescription>
         </DialogHeader>
         <div className="py-4">

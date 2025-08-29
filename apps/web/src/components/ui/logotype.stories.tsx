@@ -110,7 +110,7 @@ export const AsLink: Story = {
   },
   render: (args) => (
     <div className="space-y-4">
-      <p className="text-sm text-muted-foreground">Click the logo below (it's a link)</p>
+      <p className="text-sm text-muted-foreground">Click the logo below (it&apos;s a link)</p>
       <Logotype {...args} />
     </div>
   ),
@@ -125,7 +125,7 @@ export const AsButton: Story = {
   },
   render: (args) => (
     <div className="space-y-4">
-      <p className="text-sm text-muted-foreground">Click the logo below (it's a button)</p>
+      <p className="text-sm text-muted-foreground">Click the logo below (it&apos;s a button)</p>
       <Logotype {...args} onClick={() => alert('Logo clicked!')} />
     </div>
   ),
@@ -228,7 +228,7 @@ export const ThemeShowcase: Story = {
     <div className="space-y-8 p-6">
       <h2 className="text-2xl font-bold">Theme Adaptation</h2>
       <p className="text-muted-foreground">
-        The logo automatically adapts to light and dark themes using `fill="currentColor"`.
+        The logo automatically adapts to light and dark themes using `fill=&quot;currentColor&quot;`.
       </p>
       
       <div className="grid md:grid-cols-2 gap-6">
