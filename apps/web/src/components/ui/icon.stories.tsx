@@ -116,6 +116,7 @@ export const StatusIcons: Story = {
   render: () => (
     <div className="grid grid-cols-6 gap-4 p-4">
       {[
+<<<<<<< HEAD
         { icon: Icons.Check, name: 'Check', color: 'text-success' },
         { icon: Icons.CheckCircle, name: 'CheckCircle', color: 'text-success' },
         { icon: Icons.AlertCircle, name: 'AlertCircle', color: 'text-warning' },
@@ -164,6 +165,7 @@ export const ThemeIcons: Story = {
   render: () => (
     <div className="grid grid-cols-6 gap-4 p-4">
       {[
+<<<<<<< HEAD
         { icon: Icons.Sun, name: 'Sun', color: 'text-warning' },
         { icon: Icons.Moon, name: 'Moon', color: 'text-info' },
         { icon: Icons.Monitor, name: 'Monitor', color: 'text-muted-foreground' },

@@ -1,4 +1,5 @@
 import type { Preview } from '@storybook/react'
+import React from 'react'
 
 import '../styles/primitives.css'
 import '../styles/semantic.css'
@@ -30,11 +31,7 @@ const preview: Preview = {
   },
   decorators: [
     (Story) => {
-      return (
-        <div style={{ fontFamily: "Geist, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji'" }}>
-          <Story />
-        </div>
-      )
+      return Story()
     },
   ],
 }

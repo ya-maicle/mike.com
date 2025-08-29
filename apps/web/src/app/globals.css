@@ -52,20 +52,6 @@
   --radius: 0.625rem;
   /* Central app content max width */
   --content-max-width: 1147px;
-  /* Optional app-only tokens */
-  --chart-1: var(--sky-500);
-  --chart-2: var(--emerald-400);
-  --chart-3: var(--indigo-600);
-  --chart-4: var(--amber-500);
-  --chart-5: var(--rose-500);
-  --sidebar: var(--background);
-  --sidebar-foreground: var(--foreground);
-  --sidebar-primary: var(--primary);
-  --sidebar-primary-foreground: var(--primary-foreground);
-  --sidebar-accent: var(--accent);
-  --sidebar-accent-foreground: var(--accent-foreground);
-  --sidebar-border: var(--border);
-  --sidebar-ring: var(--ring);
 }
 
 /* Dark variables are defined in semantic.css via the .dark class */

@@ -13,7 +13,11 @@ const meta: Meta<typeof Button> = {
   argTypes: {
     variant: {
       control: { type: 'select' },
+<<<<<<< HEAD
       options: ['default', 'secondary', 'destructive', 'success', 'warning', 'info', 'outline', 'ghost', 'link'],
+=======
+      options: ['default', 'destructive', 'outline', 'secondary', 'ghost', 'link'],
+>>>>>>> origin/preview
     },
     size: {
       control: { type: 'select' },
@@ -48,6 +52,7 @@ export const Destructive: Story = {
   },
 }
 
+<<<<<<< HEAD
 export const Success: Story = {
   args: {
     variant: 'success',
@@ -69,6 +74,8 @@ export const Info: Story = {
   },
 }
 
+=======
+>>>>>>> origin/preview
 export const Outline: Story = {
   args: {
     variant: 'outline',
@@ -159,9 +166,12 @@ export const AllVariants: Story = {
       <Button>Default</Button>
       <Button variant="secondary">Secondary</Button>
       <Button variant="destructive">Destructive</Button>
+<<<<<<< HEAD
       <Button variant="success">Success</Button>
       <Button variant="warning">Warning</Button>
       <Button variant="info">Info</Button>
+=======
+>>>>>>> origin/preview
       <Button variant="outline">Outline</Button>
       <Button variant="ghost">Ghost</Button>
       <Button variant="link">Link</Button>
