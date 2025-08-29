@@ -1,3 +1,10 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Biography - Mike Y.',
+  description: 'Personal biography and background',
+}
+
 export default function BiographyPage() {
   const paragraphs = Array.from({ length: 16 })
   return (

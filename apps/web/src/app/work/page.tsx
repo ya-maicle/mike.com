@@ -1,3 +1,10 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Work - Mike Y.',
+  description: 'Portfolio of work and projects',
+}
+
 export default function WorkPage() {
   const items = Array.from({ length: 18 })
   return (

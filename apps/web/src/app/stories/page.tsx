@@ -1,3 +1,10 @@
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Stories - Mike Y.',
+  description: 'Collection of stories and content',
+}
+
 export default function StoriesPage() {
   const cards = Array.from({ length: 24 })
   return (
