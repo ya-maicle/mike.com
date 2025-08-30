@@ -5,6 +5,9 @@ import { useAuth } from '@/components/providers/auth-provider'
 import getSupabaseClient from '@/lib/supabase'
 import { upsertProfileFromUser } from '@/lib/profile'
 
+// Force dynamic rendering to prevent static generation issues with Supabase
+export const dynamic = 'force-dynamic'
+
 type Profile = {
   id: string
   email: string | null
