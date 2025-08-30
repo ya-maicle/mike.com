@@ -65,8 +65,8 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
           setInfoMsg('Check your email to confirm your account. Then sign in to continue.')
         }
       }
-    } catch (err: any) {
-      setErrorMsg(err?.message ?? 'Unexpected error. Please try again.')
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : 'Unexpected error. Please try again.')
     } finally {
       setPending(false)
     }

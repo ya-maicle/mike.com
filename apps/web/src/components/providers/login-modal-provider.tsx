@@ -31,7 +31,7 @@ export function LoginModalProvider({ children }: { children: React.ReactNode }) 
   const closeLogin = React.useCallback(() => setOpen(false), [])
   const value = React.useMemo(
     () => ({ open, setOpen, mode, setMode, openLogin, openSignup, closeLogin }),
-    [open, mode],
+    [open, mode, openLogin, openSignup, closeLogin],
   )
   // Auto-close on successful sign-in
   React.useEffect(() => {

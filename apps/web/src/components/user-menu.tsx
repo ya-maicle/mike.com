@@ -3,7 +3,6 @@
 import * as React from 'react'
 import { useAuth } from '@/components/providers/auth-provider'
 import getSupabaseClient from '@/lib/supabase'
-import { Button } from '@/components/ui/button'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import {
   DropdownMenu,

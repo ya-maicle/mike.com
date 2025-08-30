@@ -5,11 +5,20 @@ import { useAuth } from '@/components/providers/auth-provider'
 import getSupabaseClient from '@/lib/supabase'
 import { upsertProfileFromUser } from '@/lib/profile'
 
+type Profile = {
+  id: string
+  email: string | null
+  full_name: string
+  avatar_url: string | null
+  created_at?: string
+  updated_at?: string
+}
+
 export default function ProfileDebugPage() {
   const { user, loading } = useAuth()
   const supabase = getSupabaseClient()
   const [status, setStatus] = React.useState<'idle' | 'loading' | 'loaded' | 'error'>('idle')
-  const [profile, setProfile] = React.useState<any | null>(null)
+  const [profile, setProfile] = React.useState<Profile | null>(null)
   const [error, setError] = React.useState<string | null>(null)
 
   const load = React.useCallback(async () => {
@@ -21,8 +30,8 @@ export default function ProfileDebugPage() {
       if (error && error.code !== 'PGRST116') throw error
       setProfile(data ?? null)
       setStatus('loaded')
-    } catch (e: any) {
-      setError(e?.message ?? 'Unknown error')
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Unknown error')
       setStatus('error')
     }
   }, [supabase, user])
