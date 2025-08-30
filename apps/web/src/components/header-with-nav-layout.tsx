@@ -1,17 +1,24 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { Button } from "@/components/ui/button"
-import { PanelRight, PanelLeft, Search } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { CommandMenu } from "@/components/command-menu"
+import * as React from 'react'
+import { Button } from '@/components/ui/button'
+import { PanelRight, PanelLeft, Search } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { CommandMenu } from '@/components/command-menu'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { LoginForm } from '@/components/login-form'
+import { useLoginModal } from '@/components/providers/login-modal-provider'
+import { useAuth } from '@/components/providers/auth-provider'
+import { UserMenu } from '@/components/user-menu'
 
-import Link from "next/link"
-import { usePathname } from "next/navigation"
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 export function HeaderWithNavLayout({ children }: { children: React.ReactNode }) {
-  const [open, setOpen] = React.useState(false)
+  const [navOpen, setNavOpen] = React.useState(false)
   const [commandOpen, setCommandOpen] = React.useState(false)
+  const { open: loginOpen, setOpen: setLoginOpen, openLogin } = useLoginModal()
+  const { user } = useAuth()
   const pathname = usePathname()
   const [hidden, setHidden] = React.useState(false)
   const [atTop, setAtTop] = React.useState(true)
@@ -22,7 +29,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
       const mq = window.matchMedia('(min-width: 768px)')
-      setOpen(mq.matches)
+      setNavOpen(mq.matches)
       setIsMobile(!mq.matches)
       const onChange = (e: MediaQueryListEvent) => setIsMobile(!e.matches)
       mq.addEventListener('change', onChange)
@@ -65,7 +72,11 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
         <div className="h-full px-6 md:px-8 flex items-center justify-between">
           {/* Left cluster (Logo + toggle on desktop) */}
           <div className="flex items-center gap-2 md:gap-12">
-            <Link href="/" aria-label="Go to home" className="text-xl md:text-2xl font-semibold text-foreground hover:text-primary transition-colors">
+            <Link
+              href="/"
+              aria-label="Go to home"
+              className="text-xl md:text-2xl font-semibold text-foreground hover:text-primary transition-colors"
+            >
               Mike Y.
             </Link>
             <Button
@@ -73,9 +84,9 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
               variant="ghost"
               size="icon"
               className="hidden md:inline-flex pointer-events-auto"
-              onClick={() => setOpen((v) => !v)}
+              onClick={() => setNavOpen((v) => !v)}
             >
-              {open ? (
+              {navOpen ? (
                 <PanelLeft size={20} className="text-zinc-500" />
               ) : (
                 <PanelRight size={20} className="text-zinc-500" />
@@ -85,7 +96,12 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
 
           {/* Right cluster (Search + mobile toggle + Login) */}
           <div className="flex items-center gap-3">
-            <Button aria-label="Search" variant="ghost" size="icon" onClick={() => setCommandOpen(true)}>
+            <Button
+              aria-label="Search"
+              variant="ghost"
+              size="icon"
+              onClick={() => setCommandOpen(true)}
+            >
               <Search size={20} className="text-zinc-500" />
             </Button>
             <Button
@@ -93,29 +109,38 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
               variant="ghost"
               size="icon"
               className="md:hidden"
-              onClick={() => setOpen((v) => !v)}
+              onClick={() => setNavOpen((v) => !v)}
             >
-              {open ? (
+              {navOpen ? (
                 <PanelLeft size={20} className="text-zinc-500" />
               ) : (
                 <PanelRight size={20} className="text-zinc-500" />
               )}
             </Button>
-            <Button className="hidden md:inline-flex" variant="secondary" size="default">
-              Log in
-            </Button>
+            {user ? (
+              <UserMenu />
+            ) : (
+              <Button
+                className="hidden md:inline-flex"
+                variant="secondary"
+                size="default"
+                onClick={() => openLogin()}
+              >
+                Log in
+              </Button>
+            )}
           </div>
         </div>
       </header>
 
       {/* Sidebar */}
       <aside
-        aria-hidden={!open}
+        aria-hidden={!navOpen}
         suppressHydrationWarning
         className={cn(
           'fixed left-0 top-14 md:top-16 bottom-0 z-40 w-[80vw] md:w-[230px] p-5 bg-transparent text-foreground',
           'transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform',
-          open ? 'translate-x-0' : '-translate-x-full',
+          navOpen ? 'translate-x-0' : '-translate-x-full',
         )}
       >
         <div className="flex h-full flex-col">
@@ -125,10 +150,10 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
                 <Link
                   href="/work"
                   onClick={() => {
-                    if (typeof window !== 'undefined' && window.innerWidth < 768) setOpen(false)
+                    if (typeof window !== 'undefined' && window.innerWidth < 768) setNavOpen(false)
                   }}
                   className={cn(
-                    "group flex w-full items-center gap-3 rounded-md px-4 py-3 md:px-3 md:py-2 text-base md:text-sm font-medium [font-family:var(--font-geist-sans)] transition-colors",
+                    'group flex w-full items-center gap-3 rounded-md px-4 py-3 md:px-3 md:py-2 text-base md:text-sm font-medium [font-family:var(--font-geist-sans)] transition-colors',
                     pathname === '/work'
                       ? 'bg-accent text-accent-foreground'
                       : 'text-foreground hover:bg-accent hover:text-accent-foreground',
@@ -141,10 +166,10 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
                 <Link
                   href="/biography"
                   onClick={() => {
-                    if (typeof window !== 'undefined' && window.innerWidth < 768) setOpen(false)
+                    if (typeof window !== 'undefined' && window.innerWidth < 768) setNavOpen(false)
                   }}
                   className={cn(
-                    "group flex w-full items-center gap-3 rounded-md px-4 py-3 md:px-3 md:py-2 text-base md:text-sm font-medium [font-family:var(--font-geist-sans)] transition-colors",
+                    'group flex w-full items-center gap-3 rounded-md px-4 py-3 md:px-3 md:py-2 text-base md:text-sm font-medium [font-family:var(--font-geist-sans)] transition-colors',
                     pathname === '/biography'
                       ? 'bg-accent text-accent-foreground'
                       : 'text-foreground hover:bg-accent hover:text-accent-foreground',
@@ -157,10 +182,10 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
                 <Link
                   href="/stories"
                   onClick={() => {
-                    if (typeof window !== 'undefined' && window.innerWidth < 768) setOpen(false)
+                    if (typeof window !== 'undefined' && window.innerWidth < 768) setNavOpen(false)
                   }}
                   className={cn(
-                    "group flex w-full items-center gap-3 rounded-md px-4 py-3 md:px-3 md:py-2 text-base md:text-sm font-medium [font-family:var(--font-geist-sans)] transition-colors",
+                    'group flex w-full items-center gap-3 rounded-md px-4 py-3 md:px-3 md:py-2 text-base md:text-sm font-medium [font-family:var(--font-geist-sans)] transition-colors',
                     pathname === '/stories'
                       ? 'bg-accent text-accent-foreground'
                       : 'text-foreground hover:bg-accent hover:text-accent-foreground',
@@ -174,21 +199,27 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
 
           {/* Mobile-only footer action */}
           <div className="mt-auto md:hidden flex justify-end">
-            <Button variant="secondary" size="default">Log in</Button>
+            {user ? (
+              <UserMenu />
+            ) : (
+              <Button variant="secondary" size="default" onClick={() => openLogin()}>
+                Log in
+              </Button>
+            )}
           </div>
         </div>
       </aside>
 
       {/* Mobile overlay when sidebar is open */}
       <button
-        aria-hidden={!open}
+        aria-hidden={!navOpen}
         aria-label="Dismiss navigation overlay"
-        onClick={() => setOpen(false)}
+        onClick={() => setNavOpen(false)}
         className={cn(
           'md:hidden fixed left-0 right-0 bottom-0 z-30 transition-opacity duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]',
           hidden ? 'top-0' : 'top-14',
-          open ? "opacity-100" : "opacity-0 pointer-events-none",
-          "bg-white/50 dark:bg-black/50 backdrop-blur-sm",
+          navOpen ? 'opacity-100' : 'opacity-0 pointer-events-none',
+          'bg-white/50 dark:bg-black/50 backdrop-blur-sm',
         )}
       />
 
@@ -197,19 +228,28 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
         suppressHydrationWarning
         className={cn(
           'transform-gpu transition-[transform,margin-left] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform',
-          open ? 'md:ml-[230px]' : 'md:ml-0',
+          navOpen ? 'md:ml-[230px]' : 'md:ml-0',
         )}
-        style={{ transform: isMobile && open ? 'translateX(80vw)' : 'translateX(0)' }}
+        style={{ transform: isMobile && navOpen ? 'translateX(80vw)' : 'translateX(0)' }}
       >
         {/* Content Area */}
         <main className="min-h-[calc(100vh-56px)] md:min-h-[calc(100vh-64px)] px-6 md:px-8 py-6 md:py-8">
-          <div className="max-w-[var(--content-max-width)] mx-auto">
-            {children}
-          </div>
+          <div className="max-w-[var(--content-max-width)] mx-auto">{children}</div>
         </main>
       </div>
-      
+
       <CommandMenu open={commandOpen} onOpenChange={setCommandOpen} />
+
+      {/* Login Modal */}
+      <Dialog open={loginOpen} onOpenChange={setLoginOpen}>
+        <DialogContent
+          aria-label="Log in"
+          className="sm:max-w-sm bg-transparent border-none shadow-none p-0"
+        >
+          <DialogTitle className="sr-only">Log in</DialogTitle>
+          <LoginForm />
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

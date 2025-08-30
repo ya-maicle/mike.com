@@ -14,7 +14,7 @@
     ]
   },
   "engines": {
-    "node": ">=18"
+    "node": "20.17.0"
   },
   "scripts": {
     "dev": "pnpm --filter apps/web dev:swc",
