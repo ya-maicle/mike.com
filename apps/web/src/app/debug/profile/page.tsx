@@ -19,7 +19,6 @@ type Profile = {
 
 export default function ProfileDebugPage() {
   const { user, loading } = useAuth()
-  const supabase = getSupabaseClient()
   const [status, setStatus] = React.useState<'idle' | 'loading' | 'loaded' | 'error'>('idle')
   const [profile, setProfile] = React.useState<Profile | null>(null)
   const [error, setError] = React.useState<string | null>(null)
@@ -29,6 +28,7 @@ export default function ProfileDebugPage() {
     setStatus('loading')
     setError(null)
     try {
+      const supabase = getSupabaseClient()
       const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single()
       if (error && error.code !== 'PGRST116') throw error
       setProfile(data ?? null)
@@ -37,7 +37,7 @@ export default function ProfileDebugPage() {
       setError(e instanceof Error ? e.message : 'Unknown error')
       setStatus('error')
     }
-  }, [supabase, user])
+  }, [user])
 
   React.useEffect(() => {
     if (!loading && user) {
@@ -61,6 +61,7 @@ export default function ProfileDebugPage() {
         </button>
         <button
           onClick={async () => {
+            if (!user) return
             try {
               await upsertProfileFromUser(user)
               await load()
