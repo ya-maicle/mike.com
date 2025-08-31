@@ -71,7 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           try {
             // Best-effort exchange; allow up to 4s in slow networks
             await Promise.race([
-              supabase.auth.exchangeCodeForSession(href as any),
+              supabase.auth.exchangeCodeForSession(href),
               new Promise((resolve) => setTimeout(resolve, 4000)),
             ])
           } catch {}

@@ -37,19 +37,15 @@ export function UserMenu() {
     (user?.user_metadata?.picture as string | undefined) ||
     undefined
   const [avatarUrl, setAvatarUrl] = React.useState<string | undefined>(initialMetaAvatar)
-
-  if (!user) {
-    return null
-  }
+  const [avatarBroken, setAvatarBroken] = React.useState(false)
 
   const name =
-    (user.user_metadata?.full_name as string | undefined) ||
-    (user.user_metadata?.name as string | undefined) ||
+    (user?.user_metadata?.full_name as string | undefined) ||
+    (user?.user_metadata?.name as string | undefined) ||
     ''
 
-  // Pull avatar from profile; don't overwrite once we've fallen back
-  const [avatarBroken, setAvatarBroken] = React.useState(false)
   const metaAvatar = initialMetaAvatar
+
   // Seed avatar from metadata first, else pull from profile
   React.useEffect(() => {
     if (!user) return
@@ -77,6 +73,10 @@ export function UserMenu() {
       cancelled = true
     }
   }, [user, supabase, avatarBroken, metaAvatar])
+
+  if (!user) {
+    return null
+  }
 
   const seededDefault = user ? pickRandomDefaultAvatar(user.id) : undefined
   const resolvedAvatar = avatarUrl || seededDefault
