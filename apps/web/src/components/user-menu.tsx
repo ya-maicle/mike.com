@@ -4,6 +4,8 @@ import * as React from 'react'
 import { useAuth } from '@/components/providers/auth-provider'
 import getSupabaseClient from '@/lib/supabase'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
+import { pickRandomDefaultAvatar } from '@/lib/default-avatars'
+import { toAvatarProxy } from '@/lib/avatar-src'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +16,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Icon } from '@/components/ui/icon'
 import { LogOut } from 'lucide-react'
-import { useRouter } from 'next/navigation'
+// no router needed here; logout stays on current page
 
 function initialsFrom(name?: string | null, email?: string | null) {
   if (name && name.trim().length > 0) {
@@ -27,23 +29,58 @@ function initialsFrom(name?: string | null, email?: string | null) {
 }
 
 export function UserMenu() {
-  const { user } = useAuth()
+  const { user, signOut } = useAuth()
   const supabase = getSupabaseClient()
-  const router = useRouter()
   const [pending, setPending] = React.useState(false)
+  const initialMetaAvatar =
+    (user?.user_metadata?.avatar_url as string | undefined) ||
+    (user?.user_metadata?.picture as string | undefined) ||
+    undefined
+  const [avatarUrl, setAvatarUrl] = React.useState<string | undefined>(initialMetaAvatar)
+  const [avatarBroken, setAvatarBroken] = React.useState(false)
+
+  const name =
+    (user?.user_metadata?.full_name as string | undefined) ||
+    (user?.user_metadata?.name as string | undefined) ||
+    ''
+
+  const metaAvatar = initialMetaAvatar
+
+  // Seed avatar from metadata first, else pull from profile
+  React.useEffect(() => {
+    if (!user) return
+    let cancelled = false
+    ;(async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .eq('id', user.id)
+        .maybeSingle()
+      if (!cancelled) {
+        if (!error && data?.avatar_url) {
+          const dbAvatar = data.avatar_url as string
+          // If we've marked the meta avatar as broken, avoid switching back to it
+          if (!(avatarBroken && dbAvatar === metaAvatar)) {
+            setAvatarUrl(dbAvatar)
+          }
+        } else if (!metaAvatar) {
+          // As a safe fallback (e.g., before profile upsert completes), use a deterministic default
+          setAvatarUrl((prev) => prev ?? pickRandomDefaultAvatar(user.id))
+        }
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [user, supabase, avatarBroken, metaAvatar])
 
   if (!user) {
     return null
   }
 
-  const name =
-    (user.user_metadata?.full_name as string | undefined) ||
-    (user.user_metadata?.name as string | undefined) ||
-    ''
-  const avatarUrl =
-    (user.user_metadata?.avatar_url as string | undefined) ||
-    (user.user_metadata?.picture as string | undefined) ||
-    undefined
+  const seededDefault = user ? pickRandomDefaultAvatar(user.id) : undefined
+  const resolvedAvatar = avatarUrl || seededDefault
+  const proxiedSrc = resolvedAvatar ? toAvatarProxy(resolvedAvatar) : undefined
 
   return (
     <DropdownMenu>
@@ -53,7 +90,18 @@ export function UserMenu() {
           className="inline-flex items-center justify-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <Avatar>
-            {avatarUrl ? <AvatarImage src={avatarUrl} alt={name || user.email || 'User'} /> : null}
+            {proxiedSrc ? (
+              <AvatarImage
+                src={proxiedSrc}
+                alt={name || user.email || 'User'}
+                loading="lazy"
+                referrerPolicy="no-referrer"
+                onError={() => {
+                  setAvatarBroken(true)
+                  setAvatarUrl(seededDefault)
+                }}
+              />
+            ) : null}
             <AvatarFallback>{initialsFrom(name, user.email)}</AvatarFallback>
           </Avatar>
         </button>
@@ -61,7 +109,18 @@ export function UserMenu() {
       <DropdownMenuContent align="end" className="w-64">
         <DropdownMenuLabel className="flex items-center gap-3">
           <Avatar className="size-9">
-            {avatarUrl ? <AvatarImage src={avatarUrl} alt={name || user.email || 'User'} /> : null}
+            {proxiedSrc ? (
+              <AvatarImage
+                src={proxiedSrc}
+                alt={name || user.email || 'User'}
+                loading="lazy"
+                referrerPolicy="no-referrer"
+                onError={() => {
+                  setAvatarBroken(true)
+                  setAvatarUrl(seededDefault)
+                }}
+              />
+            ) : null}
             <AvatarFallback>{initialsFrom(name, user.email)}</AvatarFallback>
           </Avatar>
           <div className="min-w-0">
@@ -71,21 +130,14 @@ export function UserMenu() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          onClick={async (e) => {
-            e.preventDefault()
+          onSelect={async () => {
             if (pending) return
             setPending(true)
-            const { error } = await supabase.auth.signOut()
-            if (error) {
-              console.error('Sign out failed:', error.message)
-            }
             try {
-              router.refresh()
-            } catch {}
-            if (typeof window !== 'undefined') {
-              setTimeout(() => window.location.reload(), 50)
+              await signOut()
+            } finally {
+              setPending(false)
             }
-            setPending(false)
           }}
           className="flex items-center gap-2"
           disabled={pending}

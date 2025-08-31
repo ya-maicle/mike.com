@@ -6,13 +6,13 @@ config({ path: '../../.env.local' })
 
 export async function testSanityConnection(): Promise<boolean> {
   try {
-    console.log('Testing Sanity connection...')
-    console.log(
+    console.warn('Testing Sanity connection...')
+    console.warn(
       'All env vars starting with SANITY:',
       Object.keys(process.env).filter((key) => key.includes('SANITY')),
     )
-    console.log('Project ID:', process.env.NEXT_PUBLIC_SANITY_PROJECT_ID)
-    console.log('Dataset:', process.env.NEXT_PUBLIC_SANITY_DATASET)
+    console.warn('Project ID:', process.env.NEXT_PUBLIC_SANITY_PROJECT_ID)
+    console.warn('Dataset:', process.env.NEXT_PUBLIC_SANITY_DATASET)
 
     // Create a test client directly (avoiding server-only import issue)
     const testClient = createClient({
@@ -26,8 +26,8 @@ export async function testSanityConnection(): Promise<boolean> {
     // Simple query to test connectivity - get any document type count
     const result = await testClient.fetch('*[_type == "sanity.imageAsset"][0..1]')
 
-    console.log('✅ Sanity connection successful')
-    console.log('Query result:', result)
+    console.warn('✅ Sanity connection successful')
+    console.warn('Query result:', result)
     return true
   } catch (error) {
     console.error('❌ Sanity connection failed:', error)
