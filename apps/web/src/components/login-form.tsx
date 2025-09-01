@@ -28,6 +28,15 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
           ? `${window.location.pathname}${window.location.search}${window.location.hash}`
           : '/'
       const redirectTo = `${SITE_URL}${currentPath || '/'}`
+      try {
+        if (
+          process.env.NEXT_PUBLIC_AUTH_DEBUG === '1' ||
+          localStorage.getItem('auth-debug') === '1'
+        ) {
+          // eslint-disable-next-line no-console
+          console.log('[AUTH] Google OAuth start', { redirectTo })
+        }
+      } catch {}
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -36,10 +45,10 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
         },
       })
       if (error) {
-        console.error('Google OAuth error:', error.message)
+        console.error('[AUTH] Google OAuth error:', error.message)
       }
     } catch (e) {
-      console.error(e)
+      console.error('[AUTH] Google OAuth exception:', e)
     }
   }
 
@@ -55,6 +64,15 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
           ? `${window.location.pathname}${window.location.search}${window.location.hash}`
           : '/'
       const emailRedirectTo = `${SITE_URL}${currentPath || '/'}`
+      try {
+        if (
+          process.env.NEXT_PUBLIC_AUTH_DEBUG === '1' ||
+          localStorage.getItem('auth-debug') === '1'
+        ) {
+          // eslint-disable-next-line no-console
+          console.log('[AUTH] Requesting magic link', { email, emailRedirectTo })
+        }
+      } catch {}
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
@@ -65,12 +83,23 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
       })
       if (error) {
         setErrorMsg(error.message || 'Unable to send magic link. Please try again.')
+        console.error('[AUTH] Magic link error:', error)
       } else {
         setSent(true)
         setInfoMsg('Check your email for a magic link to sign in.')
+        try {
+          if (
+            process.env.NEXT_PUBLIC_AUTH_DEBUG === '1' ||
+            localStorage.getItem('auth-debug') === '1'
+          ) {
+            // eslint-disable-next-line no-console
+            console.log('[AUTH] Magic link sent')
+          }
+        } catch {}
       }
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : 'Unexpected error. Please try again.')
+      console.error('[AUTH] Magic link exception:', err)
     } finally {
       setPending(false)
     }

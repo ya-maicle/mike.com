@@ -161,3 +161,63 @@ Providers (already set in `apps/web/src/app/layout.tsx`):
 Example in this repo:
 
 - `apps/web/src/app/stories/page.tsx` uses `Protected` to require sign-in.
+
+## Authentication: Login & Logout (Supabase)
+
+This app uses a single Supabase browser client configured for the implicit flow. It supports both Google OAuth and passwordless Magic Link and keeps sessions in sync across tabs.
+
+Key points
+
+- Client: one implicit-flow client with `autoRefreshToken`, `persistSession`, `detectSessionInUrl`, and `multiTab` enabled (see `apps/web/src/lib/supabase.ts`).
+- Returns: the `AuthProvider` handles all return shapes and cleans the URL afterwards (see `apps/web/src/components/providers/auth-provider.tsx`).
+  - `#access_token=…` (common for magic links) → session is set via `detectSessionInUrl`.
+  - `?token_hash=…&type=…` (magic link variant) → verified with `verifyOtp`.
+  - `?code=…` (some providers) → falls back to `exchangeCodeForSession`.
+- Google button and Magic Link send live in `apps/web/src/components/login-form.tsx`.
+- Logout is instant (clears local session immediately) and revokes globally in the background; other tabs are notified via storage events.
+
+Environment
+
+- `NEXT_PUBLIC_SUPABASE_URL`: your project URL (e.g. `https://<ref>.supabase.co`).
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: anon key for the same project.
+- `NEXT_PUBLIC_SITE_URL`: the site origin used for redirects (must match the domain you’re on). Avoid trailing spaces/newlines.
+
+Supabase settings (per environment)
+
+- Auth → URL Configuration
+  - Site URL: your canonical domain for that env (`http://localhost:3000`, `https://preview.mikeiu.com`, `https://maicle.co.uk`).
+  - Redirect URLs: add every domain you will redirect back to (localhost, preview, prod, www variants).
+- Auth → Providers → Google
+  - Enable and set Client ID/Secret.
+  - Google “Authorized redirect URI”: `https://<ref>.supabase.co/auth/v1/callback`.
+- Auth → Email
+  - Enable Magic Link. Increase expiration time if prefetchers cause `otp_expired`.
+
+Known gotchas
+
+- Email link prefetch: Some email clients/security scanners “open” links which can consume one-time tokens (`otp_expired`). Resend the link and open directly in the browser. We can add a “Resend link” banner if desired.
+- Domain mismatch: Always open the site with the same host configured in Supabase. `127.0.0.1` vs `localhost` will fail allowlists.
+- Trailing newline: Ensure `NEXT_PUBLIC_SITE_URL` has no trailing whitespace (causes redirect_to mismatches).
+
+Debug logging
+
+- Enable in browser (no redeploy):
+  - `localStorage.setItem('auth-debug', '1')` then hard refresh.
+- Or set `NEXT_PUBLIC_AUTH_DEBUG=1` (and redeploy).
+- Logs are prefixed with `[AUTH]` (e.g., “Exchanging code…”, “Verifying magic link…”, “SIGNED_IN”).
+
+Logout behavior
+
+- Immediate local sign-out to avoid UI hangs.
+- Background global revoke (non-blocking).
+- Broadcast to other tabs via `localStorage` to keep headers in sync.
+
+Default profile data
+
+- On first sign-in, we upsert a `profiles` row with a default avatar and name if missing; we also attempt to mirror the name to `user.user_metadata` for UI consistency (see `apps/web/src/lib/profile.ts`).
+- Ensure RLS for `public.profiles` allows users to select/insert/update their own row.
+
+Troubleshooting checklist
+
+- Google fails with 400 on return: verify `NEXT_PUBLIC_SITE_URL` and redirect allowlists; confirm the authorized redirect URI in Google Cloud is `https://<ref>.supabase.co/auth/v1/callback`.
+- Magic link opens in new tab but doesn’t sign in: check for `[AUTH]` lines mentioning hash tokens; if the email client consumed the link, click “Resend magic link”.
