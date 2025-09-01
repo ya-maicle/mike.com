@@ -83,7 +83,6 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
       })
       if (error) {
         setErrorMsg(error.message || 'Unable to send magic link. Please try again.')
-        // eslint-disable-next-line no-console
         console.error('[AUTH] Magic link error:', error)
       } else {
         setSent(true)

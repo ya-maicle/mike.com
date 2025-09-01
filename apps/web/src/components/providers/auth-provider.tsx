@@ -33,11 +33,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
   const mask = (v?: string | null) => (v ? `${v.slice(0, 6)}…` : v)
-  const dlog = (...args: any[]) => {
-    if (!isDebug) return
-    // eslint-disable-next-line no-console
-    console.log('[AUTH]', ...args)
-  }
+  const dlog = React.useCallback(
+    (...args: unknown[]) => {
+      if (!isDebug) return
+      // eslint-disable-next-line no-console
+      console.log('[AUTH]', ...args)
+    },
+    [isDebug],
+  )
 
   const cleanupAuthParams = React.useCallback(() => {
     if (typeof window === 'undefined') return
@@ -143,6 +146,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   ? rawType
                   : 'magiclink'
               dlog('Verifying magic link via verifyOtp…', { type, tokenHash: mask(tokenHash) })
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               await (supabase.auth as any).verifyOtp({ token_hash: tokenHash, type })
               cleanupAuthParams()
             } else if ((window.location.hash || '').includes('access_token=')) {
@@ -159,7 +163,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               cleanupAuthParams()
             }
           } catch (err) {
-            dlog('Exchange/verify error:', (err as any)?.message || err)
+            dlog('Exchange/verify error:', err instanceof Error ? err.message : String(err))
           }
         }
         const { data } = await supabase.auth.getSession()
@@ -238,7 +242,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       window.removeEventListener('storage', onStorage)
       document.removeEventListener('visibilitychange', onVisible)
     }
-  }, [cleanupAuthParams])
+  }, [cleanupAuthParams, dlog])
 
   const signOut = React.useCallback(async () => {
     const supabase = getSupabaseClient()
@@ -280,7 +284,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const p = supabase.auth.signOut({ scope: 'global' })
       Promise.race([p, new Promise((resolve) => setTimeout(resolve, 2000))]).catch(() => {})
     } catch {}
-  }, [])
+  }, [dlog])
 
   const value = React.useMemo(
     () => ({ user, session, loading, signOut }),
