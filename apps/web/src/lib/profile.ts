@@ -3,11 +3,11 @@
 import type { User } from '@supabase/supabase-js'
 import getSupabaseClient from './supabase'
 import { pickRandomDefaultAvatar } from './default-avatars'
+import { pickRandomDefaultName } from './default-names'
 
 export async function upsertProfileFromUser(user: User) {
   const supabase = getSupabaseClient()
-
-  const full_name =
+  const metaName =
     (user.user_metadata?.full_name as string | undefined) ||
     (user.user_metadata?.name as string | undefined) ||
     ''
@@ -20,17 +20,48 @@ export async function upsertProfileFromUser(user: User) {
 
   const email = user.email
 
-  // Load existing profile to preserve any prior avatar assignment
-  const { data: existing } = await supabase
-    .from('profiles')
-    .select('avatar_url')
-    .eq('id', user.id)
-    .maybeSingle()
+  // Best-effort read of existing profile (may be blocked by RLS in fresh projects)
+  let existing: { avatar_url?: string | null; full_name?: string | null } | null = null
+  try {
+    const { data } = await supabase
+      .from('profiles')
+      .select('avatar_url, full_name')
+      .eq('id', user.id)
+      .maybeSingle()
+    existing = data ?? null
+  } catch {
+    existing = null
+  }
 
+  const defaultName = pickRandomDefaultName(user.id || user.email || undefined)
+  const finalName = metaName?.trim()
+    ? metaName
+    : existing?.full_name?.trim()
+      ? (existing!.full_name as string)
+      : defaultName
   const finalAvatar = incomingAvatar || existing?.avatar_url || pickRandomDefaultAvatar(user.id)
 
-  const { error } = await supabase
-    .from('profiles')
-    .upsert({ id: user.id, email, full_name, avatar_url: finalAvatar }, { onConflict: 'id' })
-  if (error) throw error
+  // Update auth metadata immediately so any UI using user.user_metadata sees a name
+  try {
+    if (!metaName || metaName.trim().length === 0) {
+      await supabase.auth.updateUser({ data: { full_name: finalName, name: finalName } })
+    }
+  } catch {}
+
+  // Upsert profile (non-throwing; log for debugging but don't block login)
+  try {
+    const { error } = await supabase
+      .from('profiles')
+      .upsert(
+        { id: user.id, email, full_name: finalName, avatar_url: finalAvatar },
+        { onConflict: 'id' },
+      )
+    if (error) {
+      // eslint-disable-next-line no-console
+      console.warn('profiles upsert failed:', error.message)
+    }
+  } catch (e: any) {
+    // eslint-disable-next-line no-console
+    console.warn('profiles upsert exception:', e?.message || e)
+  }
 }
