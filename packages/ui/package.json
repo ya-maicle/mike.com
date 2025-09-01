@@ -5,10 +5,12 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
+      "types": "./src/index.ts",
+      "development": "./src/index.ts",
       "default": "./dist/index.js"
     },
-    "./styles/tokens.css": "./styles/tokens.css"
+    "./styles/primitives.css": "./styles/primitives.css",
+    "./styles/semantic.css": "./styles/semantic.css"
   },
   "files": [
     "dist",
@@ -16,28 +18,36 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "build:watch": "tsc -p tsconfig.json --watch --preserveWatchOutput",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build -o storybook-static"
+    "build-storybook": "storybook build -o storybook-static",
+    "prepublishOnly": "pnpm run build"
   },
   "peerDependencies": {
     "react": "^18 || ^19",
     "react-dom": "^18 || ^19"
   },
   "devDependencies": {
-    "typescript": "^5",
-    "storybook": "^8",
-    "@storybook/react": "^8",
-    "@storybook/react-vite": "^8",
+    "@maicle/config": "workspace:*",
+    "geist": "^1.4.2",
+    "@storybook/addon-a11y": "^8",
     "@storybook/addon-essentials": "^8",
     "@storybook/addon-interactions": "^8",
-    "@storybook/addon-a11y": "^8",
+    "@storybook/react": "^8",
+    "@storybook/react-vite": "^8",
     "@storybook/test": "^8",
-    "vite": "^5",
+    "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "@types/node": "^20",
-    "@maicle/config": "workspace:*"
+    "storybook": "^8",
+    "typescript": "^5",
+    "vite": "^5"
+  },
+  "dependencies": {
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.3.1"
   }
 }

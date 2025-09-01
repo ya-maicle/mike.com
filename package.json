@@ -5,17 +5,31 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "supabase"
+    ],
+    "ignoredBuiltDependencies": [
+      "@tailwindcss/oxide",
+      "esbuild",
+      "sharp",
+      "unrs-resolver"
     ]
   },
   "engines": {
-    "node": ">=18"
+    "node": "20.17.0"
   },
   "scripts": {
-    "dev": "pnpm --filter ./apps/* dev",
+    "dev": "pnpm --filter apps/web dev:swc",
+    "dev:web": "pnpm --filter apps/web dev",
+    "dev:web:swc": "pnpm --filter apps/web dev:swc",
+    "build:web": "pnpm --filter apps/web build",
+    "start:web": "pnpm --filter apps/web start",
+    "storybook:web": "pnpm --filter apps/web storybook",
+    "dev:ui+web": "concurrently -n ui,web -c green,cyan \"pnpm --filter @maicle/ui build:watch\" \"pnpm --filter apps/web dev:swc\"",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
+    "clean": "rm -rf apps/web/.next packages/ui/dist",
+    "kill:3000": "pnpm dlx kill-port 3000",
     "e2e:install-browsers": "playwright install --with-deps chromium",
     "e2e:smoke": "playwright test --config=playwright.config.ts",
     "e2e:smoke:debug": "PWDEBUG=1 playwright test --config=playwright.config.ts",
@@ -34,6 +48,9 @@
     ]
   },
   "devDependencies": {
+    "concurrently": "^9.0.1",
+    "@playwright/test": "^1.49.0",
+    "@types/node": "^20",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
     "dotenv-cli": "^10.0.0",
@@ -45,7 +62,6 @@
     "lint-staged": "^15.2.9",
     "prettier": "^3.3.3",
     "supabase": "^1.183.5",
-    "typescript": "^5.5.4",
-    "@playwright/test": "^1.49.0"
+    "typescript": "^5.5.4"
   }
 }

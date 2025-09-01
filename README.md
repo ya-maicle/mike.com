@@ -100,3 +100,64 @@ pnpm e2e:smoke:ci          # Run smoke tests in CI
 - [Deployment Pipeline](docs/operations/deployment-pipeline.md) - Complete pipeline documentation
 - [Phase 0 Log](docs/logs/phase-0-log.md) - Infrastructure setup history
 - [PRD](docs/product_requirements_document.md) - Complete product requirements
+- [Development Stability Plan](docs/development/dev-stabilization.md) - Steps to stabilize local/UI dev
+
+### Protecting routes and sections (auth)
+
+The web app uses Supabase Auth. To gate content for signed-in users, use the `Protected` wrapper.
+
+Basic usage (page-level):
+
+```tsx
+// apps/web/src/app/some-protected/page.tsx
+'use client'
+import { Protected } from '@/components/protected'
+
+export default function SomeProtectedPage() {
+  return (
+    <Protected
+      onUnauthed="modal"
+      fallback={<div className="p-6">Sign in to access this page.</div>}
+    >
+      <div>Your protected content here…</div>
+    </Protected>
+  )
+}
+```
+
+- `onUnauthed="modal"` opens the login modal automatically when unauthenticated.
+- `fallback` renders while unauthenticated (until the user signs in).
+
+Section-level gating:
+
+```tsx
+'use client'
+import { Protected } from '@/components/protected'
+
+function Card() {
+  return (
+    <div>
+      <h2>Public area</h2>
+      <Protected fallback={null}>
+        <button className="rounded-md border px-3 py-1">Members Action</button>
+      </Protected>
+    </div>
+  )
+}
+```
+
+Providers (already set in `apps/web/src/app/layout.tsx`):
+
+```tsx
+<AuthProvider>
+  <LoginModalProvider>
+    <ThemeProvider ...>
+      <HeaderWithNavLayout>{children}</HeaderWithNavLayout>
+    </ThemeProvider>
+  </LoginModalProvider>
+</AuthProvider>
+```
+
+Example in this repo:
+
+- `apps/web/src/app/stories/page.tsx` uses `Protected` to require sign-in.

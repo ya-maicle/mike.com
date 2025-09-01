@@ -1,0 +1,18 @@
+{
+  "version": 1.1,
+  "atDirectives": [
+    {
+      "name": "@apply",
+      "description": "Tailwind CSS directive to apply utility classes inside CSS."
+    },
+    {
+      "name": "@theme",
+      "description": "Tailwind CSS v4 directive for defining theme tokens (inline)."
+    },
+    {
+      "name": "@variant",
+      "description": "Tailwind CSS v4 directive to declare a custom variant (e.g., dark mode)."
+    }
+  ]
+}
+
