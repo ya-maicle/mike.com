@@ -46,13 +46,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const isAuthReturn =
         url.searchParams.has('code') ||
         url.searchParams.has('token_hash') ||
-        url.searchParams.has('error_description')
+        url.searchParams.has('error_description') ||
+        (window.location.hash &&
+          /access_token|refresh_token|token_type|expires_in/i.test(window.location.hash))
       if (!isAuthReturn) return
       ;['code', 'state', 'error_description', 'error', 'provider', 'token_hash', 'type'].forEach(
         (p) => url.searchParams.delete(p),
       )
-      const next =
-        url.pathname + (url.searchParams.toString() ? `?${url.searchParams}` : '') + url.hash
+      let next = url.pathname + (url.searchParams.toString() ? `?${url.searchParams}` : '')
+      // Drop auth fragments from hash entirely
+      if (
+        window.location.hash &&
+        /access_token|refresh_token|token_type|expires_in/i.test(window.location.hash)
+      ) {
+        // skip appending hash to avoid leaking tokens in the URL bar
+      } else {
+        next += url.hash
+      }
       window.history.replaceState({}, '', next)
     } catch {}
   }, [])
@@ -73,8 +83,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         tokenHash = url.searchParams.get('token_hash')
         tokenType = url.searchParams.get('type')
         hasTokenHash = !!tokenHash
+        const hasHashTokens = (window.location.hash || '').includes('access_token=')
         dlog('Mount href:', href)
-        dlog('Detected return flags:', { hasPkceCode, hasTokenHash, type: tokenType })
+        dlog('Detected return flags:', {
+          hasPkceCode,
+          hasTokenHash,
+          type: tokenType,
+          hasHashTokens,
+        })
         if (hasPkceCode) {
           for (let i = 0; i < localStorage.length; i++) {
             const k = localStorage.key(i)
@@ -117,14 +133,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (typeof window !== 'undefined') {
           const href = window.location.href
           try {
-            if (hasPkceCode) {
-              dlog('Exchanging PKCE code via exchangeCodeForSession…')
-              await Promise.race([
-                supabase.auth.exchangeCodeForSession(href),
-                new Promise((resolve) => setTimeout(resolve, 4000)),
-              ])
-              cleanupAuthParams()
-            } else if (hasTokenHash && tokenHash) {
+            if (hasTokenHash && tokenHash) {
               const rawType = (tokenType || '').toLowerCase()
               const type =
                 rawType === 'recovery' ||
@@ -135,6 +144,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   : 'magiclink'
               dlog('Verifying magic link via verifyOtp…', { type, tokenHash: mask(tokenHash) })
               await (supabase.auth as any).verifyOtp({ token_hash: tokenHash, type })
+              cleanupAuthParams()
+            } else if ((window.location.hash || '').includes('access_token=')) {
+              // Hash tokens present; let detectSessionInUrl set the session.
+              dlog('Hash tokens detected; awaiting detectSessionInUrl…')
+              await new Promise((r) => setTimeout(r, 50))
+            } else if (hasPkceCode) {
+              // Some providers may still return ?code=. Try exchange with same client.
+              dlog('Exchanging code via exchangeCodeForSession (implicit client)…')
+              await Promise.race([
+                supabase.auth.exchangeCodeForSession(href),
+                new Promise((resolve) => setTimeout(resolve, 4000)),
+              ])
               cleanupAuthParams()
             }
           } catch (err) {
