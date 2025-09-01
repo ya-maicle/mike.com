@@ -19,6 +19,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = React.useState<Session | null>(null)
   const [loading, setLoading] = React.useState(true)
 
+  const cleanupAuthParams = React.useCallback(() => {
+    if (typeof window === 'undefined') return
+    try {
+      const url = new URL(window.location.href)
+      const isAuthReturn =
+        url.searchParams.has('code') ||
+        url.searchParams.has('token_hash') ||
+        url.searchParams.has('error_description')
+      if (!isAuthReturn) return
+      ;['code', 'state', 'error_description', 'error', 'provider', 'token_hash', 'type'].forEach(
+        (p) => url.searchParams.delete(p),
+      )
+      const next =
+        url.pathname + (url.searchParams.toString() ? `?${url.searchParams}` : '') + url.hash
+      window.history.replaceState({}, '', next)
+    } catch {}
+  }, [])
+
   React.useEffect(() => {
     let mounted = true
 
@@ -60,6 +78,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
           await upsertProfileFromUser(newSession.user)
         } catch {}
+        // Remove OAuth/Magic Link query params once we've processed the session
+        cleanupAuthParams()
       }
     })
 
@@ -74,6 +94,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               supabase.auth.exchangeCodeForSession(href),
               new Promise((resolve) => setTimeout(resolve, 4000)),
             ])
+            cleanupAuthParams()
           } catch {}
         }
         const { data } = await supabase.auth.getSession()
@@ -145,7 +166,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       window.removeEventListener('storage', onStorage)
       document.removeEventListener('visibilitychange', onVisible)
     }
-  }, [])
+  }, [cleanupAuthParams])
 
   const signOut = React.useCallback(async () => {
     const supabase = getSupabaseClient()
