@@ -20,7 +20,6 @@ export function getSupabaseClient(): SupabaseClient {
         autoRefreshToken: true,
         persistSession: true,
         detectSessionInUrl: true,
-        multiTab: true,
       },
     })
   }
