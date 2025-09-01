@@ -19,6 +19,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = React.useState<Session | null>(null)
   const [loading, setLoading] = React.useState(true)
 
+  // Debug logger (enable by setting NEXT_PUBLIC_AUTH_DEBUG=1 or localStorage.setItem('auth-debug','1'))
+  const isDebug = React.useMemo(() => {
+    if (typeof window === 'undefined') return process.env.NEXT_PUBLIC_AUTH_DEBUG === '1'
+    try {
+      return (
+        process.env.NEXT_PUBLIC_AUTH_DEBUG === '1' ||
+        localStorage.getItem('auth-debug') === '1' ||
+        process.env.NODE_ENV !== 'production'
+      )
+    } catch {
+      return process.env.NEXT_PUBLIC_AUTH_DEBUG === '1'
+    }
+  }, [])
+  const mask = (v?: string | null) => (v ? `${v.slice(0, 6)}…` : v)
+  const dlog = (...args: any[]) => {
+    if (!isDebug) return
+    // eslint-disable-next-line no-console
+    console.log('[AUTH]', ...args)
+  }
+
   const cleanupAuthParams = React.useCallback(() => {
     if (typeof window === 'undefined') return
     try {
@@ -40,26 +60,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     let mounted = true
 
-    // 0) If returning via magic link/PKCE in a new tab, ensure the code_verifier
-    // is present in sessionStorage BEFORE creating the Supabase client, so that
-    // any internal URL detection/exchange can succeed.
-    let needsExchange = false
+    // 0) Detect PKCE vs Magic Link, prep code_verifier for PKCE
+    let hasPkceCode = false
+    let hasTokenHash = false
+    let tokenHash: string | null = null
+    let tokenType: string | null = null
     if (typeof window !== 'undefined') {
       try {
         const href = window.location.href
         const url = new URL(href)
-        const hasCodeOrTokenHash = !!(
-          url.searchParams.get('code') || url.searchParams.get('token_hash')
-        )
-        // Only run manual exchange for code/token_hash; leave hash tokens to detectSessionInUrl
-        needsExchange = hasCodeOrTokenHash
-        if (needsExchange) {
+        hasPkceCode = !!url.searchParams.get('code')
+        tokenHash = url.searchParams.get('token_hash')
+        tokenType = url.searchParams.get('type')
+        hasTokenHash = !!tokenHash
+        dlog('Mount href:', href)
+        dlog('Detected return flags:', { hasPkceCode, hasTokenHash, type: tokenType })
+        if (hasPkceCode) {
           for (let i = 0; i < localStorage.length; i++) {
             const k = localStorage.key(i)
             if (!k) continue
             if (/^sb-.*-auth-token-code-verifier$/.test(k) && !sessionStorage.getItem(k)) {
               const v = localStorage.getItem(k)
               if (v) sessionStorage.setItem(k, v)
+              dlog('Copied code_verifier to sessionStorage from', k)
             }
           }
         }
@@ -70,6 +93,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // 1) Subscribe first so SIGNED_IN from code exchange is captured
     const { data: sub } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+      dlog('onAuthStateChange:', event, {
+        hasSession: !!newSession,
+        userId: newSession?.user?.id,
+        exp: newSession?.expires_at,
+      })
       setSession(newSession)
       setUser(newSession?.user ?? null)
       // Ensure we never get stuck in loading after an auth event
@@ -83,22 +111,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     })
 
-    // 2) Attempt code exchange (if indicated), then read session
+    // 2) Attempt PKCE (code) exchange or Magic Link (token_hash) verify, then read session
     ;(async () => {
       try {
-        if (typeof window !== 'undefined' && needsExchange) {
+        if (typeof window !== 'undefined') {
           const href = window.location.href
           try {
-            // Best-effort exchange; allow up to 4s in slow networks
-            await Promise.race([
-              supabase.auth.exchangeCodeForSession(href),
-              new Promise((resolve) => setTimeout(resolve, 4000)),
-            ])
-            cleanupAuthParams()
-          } catch {}
+            if (hasPkceCode) {
+              dlog('Exchanging PKCE code via exchangeCodeForSession…')
+              await Promise.race([
+                supabase.auth.exchangeCodeForSession(href),
+                new Promise((resolve) => setTimeout(resolve, 4000)),
+              ])
+              cleanupAuthParams()
+            } else if (hasTokenHash && tokenHash) {
+              const rawType = (tokenType || '').toLowerCase()
+              const type =
+                rawType === 'recovery' ||
+                rawType === 'email_change' ||
+                rawType === 'invite' ||
+                rawType === 'signup'
+                  ? rawType
+                  : 'magiclink'
+              dlog('Verifying magic link via verifyOtp…', { type, tokenHash: mask(tokenHash) })
+              await (supabase.auth as any).verifyOtp({ token_hash: tokenHash, type })
+              cleanupAuthParams()
+            }
+          } catch (err) {
+            dlog('Exchange/verify error:', (err as any)?.message || err)
+          }
         }
         const { data } = await supabase.auth.getSession()
         if (!mounted) return
+        dlog('Post-exchange getSession:', {
+          hasSession: !!data.session,
+          userId: data.session?.user?.id,
+        })
         setSession(data.session ?? null)
         setUser(data.session?.user ?? null)
         setLoading(false)
@@ -119,6 +167,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (key === 'app-auth-event') {
         try {
           const payload = JSON.parse(e.newValue || '{}') as { event?: string }
+          dlog('storage: app-auth-event', payload)
           if (payload?.event === 'SIGNED_OUT') {
             // do not await; ensure immediate state update
             supabase.auth.signOut({ scope: 'local' }).catch(() => {})
@@ -131,6 +180,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       // Supabase token changes: resync session
       if (/^sb-.*-auth-token(\..*)?$/.test(key)) {
+        dlog('storage: supabase token key changed', { key, present: e.newValue != null })
         // If token removed (e.newValue === null), treat as signed out
         if (e.newValue === null) {
           supabase.auth.signOut({ scope: 'local' }).catch(() => {})
@@ -151,6 +201,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Visibility change: resync when a tab becomes active (last-ditch fix)
     const onVisible = () => {
       if (document.visibilityState === 'visible') {
+        dlog('visibilitychange: visible → revalidate session')
         supabase.auth.getSession().then(({ data }) => {
           setSession(data.session ?? null)
           setUser(data.session?.user ?? null)
@@ -172,6 +223,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const supabase = getSupabaseClient()
     // 1) Immediately clear local session to avoid UI hang
     try {
+      dlog('signOut: local')
       await Promise.race([
         supabase.auth.signOut({ scope: 'local' }),
         new Promise((resolve) => setTimeout(resolve, 500)),
@@ -197,11 +249,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(false)
     // Broadcast to other tabs to resync
     try {
+      dlog('signOut: broadcast app-auth-event')
       localStorage.setItem('app-auth-event', JSON.stringify({ event: 'SIGNED_OUT', t: Date.now() }))
     } catch {}
 
     // 2) Fire-and-forget a global revoke in the background (non-blocking)
     try {
+      dlog('signOut: global (background)')
       const p = supabase.auth.signOut({ scope: 'global' })
       Promise.race([p, new Promise((resolve) => setTimeout(resolve, 2000))]).catch(() => {})
     } catch {}
