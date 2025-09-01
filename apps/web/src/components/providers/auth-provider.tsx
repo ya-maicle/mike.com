@@ -166,7 +166,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       window.removeEventListener('storage', onStorage)
       document.removeEventListener('visibilitychange', onVisible)
     }
-  }, [])
+  }, [cleanupAuthParams])
 
   const signOut = React.useCallback(async () => {
     const supabase = getSupabaseClient()

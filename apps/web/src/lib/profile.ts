@@ -57,11 +57,9 @@ export async function upsertProfileFromUser(user: User) {
         { onConflict: 'id' },
       )
     if (error) {
-      // eslint-disable-next-line no-console
       console.warn('profiles upsert failed:', error.message)
     }
-  } catch (e: any) {
-    // eslint-disable-next-line no-console
-    console.warn('profiles upsert exception:', e?.message || e)
+  } catch (e: unknown) {
+    console.warn('profiles upsert exception:', e instanceof Error ? e.message : String(e))
   }
 }
