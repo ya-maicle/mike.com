@@ -40,20 +40,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   React.useEffect(() => {
     let mounted = true
 
-    // 0) If returning via magic link/PKCE in a new tab, ensure the code_verifier
-    // is present in sessionStorage BEFORE creating the Supabase client, so that
-    // any internal URL detection/exchange can succeed.
-    let needsExchange = false
+    // 0) Detect PKCE (code) vs Magic Link (token_hash) returns and prep accordingly.
+    let hasPkceCode = false
+    let hasTokenHash = false
+    let tokenHash: string | null = null
+    let tokenType: string | null = null
     if (typeof window !== 'undefined') {
       try {
         const href = window.location.href
         const url = new URL(href)
-        const hasCodeOrTokenHash = !!(
-          url.searchParams.get('code') || url.searchParams.get('token_hash')
-        )
-        // Only run manual exchange for code/token_hash; leave hash tokens to detectSessionInUrl
-        needsExchange = hasCodeOrTokenHash
-        if (needsExchange) {
+        hasPkceCode = !!url.searchParams.get('code')
+        tokenHash = url.searchParams.get('token_hash')
+        tokenType = url.searchParams.get('type')
+        hasTokenHash = !!tokenHash
+        if (hasPkceCode) {
           for (let i = 0; i < localStorage.length; i++) {
             const k = localStorage.key(i)
             if (!k) continue
@@ -83,18 +83,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     })
 
-    // 2) Attempt code exchange (if indicated), then read session
+    // 2) Attempt code (PKCE) or token (magic link) exchange, then read session
     ;(async () => {
       try {
-        if (typeof window !== 'undefined' && needsExchange) {
+        if (typeof window !== 'undefined') {
           const href = window.location.href
           try {
-            // Best-effort exchange; allow up to 4s in slow networks
-            await Promise.race([
-              supabase.auth.exchangeCodeForSession(href),
-              new Promise((resolve) => setTimeout(resolve, 4000)),
-            ])
-            cleanupAuthParams()
+            if (hasPkceCode) {
+              await Promise.race([
+                supabase.auth.exchangeCodeForSession(href),
+                new Promise((resolve) => setTimeout(resolve, 4000)),
+              ])
+              cleanupAuthParams()
+            } else if (hasTokenHash && tokenHash) {
+              const rawType = (tokenType || '').toLowerCase()
+              const type =
+                rawType === 'recovery' ||
+                rawType === 'email_change' ||
+                rawType === 'invite' ||
+                rawType === 'signup'
+                  ? rawType
+                  : 'magiclink'
+              // verify magic-link token; cast to any to support token_hash-only signature
+              await (supabase.auth as any).verifyOtp({ token_hash: tokenHash, type })
+              cleanupAuthParams()
+            }
           } catch {}
         }
         const { data } = await supabase.auth.getSession()
