@@ -1,11 +1,8 @@
 import type { Preview } from '@storybook/nextjs-vite'
 import React from 'react'
 import '../src/app/globals.css'
-<<<<<<< HEAD
-import 'geist/font/sans'
-import 'geist/font/mono'
-=======
->>>>>>> origin/preview
+// import 'geist/font/sans'
+// import 'geist/font/mono'
 
 const preview: Preview = {
   parameters: {
@@ -16,31 +13,23 @@ const preview: Preview = {
       },
     },
     backgrounds: {
-<<<<<<< HEAD
       default: 'light',
       values: [
         { name: 'light', value: '#ffffff' },
         { name: 'dark', value: '#0b0b0f' },
         { name: 'transparent', value: 'transparent' },
       ],
-=======
-      disable: true,
->>>>>>> origin/preview
     },
     a11y: {
       test: 'todo',
     },
   },
   decorators: [
-<<<<<<< HEAD
-    (Story) => <Story />,
-=======
     (Story) => (
       <div className="bg-background text-foreground p-8">
         <Story />
       </div>
     ),
->>>>>>> origin/preview
   ],
 }
 
