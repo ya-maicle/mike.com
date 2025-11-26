@@ -22,10 +22,14 @@ export const sanityClient = createClient({
 export async function sanityFetch<T>(
   query: string,
   params: Record<string, unknown> = {},
-  options?: { tag?: string },
+  options?: { tag?: string; revalidate?: number },
 ): Promise<T> {
+  const revalidate = options?.revalidate ?? (process.env.NODE_ENV === 'development' ? 60 : 300)
+
   return sanityClient.fetch<T>(query, params, {
-    cache: 'force-cache',
-    ...(options?.tag ? { next: { tags: [options.tag] } } : {}),
+    next: {
+      revalidate,
+      ...(options?.tag ? { tags: [options.tag] } : {}),
+    },
   })
 }

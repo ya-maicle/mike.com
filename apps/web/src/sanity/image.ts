@@ -3,7 +3,12 @@
 // Supports width/height options and always applies auto=format for optimal delivery
 export function imageUrl(
   source: any,
-  opts?: { width?: number; height?: number; fit?: 'clip' | 'crop' | 'scale' | 'min' },
+  opts?: {
+    width?: number
+    height?: number
+    fit?: 'clip' | 'crop' | 'scale' | 'min'
+    quality?: number
+  },
 ) {
   const rawUrl: string | undefined = source?.asset?.url
   if (!rawUrl) return ''
@@ -12,5 +17,6 @@ export function imageUrl(
   if (opts?.width) url.searchParams.set('w', String(opts.width))
   if (opts?.height) url.searchParams.set('h', String(opts.height))
   if (opts?.fit) url.searchParams.set('fit', opts.fit)
+  if (opts?.quality) url.searchParams.set('q', String(opts.quality))
   return url.toString()
 }

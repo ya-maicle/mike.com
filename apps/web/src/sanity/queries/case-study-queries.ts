@@ -43,7 +43,7 @@ export const CASE_STUDY_WITH_BLOCKS = groq`
 
 // Fetch all published case studies for listing (minimal projection)
 export const PUBLISHED_CASE_STUDIES = groq`
-  *[_type == "caseStudy" && published == true] | order(featuredOrder asc){
+  *[_type == "caseStudy" && defined(slug.current)] | order(featuredOrder asc){
     _id,
     title,
     summary,

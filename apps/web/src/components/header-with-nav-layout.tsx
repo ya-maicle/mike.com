@@ -35,7 +35,17 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
       const mq = window.matchMedia('(min-width: 768px)')
       setNavOpen(mq.matches)
       setIsMobile(!mq.matches)
-      const onChange = (e: MediaQueryListEvent) => setIsMobile(!e.matches)
+      const onChange = (e: MediaQueryListEvent) => {
+        setIsMobile(!e.matches)
+        // When transitioning from desktop to mobile, close the nav
+        if (!e.matches) {
+          setNavOpen(false)
+        }
+        // When transitioning from mobile to desktop, open the nav
+        else {
+          setNavOpen(true)
+        }
+      }
       mq.addEventListener('change', onChange)
       return () => mq.removeEventListener('change', onChange)
     }
