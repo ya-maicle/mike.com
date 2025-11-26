@@ -3,7 +3,7 @@ import 'server-only'
 
 /**
  * Server-side Sanity client.
- * - Uses public projectId/dataset from NEXT_PUBLIC_*
+ * - Uses public projectId/dataset from NEXT_PUBLIC_* (Required in Vercel)
  * - Optionally uses SANITY_API_READ_TOKEN on the server only
  * - CDN enabled in production for faster cached reads
  *
