@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
-import './globals.css'
+import '../globals.css'
 import { ThemeProvider } from '@/components/theme-provider'
 import { AuthProvider } from '@/components/providers/auth-provider'
 import { LoginModalProvider } from '@/components/providers/login-modal-provider'

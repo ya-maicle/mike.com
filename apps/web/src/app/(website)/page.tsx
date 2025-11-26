@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Home - Mike Y.',
-  description: 'Welcome to Mike Y.\'s personal website and portfolio',
+  description: "Welcome to Mike Y.'s personal website and portfolio",
 }
 
 export default function Home() {
@@ -21,7 +21,10 @@ export default function Home() {
       </section>
       <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {Array.from({ length: 8 }).map((_, i) => (
-          <div key={i} className={(i % 3 === 0 ? 'md:col-span-2 ' : '') + 'bg-muted h-40 rounded-lg border'} />
+          <div
+            key={i}
+            className={(i % 3 === 0 ? 'md:col-span-2 ' : '') + 'bg-muted h-40 rounded-lg border'}
+          />
         ))}
       </section>
     </div>
