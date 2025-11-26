@@ -14,7 +14,8 @@ export const sanityClient = createClient({
   dataset: process.env.NEXT_PUBLIC_SANITY_DATASET,
   apiVersion: '2025-01-01',
   useCdn: process.env.NODE_ENV === 'production',
-  token: process.env.SANITY_API_READ_TOKEN, // never exposed to client because this module is server-only
+  // Only use token if it exists, otherwise client defaults to anonymous (public) mode
+  ...(process.env.SANITY_API_READ_TOKEN ? { token: process.env.SANITY_API_READ_TOKEN } : {}),
   perspective: 'published',
 })
 
