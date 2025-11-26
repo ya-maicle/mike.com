@@ -2,8 +2,8 @@ import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
 import { muxInput } from 'sanity-plugin-mux-input'
 import { visionTool } from '@sanity/vision'
-import { schemaTypes } from './apps/web/src/sanity/schemas'
-import { LinkToCaseStudyAction } from './apps/web/src/sanity/schemas/actions/link-to-case-study'
+import { schemaTypes } from '../../sanity/schemas'
+import { LinkToCaseStudyAction } from '../../sanity/schemas/actions/link-to-case-study'
 
 // Reading time calculation will be implemented in Stage 3 (Assembly Engine)
 
