@@ -3,7 +3,7 @@ import { structureTool } from 'sanity/structure'
 import { muxInput } from 'sanity-plugin-mux-input'
 import { visionTool } from '@sanity/vision'
 import { schemaTypes } from './apps/web/src/sanity/schemas'
-import { linkToCaseStudyAction } from './apps/web/src/sanity/schemas/actions/link-to-case-study'
+import { LinkToCaseStudyAction } from './apps/web/src/sanity/schemas/actions/link-to-case-study'
 
 // Reading time calculation will be implemented in Stage 3 (Assembly Engine)
 
@@ -48,7 +48,7 @@ export default defineConfig({
     actions: (prev, context) => {
       const eligible = new Set(['caseStudyBlock', 'imageBlock', 'videoBlock', 'carouselBlock'])
       if (eligible.has(context.schemaType)) {
-        return [...prev, linkToCaseStudyAction]
+        return [...prev, LinkToCaseStudyAction]
       }
       return prev
     },

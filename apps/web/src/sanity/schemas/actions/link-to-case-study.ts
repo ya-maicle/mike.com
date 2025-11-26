@@ -1,7 +1,8 @@
-import type { DocumentActionComponent } from 'sanity'
+import { useClient, type DocumentActionComponent } from 'sanity'
 
-export const linkToCaseStudyAction: DocumentActionComponent = (props) => {
-  const { draft, published, type, onComplete, id, getClient } = props
+export const LinkToCaseStudyAction: DocumentActionComponent = (props) => {
+  const { draft, published, type, onComplete, id } = props
+  const client = useClient({ apiVersion: '2025-01-01' })
 
   const supported = new Set(['caseStudyBlock', 'imageBlock', 'videoBlock', 'carouselBlock'])
   if (!supported.has(type)) return null
@@ -20,7 +21,7 @@ export const linkToCaseStudyAction: DocumentActionComponent = (props) => {
           onComplete?.()
           return
         }
-        const client = getClient({ apiVersion: '2025-01-01' })
+
         await client
           .patch(id)
           .set({ caseStudy: { _type: 'reference', _ref: caseStudyId } })
