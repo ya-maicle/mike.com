@@ -46,12 +46,32 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --radius: var(--radius);
+  --text-sm: var(--text-sm);
+  --text-base: var(--text-base);
+  --text-lg: var(--text-lg);
+  --text-xl: var(--text-xl);
+  --text-2xl: var(--text-2xl);
+  --text-3xl: var(--text-3xl);
+  --text-4xl: var(--text-4xl);
+  --text-5xl: var(--text-5xl);
+  --text-6xl: var(--text-6xl);
 }
 
 :root {
   --radius: 0.625rem;
   /* Central app content max width */
-  --content-max-width: 1147px;
+  --content-max-width: 1376px;
+
+  /* Fluid Typography */
+  --text-sm: clamp(0.875rem, 0.831rem + 0.1878vw, 1rem);
+  --text-base: clamp(1rem, 0.956rem + 0.1878vw, 1.125rem);
+  --text-lg: clamp(1.125rem, 1.081rem + 0.1878vw, 1.25rem);
+  --text-xl: clamp(1.125rem, 0.993rem + 0.5634vw, 1.5rem);
+  --text-2xl: clamp(1.25rem, 0.9859rem + 1.1268vw, 2rem);
+  --text-3xl: clamp(1.5rem, 1.1479rem + 1.5023vw, 2.5rem);
+  --text-4xl: clamp(1.75rem, 1.3099rem + 1.8779vw, 3rem);
+  --text-5xl: clamp(2rem, 1.2958rem + 3.0047vw, 4rem);
+  --text-6xl: clamp(2.25rem, 1.2817rem + 4.1315vw, 5rem);
 }
 
 /* Dark variables are defined in semantic.css via the .dark class */
@@ -62,11 +82,24 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-geist-sans, Geist), ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
-      Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji';
+    font-family:
+      var(--font-geist-sans, Geist),
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      Segoe UI,
+      Roboto,
+      Helvetica,
+      Arial,
+      'Apple Color Emoji',
+      'Segoe UI Emoji';
   }
-  code, kbd, samp, pre {
-    font-family: var(--font-geist-mono, 'Geist Mono'), ui-monospace, SFMono-Regular, Menlo, Monaco,
-      Consolas, 'Liberation Mono', 'Courier New', monospace;
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family:
+      var(--font-geist-mono, 'Geist Mono'), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+      'Liberation Mono', 'Courier New', monospace;
   }
 }

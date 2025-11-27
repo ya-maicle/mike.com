@@ -16,6 +16,11 @@ export const CASE_STUDY_WITH_BLOCKS = groq`
     seoSettings,
     slug,
     coverImage{..., asset->},
+    headerMedia{
+      type,
+      image{..., asset->},
+      video{asset->{playbackId}}
+    },
     projectInfo,
 
     // Inline content blocks
@@ -27,6 +32,7 @@ export const CASE_STUDY_WITH_BLOCKS = groq`
       },
       _type == 'videoBlock' => {
         ...,
+        mode,
         video{asset->{playbackId}}
       },
       _type == 'carouselBlock' => {
@@ -36,6 +42,11 @@ export const CASE_STUDY_WITH_BLOCKS = groq`
           image{..., asset->},
           video{asset->{playbackId}}
         }
+      },
+      _type == 'twoColumnImageBlock' => {
+        ...,
+        leftImage{..., asset->},
+        rightImage{..., asset->}
       }
     }
   }

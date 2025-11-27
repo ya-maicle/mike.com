@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { defineField, defineType } from 'sanity'
 
 export const videoBlock = defineType({
@@ -28,6 +27,20 @@ export const videoBlock = defineType({
       type: 'text',
       rows: 3,
       validation: (Rule) => Rule.max(300),
+    }),
+
+    defineField({
+      name: 'mode',
+      title: 'Display Mode',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Standard (Controls)', value: 'standard' },
+          { title: 'Decorative (Autoplay, Loop, Muted)', value: 'decorative' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'standard',
     }),
   ],
 

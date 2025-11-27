@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { defineField, defineType } from 'sanity'
 
 export const imageBlock = defineType({

@@ -54,6 +54,48 @@ export const caseStudy = defineType({
     }),
 
     defineField({
+      name: 'headerMedia',
+      title: 'Header Media',
+      description: 'Full width media shown below the header (Image or Video)',
+      type: 'object',
+      fields: [
+        defineField({
+          name: 'type',
+          title: 'Media Type',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'Image', value: 'image' },
+              { title: 'Video', value: 'video' },
+            ],
+            layout: 'radio',
+          },
+          initialValue: 'image',
+        }),
+        defineField({
+          name: 'image',
+          title: 'Image',
+          type: 'image',
+          options: { hotspot: true },
+          hidden: ({ parent }) => parent?.type !== 'image',
+          fields: [
+            {
+              name: 'alt',
+              type: 'string',
+              title: 'Alt text',
+            },
+          ],
+        }),
+        defineField({
+          name: 'video',
+          title: 'Video',
+          type: 'mux.video',
+          hidden: ({ parent }) => parent?.type !== 'video',
+        }),
+      ],
+    }),
+
+    defineField({
       name: 'projectInfo',
       title: 'Project Info',
       type: 'object',
@@ -103,6 +145,60 @@ export const caseStudy = defineType({
         { type: 'imageBlock' },
         { type: 'videoBlock' },
         { type: 'carouselBlock' },
+        {
+          name: 'twoColumnImageBlock',
+          title: 'Two Column Images',
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'leftImage',
+              title: 'Left Image',
+              type: 'image',
+              options: { hotspot: true },
+              fields: [
+                {
+                  name: 'alt',
+                  type: 'string',
+                  title: 'Alt text',
+                },
+                {
+                  name: 'caption',
+                  type: 'string',
+                  title: 'Caption',
+                },
+              ],
+            }),
+            defineField({
+              name: 'rightImage',
+              title: 'Right Image',
+              type: 'image',
+              options: { hotspot: true },
+              fields: [
+                {
+                  name: 'alt',
+                  type: 'string',
+                  title: 'Alt text',
+                },
+                {
+                  name: 'caption',
+                  type: 'string',
+                  title: 'Caption',
+                },
+              ],
+            }),
+          ],
+          preview: {
+            select: {
+              media: 'leftImage',
+            },
+            prepare({ media }) {
+              return {
+                title: 'Two Column Images',
+                media,
+              }
+            },
+          },
+        },
       ],
       description: 'Add content blocks to the case study',
     }),
