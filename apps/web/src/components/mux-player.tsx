@@ -3,7 +3,6 @@ import * as React from 'react'
 
 function ensureMuxPlayerLoaded() {
   if (typeof window === 'undefined') return
-  // If the custom element already exists, skip
   if (customElements && customElements.get && customElements.get('mux-player')) return
 
   const existing = document.querySelector('script[data-mux-player]') as HTMLScriptElement | null
@@ -17,66 +16,104 @@ function ensureMuxPlayerLoaded() {
   document.head.appendChild(script)
 }
 
-export function MuxPlayer({
-  playbackId,
-  title,
-  poster,
-  className,
-}: {
+export interface MuxPlayerProps {
   playbackId?: string
   title?: string
   poster?: string
   className?: string
-}) {
-  const [fallback, setFallback] = React.useState(false)
-  React.useEffect(() => {
-    ensureMuxPlayerLoaded()
-    const check = () => {
-      // If custom element still not registered after a short delay, show native fallback
-      if (!(customElements && customElements.get && customElements.get('mux-player'))) {
-        setFallback(true)
+  autoPlay?: boolean
+  muted?: boolean
+  loop?: boolean
+  showControls?: boolean
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const MuxPlayer = React.forwardRef<any, MuxPlayerProps>(
+  (
+    {
+      playbackId,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      title,
+      poster,
+      className,
+      autoPlay,
+      muted,
+      loop,
+      showControls,
+    },
+    ref,
+  ) => {
+    const [fallback, setFallback] = React.useState(false)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const internalRef = React.useRef<any>(null)
+
+    React.useImperativeHandle(ref, () => internalRef.current)
+
+    React.useEffect(() => {
+      ensureMuxPlayerLoaded()
+      const check = () => {
+        if (!(customElements && customElements.get && customElements.get('mux-player'))) {
+          setFallback(true)
+        }
       }
+      const t = window.setTimeout(check, 2000)
+      return () => window.clearTimeout(t)
+    }, [])
+
+    if (!playbackId) return null
+
+    const posterUrl = poster || `https://image.mux.com/${playbackId}/thumbnail.jpg`
+    if (fallback) {
+      const mp4 = `https://stream.mux.com/${playbackId}/medium.mp4`
+      return (
+        <div className={className}>
+          <video
+            ref={internalRef}
+            controls={showControls ?? !autoPlay}
+            autoPlay={autoPlay}
+            muted={muted}
+            loop={loop}
+            preload="none"
+            poster={posterUrl}
+            style={{
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              borderRadius: '0.5rem',
+              overflow: 'hidden',
+            }}
+          >
+            <source src={mp4} type="video/mp4" />
+          </video>
+        </div>
+      )
     }
-    const t = window.setTimeout(check, 2000)
-    return () => window.clearTimeout(t)
-  }, [])
 
-  if (!playbackId) return null
-
-  // Render the custom element. It will upgrade when the script loads.
-  const posterUrl = poster || `https://image.mux.com/${playbackId}/thumbnail.jpg`
-  if (fallback) {
-    const mp4 = `https://stream.mux.com/${playbackId}/medium.mp4`
     return (
       <div className={className}>
-        {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
-        <video
-          controls
-          preload="none"
+        {/* @ts-expect-error - custom element provided by external script */}
+        <mux-player
+          ref={internalRef}
+          playback-id={playbackId}
+          stream-type="on-demand"
           poster={posterUrl}
-          style={{
-            width: '100%',
-            aspectRatio: '16 / 9',
-            borderRadius: '0.5rem',
-            overflow: 'hidden',
-          }}
-        >
-          <source src={mp4} type="video/mp4" />
-        </video>
+          playsinline
+          autoplay={autoPlay ? '' : undefined}
+          muted={muted ? '' : undefined}
+          loop={loop ? '' : undefined}
+          style={
+            {
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              borderRadius: '0.5rem',
+              overflow: 'hidden',
+              '--controls': showControls === false ? 'none' : undefined,
+            } as React.CSSProperties
+          }
+        />
       </div>
     )
-  }
-
-  return (
-    <div className={className}>
-      {/* @ts-expect-error - custom element provided by external script */}
-      <mux-player
-        playback-id={playbackId}
-        stream-type="on-demand"
-        poster={posterUrl}
-        playsinline
-        style={{ width: '100%', aspectRatio: '16 / 9', borderRadius: '0.5rem', overflow: 'hidden' }}
-      />
-    </div>
-  )
-}
+  },
+)
+MuxPlayer.displayName = 'MuxPlayer'

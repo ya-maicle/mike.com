@@ -6,8 +6,6 @@ import 'server-only'
  * - Uses public projectId/dataset from NEXT_PUBLIC_*
  * - Optionally uses SANITY_API_READ_TOKEN on the server only
  * - CDN enabled in production for faster cached reads
- *
- * Phase 0 scaffold: schema/queries will be added in Phase 2.
  */
 export const sanityClient = createClient({
   projectId: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
@@ -24,7 +22,7 @@ export async function sanityFetch<T>(
   params: Record<string, unknown> = {},
   options?: { tag?: string; revalidate?: number },
 ): Promise<T> {
-  const revalidate = options?.revalidate ?? (process.env.NODE_ENV === 'development' ? 60 : 300)
+  const revalidate = options?.revalidate ?? (process.env.NODE_ENV === 'development' ? 0 : 300)
 
   return sanityClient.fetch<T>(query, params, {
     next: {

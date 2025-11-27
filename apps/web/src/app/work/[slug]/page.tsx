@@ -1,27 +1,19 @@
-/* eslint-disable */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import type { Metadata } from 'next'
-import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { ArrowLeft, ExternalLink } from 'lucide-react'
 
 import { sanityFetch } from '@/sanity/client'
 import { ALL_CASE_STUDY_SLUGS_QUERY } from '@/sanity/queries'
 import { CASE_STUDY_WITH_BLOCKS } from '@/sanity/queries/case-study-queries'
-import type { CaseStudy, SanityImage as SanityImageType } from '@/sanity/queries'
-import { imageUrl } from '@/sanity/image'
+import type { CaseStudy } from '@/sanity/queries'
 
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { PortableTextLite } from '@/components/portable-text-lite'
 import { MuxPlayer } from '@/components/mux-player'
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-} from '@/components/ui/carousel'
+import { CaseStudyCarousel } from '@/components/case-study-carousel'
+import { DecorativeVideoBlock } from '@/components/decorative-video-block'
 
 type PageProps = { params: Promise<{ slug: string }> }
 
@@ -48,110 +40,107 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
   }
 }
 
-function SanityImage({
-  image,
-  widths = [640, 960, 1200],
-  sizes = '(min-width: 1024px) 960px, 100vw',
-  className,
-  priority,
-}: {
-  image: SanityImageType
-  widths?: number[]
-  sizes?: string
-  className?: string
-  priority?: boolean
-}) {
-  if (!image?.asset) return null
-  const largest = Math.max(...widths)
-  return (
-    <Image
-      src={imageUrl(image, { width: largest })}
-      alt={image.alt || ''}
-      width={largest}
-      height={Math.round((largest * 9) / 16)}
-      sizes={sizes}
-      className={className}
-      priority={priority}
-    />
-  )
-}
+import { SanityImage } from '@/components/sanity-image'
 
 function CaseStudyBlock({ block }: { block: any }) {
-  // Handle the four block types (caseStudyBlock, imageBlock, videoBlock, carouselBlock)
   if (block._type === 'imageBlock') {
     return (
-      <section className="mx-auto max-w-5xl space-y-3 py-8">
-        <SanityImage image={block.image} className="w-full rounded-lg border" />
+      <section className="w-full space-y-3 py-2">
+        <SanityImage image={block.image} className="w-full h-auto rounded-[8px]" />
         {block.image?.caption ? (
-          <div className="mt-2 text-center text-sm text-muted-foreground">
+          <div className="mx-auto max-w-[592px] mt-2 text-center text-sm text-muted-foreground">
             {block.image.caption}
           </div>
         ) : null}
         {block.title ? (
-          <h3 className="text-xl font-semibold tracking-tight">{block.title}</h3>
+          <div className="mx-auto max-w-[592px]">
+            <h3 className="text-xl font-semibold tracking-tight">{block.title}</h3>
+          </div>
         ) : null}
-        {block.description ? <p className="text-muted-foreground">{block.description}</p> : null}
+        {block.description ? (
+          <div className="mx-auto max-w-[592px]">
+            <p className="text-muted-foreground">{block.description}</p>
+          </div>
+        ) : null}
       </section>
     )
   }
 
   if (block._type === 'videoBlock') {
     const playbackId: string | undefined = block.video?.asset?.playbackId
+    if (!playbackId) return null
+
+    if (block.mode === 'decorative') {
+      return (
+        <DecorativeVideoBlock
+          playbackId={playbackId}
+          title={block.title}
+          description={block.description}
+        />
+      )
+    }
+
     return (
-      <section className="mx-auto max-w-5xl space-y-3 py-8">
+      <section className="w-full space-y-3 py-2 max-w-[var(--content-max-width)] mx-auto">
         <MuxPlayer
           playbackId={playbackId}
           title={block.title}
-          className="w-full rounded-lg border"
+          className="w-full h-auto rounded-[8px] overflow-hidden"
+          autoPlay
+          muted
+          loop
         />
         {block.title ? (
-          <h3 className="text-xl font-semibold tracking-tight">{block.title}</h3>
+          <div className="mx-auto max-w-[592px]">
+            <h3 className="text-xl font-semibold tracking-tight">{block.title}</h3>
+          </div>
         ) : null}
-        {block.description ? <p className="text-muted-foreground">{block.description}</p> : null}
+        {block.description ? (
+          <div className="mx-auto max-w-[592px]">
+            <p className="text-muted-foreground">{block.description}</p>
+          </div>
+        ) : null}
       </section>
     )
   }
 
   if (block._type === 'carouselBlock') {
     const items: any[] = Array.isArray(block.items) ? block.items : []
+    return <CaseStudyCarousel items={items} title={block.title} description={block.description} />
+  }
+
+  if (block._type === 'twoColumnImageBlock') {
     return (
-      <section className="mx-auto max-w-5xl space-y-3 py-8">
-        <Carousel opts={{ align: 'start' }}>
-          <CarouselContent className="-ml-4">
-            {items.map((item, i) => (
-              <CarouselItem key={i} className="pl-4 md:basis-2/3 lg:basis-1/2">
-                {item.kind === 'image' ? (
-                  <SanityImage image={item.image} className="w-full rounded-lg border" />
-                ) : (
-                  <MuxPlayer
-                    playbackId={item.video?.asset?.playbackId}
-                    title={block.title}
-                    className="w-full rounded-lg border"
-                  />
-                )}
-                {item.image?.caption ? (
-                  <div className="mt-2 text-center text-sm text-muted-foreground">
-                    {item.image.caption}
-                  </div>
-                ) : null}
-              </CarouselItem>
-            ))}
-          </CarouselContent>
-          <CarouselPrevious />
-          <CarouselNext />
-        </Carousel>
-        {block.title ? (
-          <h3 className="text-xl font-semibold tracking-tight">{block.title}</h3>
-        ) : null}
-        {block.description ? <p className="text-muted-foreground">{block.description}</p> : null}
+      <section className="w-full py-2">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <SanityImage
+              image={block.leftImage}
+              className="w-full h-auto rounded-[8px]"
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+            {block.leftImage?.caption && (
+              <div className="text-sm text-muted-foreground">{block.leftImage.caption}</div>
+            )}
+          </div>
+          <div className="space-y-2">
+            <SanityImage
+              image={block.rightImage}
+              className="w-full h-auto rounded-[8px]"
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+            {block.rightImage?.caption && (
+              <div className="text-sm text-muted-foreground">{block.rightImage.caption}</div>
+            )}
+          </div>
+        </div>
       </section>
     )
   }
 
-  // Default: standard portable text block
   if (block._type === 'block') {
     return (
-      <section className="mx-auto max-w-3xl space-y-3 py-8">
+      <section className="mx-auto max-w-[592px] space-y-3 py-8">
         <PortableTextLite value={[block]} />
       </section>
     )
@@ -170,82 +159,60 @@ export default async function CaseStudyPage(props: PageProps) {
   if (!data) return notFound()
 
   return (
-    <div className="space-y-12 pb-24">
-      {/* Back link */}
-      <div className="flex items-center justify-between">
-        <Button asChild variant="ghost" size="sm">
-          <Link href="/work" className="inline-flex items-center gap-2">
-            <ArrowLeft className="size-4" /> Back to Work
-          </Link>
-        </Button>
+    <div className="min-h-screen pb-24">
+      <div className="mx-auto max-w-[592px] pt-6 pb-16 space-y-8 text-center flex flex-col items-center">
+        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground font-medium">
+          {data.projectInfo?.year && <span>{data.projectInfo.year}</span>}
+          {data.projectInfo?.year && data.projectInfo?.sector && <span>&nbsp;&nbsp;</span>}
+          {data.projectInfo?.sector && <span>{data.projectInfo.sector}</span>}
+        </div>
+
+        <h1 className="text-5xl font-medium tracking-tight text-foreground leading-none">
+          {data.title}
+        </h1>
+
+        {data.summary ? (
+          <p className="text-lg leading-relaxed text-black dark:text-white">{data.summary}</p>
+        ) : null}
+
+        <div>
+          <Button asChild variant="secondary" size="lg">
+            <Link href={data.projectInfo?.link || '#'}>About the project</Link>
+          </Button>
+        </div>
       </div>
 
-      {/* Page header (centered) */}
-      <header className="mx-auto max-w-3xl text-center space-y-6">
-        <h1 className="text-4xl md:text-6xl font-bold tracking-tighter">{data.title}</h1>
-        {data.summary ? (
-          <p className="text-muted-foreground text-xl leading-relaxed">{data.summary}</p>
-        ) : null}
-      </header>
-
-      {/* Project Info Grid */}
-      {data.projectInfo ? (
-        <section className="mx-auto max-w-4xl border-y py-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            {data.projectInfo.client ? (
-              <div className="space-y-1">
-                <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Client
-                </div>
-                <div className="font-medium">{data.projectInfo.client}</div>
-              </div>
-            ) : null}
-            {data.projectInfo.sector ? (
-              <div className="space-y-1">
-                <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Sector
-                </div>
-                <div className="font-medium">{data.projectInfo.sector}</div>
-              </div>
-            ) : null}
-            {data.projectInfo.discipline ? (
-              <div className="space-y-1">
-                <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Discipline
-                </div>
-                <div className="font-medium">{data.projectInfo.discipline}</div>
-              </div>
-            ) : null}
-            {data.projectInfo.year ? (
-              <div className="space-y-1">
-                <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                  Year
-                </div>
-                <div className="font-medium">{data.projectInfo.year}</div>
-              </div>
-            ) : null}
-          </div>
-          {data.projectInfo.link ? (
-            <div className="mt-6 flex justify-center">
-              <Button asChild variant="outline">
-                <a href={data.projectInfo.link} target="_blank" rel="noreferrer" className="gap-2">
-                  Visit Project <ExternalLink className="size-4" />
-                </a>
-              </Button>
-            </div>
+      {data.headerMedia ? (
+        <section className="w-full my-2">
+          {data.headerMedia.type === 'video' && data.headerMedia.video?.asset?.playbackId ? (
+            <MuxPlayer
+              playbackId={data.headerMedia.video.asset.playbackId}
+              className="w-full h-auto max-h-[90vh] object-cover rounded-[8px] overflow-hidden"
+              autoPlay
+              muted
+              loop
+            />
+          ) : data.headerMedia.image ? (
+            <SanityImage
+              image={data.headerMedia.image}
+              className="w-full h-auto object-cover max-h-[90vh] rounded-[8px]"
+              priority
+              sizes="100vw"
+            />
           ) : null}
         </section>
-      ) : null}
-
-      {/* Hero Image */}
-      {data.coverImage ? (
-        <section className="mx-auto max-w-6xl">
-          <SanityImage image={data.coverImage} className="w-full rounded-xl shadow-sm" priority />
+      ) : data.coverImage ? (
+        <section className="w-full my-2">
+          <SanityImage
+            image={data.coverImage}
+            className="w-full h-auto object-cover max-h-[90vh] rounded-[8px]"
+            priority
+            sizes="100vw"
+          />
         </section>
       ) : null}
 
-      {/* Content Blocks */}
-      <div className="space-y-8">
+      <div className="space-y-0">
         {data.content?.map((block: any, i: number) => (
           <CaseStudyBlock key={block._key || i} block={block} />
         ))}

@@ -79,7 +79,7 @@ export function PortableTextLite({ value }: { value?: Block[] }) {
     switch (block.style) {
       case 'h3':
         elements.push(
-          <h3 key={i} className="text-2xl font-semibold tracking-tight mt-8 mb-3">
+          <h3 key={i} className="text-2xl font-semibold tracking-tight">
             {content}
           </h3>,
         )
