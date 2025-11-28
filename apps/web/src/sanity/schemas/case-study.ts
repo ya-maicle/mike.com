@@ -129,6 +129,83 @@ export const caseStudy = defineType({
     }),
 
     defineField({
+      name: 'panelContent',
+      title: 'About the Project (Panel Content)',
+      type: 'array',
+      of: [
+        {
+          type: 'block',
+          styles: [
+            { title: 'Normal', value: 'normal' },
+            { title: 'H2', value: 'h2' },
+            { title: 'H3', value: 'h3' },
+            { title: 'Quote', value: 'blockquote' },
+          ],
+        },
+        { type: 'imageBlock' },
+        { type: 'videoBlock' },
+        { type: 'carouselBlock' },
+        {
+          name: 'twoColumnImageBlock',
+          title: 'Two Column Images',
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'leftImage',
+              title: 'Left Image',
+              type: 'image',
+              options: { hotspot: true },
+              fields: [
+                {
+                  name: 'alt',
+                  type: 'string',
+                  title: 'Alt text',
+                  validation: (Rule) => Rule.required(),
+                },
+                {
+                  name: 'caption',
+                  type: 'string',
+                  title: 'Caption',
+                },
+              ],
+            }),
+            defineField({
+              name: 'rightImage',
+              title: 'Right Image',
+              type: 'image',
+              options: { hotspot: true },
+              fields: [
+                {
+                  name: 'alt',
+                  type: 'string',
+                  title: 'Alt text',
+                  validation: (Rule) => Rule.required(),
+                },
+                {
+                  name: 'caption',
+                  type: 'string',
+                  title: 'Caption',
+                },
+              ],
+            }),
+          ],
+          preview: {
+            select: {
+              media: 'leftImage',
+            },
+            prepare({ media }) {
+              return {
+                title: 'Two Column Images',
+                media,
+              }
+            },
+          },
+        },
+      ],
+      description: 'Content for the side panel (About the Project)',
+    }),
+
+    defineField({
       name: 'content',
       title: 'Content',
       type: 'array',
