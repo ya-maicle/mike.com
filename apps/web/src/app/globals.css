@@ -63,15 +63,15 @@
   --content-max-width: 1376px;
 
   /* Fluid Typography */
-  --text-sm: clamp(0.875rem, 0.831rem + 0.1878vw, 1rem);
-  --text-base: clamp(1rem, 0.956rem + 0.1878vw, 1.125rem);
-  --text-lg: clamp(1.125rem, 1.081rem + 0.1878vw, 1.25rem);
-  --text-xl: clamp(1.125rem, 0.993rem + 0.5634vw, 1.5rem);
-  --text-2xl: clamp(1.25rem, 0.9859rem + 1.1268vw, 2rem);
-  --text-3xl: clamp(1.5rem, 1.1479rem + 1.5023vw, 2.5rem);
-  --text-4xl: clamp(1.75rem, 1.3099rem + 1.8779vw, 3rem);
-  --text-5xl: clamp(2rem, 1.2958rem + 3.0047vw, 4rem);
-  --text-6xl: clamp(2.25rem, 1.2817rem + 4.1315vw, 5rem);
+  --text-sm: clamp(12px, 2vw, 12px);
+  --text-base: clamp(14px, 2vw, 14px);
+  --text-lg: clamp(15px, 2vw, 16px);
+  --text-xl: clamp(17px, 2vw, 17px);
+  --text-2xl: clamp(16px, 3vw, 18px);
+  --text-3xl: clamp(22px, 4vw, 24px);
+  --text-4xl: clamp(25px, 5vw, 30px);
+  --text-5xl: clamp(34px, 6vw, 48px);
+  --text-6xl: clamp(36px, 8vw, 64px);
 }
 
 /* Dark variables are defined in semantic.css via the .dark class */
@@ -83,7 +83,7 @@
   body {
     @apply bg-background text-foreground;
     font-family:
-      var(--font-plain),
+      var(--font-maicle-plain),
       ui-sans-serif,
       system-ui,
       -apple-system,
@@ -94,6 +94,48 @@
       'Apple Color Emoji',
       'Segoe UI Emoji';
   }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+
+  h1 {
+    font-size: var(--text-6xl);
+    letter-spacing: -0.03em;
+  }
+
+  h2 {
+    font-size: var(--text-5xl);
+  }
+
+  h3 {
+    font-size: var(--text-4xl);
+  }
+
+  h4 {
+    font-size: var(--text-3xl);
+  }
+
+  h5 {
+    font-size: var(--text-2xl);
+  }
+
+  h6 {
+    font-size: var(--text-lg);
+  }
+
+  p {
+    font-size: var(--text-base);
+    font-weight: normal;
+    line-height: 1.4;
+  }
   code,
   kbd,
   samp,
@@ -102,4 +144,19 @@
       var(--font-geist-mono, 'Geist Mono'), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
       'Liberation Mono', 'Courier New', monospace;
   }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 1s cubic-bezier(0.22, 1, 0.36, 1);
 }

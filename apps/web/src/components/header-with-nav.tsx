@@ -1,15 +1,13 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { Button } from "@/components/ui/button"
-import { PanelRight, PanelLeft } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Logotype } from "@/components/ui/logotype"
-
+import * as React from 'react'
+import { Button } from '@/components/ui/button'
+import { PanelRight, PanelLeft } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Logotype } from '@/components/ui/logotype'
 
 export function HeaderWithNav() {
   const [open, setOpen] = React.useState(true)
-
 
   return (
     <>
@@ -21,7 +19,7 @@ export function HeaderWithNav() {
               size="2xl"
               showText={false}
               text="Maicle"
-              className="[&_svg]:w-[48px] [&_svg]:h-auto text-foreground"
+              className="[&_svg]:w-[36px] md:[&_svg]:w-[42px] [&_svg]:h-auto text-foreground"
             />
             <Button
               aria-label="Open navigation"
@@ -40,7 +38,6 @@ export function HeaderWithNav() {
 
           {/* Right cluster (desktop: Search + Login; mobile: Search + PanelRight) */}
           <div className="flex items-center gap-3">
-
             <Button
               aria-label="Open navigation"
               variant="ghost"
@@ -65,9 +62,9 @@ export function HeaderWithNav() {
       <aside
         aria-hidden={!open}
         className={cn(
-          "fixed left-0 top-14 md:top-16 bottom-0 z-40 w-[230px] p-5 bg-sidebar text-sidebar-foreground", // below header
-          "transition-transform duration-200 ease-out", // animation
-          open ? "translate-x-0" : "-translate-x-full",
+          'fixed left-0 top-14 md:top-16 bottom-0 z-40 w-[230px] p-5 bg-sidebar text-sidebar-foreground', // below header
+          'transition-transform duration-200 ease-out', // animation
+          open ? 'translate-x-0' : '-translate-x-full',
         )}
       >
         <nav className="flex h-full flex-col items-stretch justify-center md:-mt-16">
@@ -75,7 +72,7 @@ export function HeaderWithNav() {
             <li>
               <a
                 href="#"
-                className="group flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium [font-family:var(--font-geist-sans)] text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                className="group flex items-center gap-3 rounded-md px-3 py-2 text-base font-normal [font-family:var(--font-geist-sans)] text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
               >
                 <span>Work</span>
               </a>
@@ -83,7 +80,7 @@ export function HeaderWithNav() {
             <li>
               <a
                 href="#"
-                className="group flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium [font-family:var(--font-geist-sans)] text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                className="group flex items-center gap-3 rounded-md px-3 py-2 text-base font-normal [font-family:var(--font-geist-sans)] text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
               >
                 <span>Biography</span>
               </a>
@@ -91,7 +88,7 @@ export function HeaderWithNav() {
             <li>
               <a
                 href="#"
-                className="group flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium [font-family:var(--font-geist-sans)] text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                className="group flex items-center gap-3 rounded-md px-3 py-2 text-base font-normal [font-family:var(--font-geist-sans)] text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
               >
                 <span>Stories</span>
               </a>
@@ -99,8 +96,6 @@ export function HeaderWithNav() {
           </ul>
         </nav>
       </aside>
-      
-
     </>
   )
 }
