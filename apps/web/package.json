@@ -11,7 +11,8 @@
     "test:sanity": "tsx src/sanity/test-connection.ts",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test:ai-compose": "tsx src/scripts/test-ai-compose.ts"
+    "test:ai-compose": "tsx src/scripts/test-ai-compose.ts",
+    "clean": "rm -rf .next"
   },
   "dependencies": {
     "@maicle/ui": "workspace:*",

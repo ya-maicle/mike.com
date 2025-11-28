@@ -97,7 +97,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
                   size="2xl"
                   showText={false}
                   text="Maicle"
-                  className="[&_svg]:w-[48px] [&_svg]:h-auto"
+                  className="[&_svg]:w-[36px] md:[&_svg]:w-[42px] [&_svg]:h-auto"
                 />
               </Link>
               <Button
@@ -117,7 +117,6 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
 
             {/* Right cluster (Search + mobile toggle + Login) */}
             <div className="flex items-center gap-3">
-
               <Button
                 aria-label="Toggle navigation"
                 variant="ghost"
@@ -170,7 +169,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
                         setNavOpen(false)
                     }}
                     className={cn(
-                      'group flex w-full items-center gap-3 rounded-md px-4 py-3 md:px-3 md:py-2 text-base md:text-sm font-medium [font-family:var(--font-geist-sans)] transition-colors',
+                      'group flex w-full items-center gap-3 rounded-md px-4 py-3 md:px-3 md:py-2 text-xl md:text-base font-normal [font-family:var(--font-geist-sans)] transition-colors',
                       pathname === '/work'
                         ? 'bg-accent text-accent-foreground'
                         : 'text-foreground hover:bg-accent hover:text-accent-foreground',
@@ -187,7 +186,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
                         setNavOpen(false)
                     }}
                     className={cn(
-                      'group flex w-full items-center gap-3 rounded-md px-4 py-3 md:px-3 md:py-2 text-base md:text-sm font-medium [font-family:var(--font-geist-sans)] transition-colors',
+                      'group flex w-full items-center gap-3 rounded-md px-4 py-3 md:px-3 md:py-2 text-xl md:text-base font-normal [font-family:var(--font-geist-sans)] transition-colors',
                       pathname === '/biography'
                         ? 'bg-accent text-accent-foreground'
                         : 'text-foreground hover:bg-accent hover:text-accent-foreground',
@@ -204,7 +203,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
                         setNavOpen(false)
                     }}
                     className={cn(
-                      'group flex w-full items-center gap-3 rounded-md px-4 py-3 md:px-3 md:py-2 text-base md:text-sm font-medium [font-family:var(--font-geist-sans)] transition-colors',
+                      'group flex w-full items-center gap-3 rounded-md px-4 py-3 md:px-3 md:py-2 text-xl md:text-base font-normal [font-family:var(--font-geist-sans)] transition-colors',
                       pathname === '/stories'
                         ? 'bg-accent text-accent-foreground'
                         : 'text-foreground hover:bg-accent hover:text-accent-foreground',
@@ -259,8 +258,6 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
           <div className="max-w-[var(--content-max-width)] mx-auto">{children}</div>
         </main>
       </div>
-
-
 
       {/* Login Modal */}
       {mounted && (
