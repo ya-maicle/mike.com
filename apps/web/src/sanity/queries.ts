@@ -113,9 +113,8 @@ export type CaseStudy = {
     year?: string
     link?: string
   }
-  content?: // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (
-    | { _type: 'block'; [key: string]: any }
+  content?: (
+    | { _type: 'block'; [key: string]: any } // eslint-disable-line @typescript-eslint/no-explicit-any
     | ImageBlock
     | VideoBlock
     | CarouselBlock
