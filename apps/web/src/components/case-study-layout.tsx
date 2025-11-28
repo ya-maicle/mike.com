@@ -180,7 +180,7 @@ function PanelContent({ data }: { data: CaseStudy }) {
       {/* Panel Content */}
       {data.panelContent && (
         <div className="space-y-0 text-xl leading-relaxed text-black dark:text-white">
-          {data.panelContent.map((block: any, i: number) => (
+          {data.panelContent.map((block, i) => (
             <CaseStudyBlock key={block._key || i} block={block} />
           ))}
         </div>
