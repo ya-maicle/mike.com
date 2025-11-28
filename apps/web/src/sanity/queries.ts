@@ -120,6 +120,13 @@ export type CaseStudy = {
     | CarouselBlock
     | TwoColumnImageBlock
   )[]
+  panelContent?: (
+    | { _type: 'block'; [key: string]: any } // eslint-disable-line @typescript-eslint/no-explicit-any
+    | ImageBlock
+    | VideoBlock
+    | CarouselBlock
+    | TwoColumnImageBlock
+  )[]
   seoSettings?: {
     metaTitle?: string
     metaDescription?: string

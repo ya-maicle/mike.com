@@ -22,6 +22,33 @@ export const CASE_STUDY_WITH_BLOCKS = groq`
       video{asset->{playbackId}}
     },
     projectInfo,
+    
+    // Panel content blocks
+    panelContent[]{
+      ...,
+      _type == 'imageBlock' => {
+        ...,
+        image{..., asset->}
+      },
+      _type == 'videoBlock' => {
+        ...,
+        mode,
+        video{asset->{playbackId}}
+      },
+      _type == 'carouselBlock' => {
+        ...,
+        items[]{
+          kind,
+          image{..., asset->},
+          video{asset->{playbackId}}
+        }
+      },
+      _type == 'twoColumnImageBlock' => {
+        ...,
+        leftImage{..., asset->},
+        rightImage{..., asset->}
+      }
+    },
 
     // Inline content blocks
     content[]{

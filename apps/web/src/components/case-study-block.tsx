@@ -103,8 +103,8 @@ export function CaseStudyBlock({ block }: { block: any }) {
 
   if (block._type === 'block') {
     return (
-      <section className="mx-auto max-w-[592px] space-y-3 py-8">
-        <PortableTextLite value={[block]} />
+      <section className="mx-auto max-w-[592px] space-y-3 py-2">
+        <PortableTextLite value={[block]} className="text-xl" />
       </section>
     )
   }

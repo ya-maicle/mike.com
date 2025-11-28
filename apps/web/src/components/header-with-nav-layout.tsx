@@ -26,29 +26,28 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
   const [atTop, setAtTop] = React.useState(true)
   const lastYRef = React.useRef(0)
   const [isMobile, setIsMobile] = React.useState(false)
-
-  // Mark as mounted to avoid hydration mismatches for interactive UI
   React.useEffect(() => setMounted(true), [])
-
-  // Default: open on desktop, closed on mobile (initial load)
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
-      const mq = window.matchMedia('(min-width: 768px)')
-      setNavOpen(mq.matches)
-      setIsMobile(!mq.matches)
-      const onChange = (e: MediaQueryListEvent) => {
+      const mqMobile = window.matchMedia('(min-width: 768px)')
+      setIsMobile(!mqMobile.matches)
+
+      const onMobileChange = (e: MediaQueryListEvent) => {
         setIsMobile(!e.matches)
-        // When transitioning from desktop to mobile, close the nav
-        if (!e.matches) {
-          setNavOpen(false)
-        }
-        // When transitioning from mobile to desktop, open the nav
-        else {
-          setNavOpen(true)
-        }
       }
-      mq.addEventListener('change', onChange)
-      return () => mq.removeEventListener('change', onChange)
+      mqMobile.addEventListener('change', onMobileChange)
+      const mqNav = window.matchMedia('(min-width: 1000px)')
+      setNavOpen(mqNav.matches)
+
+      const onNavChange = (e: MediaQueryListEvent) => {
+        setNavOpen(e.matches)
+      }
+      mqNav.addEventListener('change', onNavChange)
+
+      return () => {
+        mqMobile.removeEventListener('change', onMobileChange)
+        mqNav.removeEventListener('change', onNavChange)
+      }
     }
   }, [])
 
@@ -165,7 +164,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
                   <Link
                     href="/work"
                     onClick={() => {
-                      if (typeof window !== 'undefined' && window.innerWidth < 768)
+                      if (typeof window !== 'undefined' && window.innerWidth < 1000)
                         setNavOpen(false)
                     }}
                     className={cn(
@@ -182,7 +181,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
                   <Link
                     href="/biography"
                     onClick={() => {
-                      if (typeof window !== 'undefined' && window.innerWidth < 768)
+                      if (typeof window !== 'undefined' && window.innerWidth < 1000)
                         setNavOpen(false)
                     }}
                     className={cn(
@@ -199,7 +198,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
                   <Link
                     href="/stories"
                     onClick={() => {
-                      if (typeof window !== 'undefined' && window.innerWidth < 768)
+                      if (typeof window !== 'undefined' && window.innerWidth < 1000)
                         setNavOpen(false)
                     }}
                     className={cn(
@@ -248,10 +247,11 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
       <div
         suppressHydrationWarning
         className={cn(
-          'transform-gpu transition-[transform,margin-left] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform',
+          'transition-[transform,margin-left] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]',
+          isMobile && 'transform-gpu will-change-transform',
           navOpen ? 'md:ml-[230px]' : 'md:ml-0',
         )}
-        style={{ transform: isMobile && navOpen ? 'translateX(80vw)' : 'translateX(0)' }}
+        style={isMobile ? { transform: navOpen ? 'translateX(80vw)' : 'translateX(0)' } : undefined}
       >
         {/* Content Area */}
         <main className="min-h-[calc(100vh-56px)] md:min-h-[calc(100vh-64px)] px-6 md:px-8 py-6 md:py-8">

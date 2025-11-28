@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { cn } from '@/lib/utils'
 
 type Span = { _type: 'span'; text: string; marks?: string[] }
 type MarkDef = { _key: string; _type: string; href?: string }
@@ -40,7 +41,7 @@ function renderInline(children: Span[] = [], markDefs: MarkDef[] = []) {
   ))
 }
 
-export function PortableTextLite({ value }: { value?: Block[] }) {
+export function PortableTextLite({ value, className }: { value?: Block[]; className?: string }) {
   if (!Array.isArray(value) || value.length === 0) return null
 
   const elements: React.ReactNode[] = []
@@ -61,11 +62,11 @@ export function PortableTextLite({ value }: { value?: Block[] }) {
       }
       elements.push(
         type === 'bullet' ? (
-          <ul key={`list-${i}`} className="list-disc pl-6 space-y-1">
+          <ul key={`list-${i}`} className={cn('list-disc pl-6 space-y-1', className)}>
             {items}
           </ul>
         ) : (
-          <ol key={`list-${i}`} className="list-decimal pl-6 space-y-1">
+          <ol key={`list-${i}`} className={cn('list-decimal pl-6 space-y-1', className)}>
             {items}
           </ol>
         ),
@@ -100,7 +101,7 @@ export function PortableTextLite({ value }: { value?: Block[] }) {
         break
       default:
         elements.push(
-          <p key={i} className="leading-7 text-foreground/90">
+          <p key={i} className={cn('leading-7 text-foreground/90', className)}>
             {content}
           </p>,
         )
