@@ -2,9 +2,10 @@
 
 import * as React from 'react'
 import { Button } from '@/components/ui/button'
-import { PanelRight, PanelLeft, Search } from 'lucide-react'
+import { PanelRight, PanelLeft } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { CommandMenu } from '@/components/command-menu'
+import { Logotype } from '@/components/ui/logotype'
+
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { LoginForm } from '@/components/login-form'
 import { useLoginModal } from '@/components/providers/login-modal-provider'
@@ -17,7 +18,7 @@ import { usePathname } from 'next/navigation'
 export function HeaderWithNavLayout({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = React.useState(false)
   const [navOpen, setNavOpen] = React.useState(false)
-  const [commandOpen, setCommandOpen] = React.useState(false)
+
   const { open: loginOpen, setOpen: setLoginOpen, openLogin } = useLoginModal()
   const { user } = useAuth()
   const pathname = usePathname()
@@ -90,9 +91,14 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
               <Link
                 href="/"
                 aria-label="Go to home"
-                className="text-xl md:text-2xl font-semibold text-foreground hover:text-primary transition-colors"
+                className="text-foreground hover:text-primary transition-colors"
               >
-                Mike Y.
+                <Logotype
+                  size="2xl"
+                  showText={false}
+                  text="Maicle"
+                  className="[&_svg]:w-[48px] [&_svg]:h-auto"
+                />
               </Link>
               <Button
                 aria-label="Toggle navigation"
@@ -111,14 +117,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
 
             {/* Right cluster (Search + mobile toggle + Login) */}
             <div className="flex items-center gap-3">
-              <Button
-                aria-label="Search"
-                variant="ghost"
-                size="icon"
-                onClick={() => setCommandOpen(true)}
-              >
-                <Search size={20} className="text-zinc-500" />
-              </Button>
+
               <Button
                 aria-label="Toggle navigation"
                 variant="ghost"
@@ -261,7 +260,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
         </main>
       </div>
 
-      {mounted && <CommandMenu open={commandOpen} onOpenChange={setCommandOpen} />}
+
 
       {/* Login Modal */}
       {mounted && (

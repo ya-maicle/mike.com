@@ -2,13 +2,14 @@
 
 import * as React from "react"
 import { Button } from "@/components/ui/button"
-import { PanelRight, PanelLeft, Search } from "lucide-react"
+import { PanelRight, PanelLeft } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { CommandMenu } from "@/components/command-menu"
+import { Logotype } from "@/components/ui/logotype"
+
 
 export function HeaderWithNav() {
   const [open, setOpen] = React.useState(true)
-  const [commandOpen, setCommandOpen] = React.useState(false)
+
 
   return (
     <>
@@ -16,7 +17,12 @@ export function HeaderWithNav() {
         <div className="h-full px-6 md:px-8 flex items-center justify-between">
           {/* Left cluster (desktop: Logo + PanelRight; mobile: Logo only) */}
           <div className="flex items-center gap-2 md:gap-12">
-            <div className="text-xl md:text-2xl font-semibold text-foreground">Mike Y.</div>
+            <Logotype
+              size="2xl"
+              showText={false}
+              text="Maicle"
+              className="[&_svg]:w-[48px] [&_svg]:h-auto text-foreground"
+            />
             <Button
               aria-label="Open navigation"
               variant="ghost"
@@ -34,9 +40,7 @@ export function HeaderWithNav() {
 
           {/* Right cluster (desktop: Search + Login; mobile: Search + PanelRight) */}
           <div className="flex items-center gap-3">
-            <Button aria-label="Search" variant="ghost" size="icon" onClick={() => setCommandOpen(true)}>
-              <Search size={20} className="text-zinc-500" />
-            </Button>
+
             <Button
               aria-label="Open navigation"
               variant="ghost"
@@ -96,7 +100,7 @@ export function HeaderWithNav() {
         </nav>
       </aside>
       
-      <CommandMenu open={commandOpen} onOpenChange={setCommandOpen} />
+
     </>
   )
 }

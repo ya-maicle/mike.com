@@ -239,16 +239,96 @@ export const Table: Story = {
 
 export const FontWeights: Story = {
   render: () => (
-    <div className="space-y-2 max-w-3xl">
-      <div className="font-thin">font-thin - The quick brown fox</div>
-      <div className="font-extralight">font-extralight - The quick brown fox</div>
-      <div className="font-light">font-light - The quick brown fox</div>
-      <div className="font-normal">font-normal - The quick brown fox</div>
-      <div className="font-medium">font-medium - The quick brown fox</div>
-      <div className="font-semibold">font-semibold - The quick brown fox</div>
-      <div className="font-bold">font-bold - The quick brown fox</div>
-      <div className="font-extrabold">font-extrabold - The quick brown fox</div>
-      <div className="font-black">font-black - The quick brown fox</div>
+    <div className="space-y-8 max-w-3xl">
+      <div className="space-y-4">
+        <h2 className="text-2xl font-semibold tracking-tight">Font Weights</h2>
+        <p className="text-muted-foreground">
+          The Plain font family includes weights from 100 to 900.
+        </p>
+        <div className="grid gap-6">
+          <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-8 border-b pb-4">
+            <div className="w-40 shrink-0 text-sm text-muted-foreground">
+              <span className="font-mono text-xs border rounded bg-muted px-1 mr-2">100</span>
+              Hairline
+              <br />
+              <span className="text-xs opacity-50">font-thin</span>
+            </div>
+            <div className="font-thin text-4xl">The quick brown fox</div>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-8 border-b pb-4">
+            <div className="w-40 shrink-0 text-sm text-muted-foreground">
+              <span className="font-mono text-xs border rounded bg-muted px-1 mr-2">200</span>
+              Thin
+              <br />
+              <span className="text-xs opacity-50">font-extralight</span>
+            </div>
+            <div className="font-extralight text-4xl">The quick brown fox</div>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-8 border-b pb-4">
+            <div className="w-40 shrink-0 text-sm text-muted-foreground">
+              <span className="font-mono text-xs border rounded bg-muted px-1 mr-2">300</span>
+              Light
+              <br />
+              <span className="text-xs opacity-50">font-light</span>
+            </div>
+            <div className="font-light text-4xl">The quick brown fox</div>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-8 border-b pb-4">
+            <div className="w-40 shrink-0 text-sm text-muted-foreground">
+              <span className="font-mono text-xs border rounded bg-muted px-1 mr-2">400</span>
+              Regular
+              <br />
+              <span className="text-xs opacity-50">font-normal</span>
+            </div>
+            <div className="font-normal text-4xl">The quick brown fox</div>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-8 border-b pb-4">
+            <div className="w-40 shrink-0 text-sm text-muted-foreground">
+              <span className="font-mono text-xs border rounded bg-muted px-1 mr-2">500</span>
+              Medium
+              <br />
+              <span className="text-xs opacity-50">font-medium</span>
+            </div>
+            <div className="font-medium text-4xl">The quick brown fox</div>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-8 border-b pb-4">
+            <div className="w-40 shrink-0 text-sm text-muted-foreground">
+              <span className="font-mono text-xs border rounded bg-muted px-1 mr-2">600</span>
+              Semibold
+              <br />
+              <span className="text-xs opacity-50">font-semibold</span>
+            </div>
+            <div className="font-semibold text-4xl">The quick brown fox</div>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-8 border-b pb-4">
+            <div className="w-40 shrink-0 text-sm text-muted-foreground">
+              <span className="font-mono text-xs border rounded bg-muted px-1 mr-2">700</span>
+              Bold
+              <br />
+              <span className="text-xs opacity-50">font-bold</span>
+            </div>
+            <div className="font-bold text-4xl">The quick brown fox</div>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-8 border-b pb-4">
+            <div className="w-40 shrink-0 text-sm text-muted-foreground">
+              <span className="font-mono text-xs border rounded bg-muted px-1 mr-2">800</span>
+              Extrabold
+              <br />
+              <span className="text-xs opacity-50">font-extrabold</span>
+            </div>
+            <div className="font-extrabold text-4xl">The quick brown fox</div>
+          </div>
+          <div className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-8 border-b pb-4">
+            <div className="w-40 shrink-0 text-sm text-muted-foreground">
+              <span className="font-mono text-xs border rounded bg-muted px-1 mr-2">900</span>
+              Black
+              <br />
+              <span className="text-xs opacity-50">font-black</span>
+            </div>
+            <div className="font-black text-4xl">The quick brown fox</div>
+          </div>
+        </div>
+      </div>
     </div>
   ),
 }

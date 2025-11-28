@@ -4,6 +4,8 @@ import '../src/app/globals.css'
 // import 'geist/font/sans'
 // import 'geist/font/mono'
 
+import { plain } from '../src/lib/fonts'
+
 const preview: Preview = {
   parameters: {
     controls: {
@@ -26,7 +28,7 @@ const preview: Preview = {
   },
   decorators: [
     (Story) => (
-      <div className="bg-background text-foreground p-8">
+      <div className={`${plain.variable} bg-background text-foreground p-8`} style={{ fontFamily: 'var(--font-plain)' }}>
         <Story />
       </div>
     ),
