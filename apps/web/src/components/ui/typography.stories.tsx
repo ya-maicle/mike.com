@@ -23,8 +23,8 @@ export const Overview: Story = {
         <h2 className="text-2xl font-semibold tracking-tight">Typography System</h2>
         <p className="text-muted-foreground max-w-prose">
           Our typography system uses fluid scaling and specific font weights to ensure optimal
-          readability across all devices. Use these utility classes to apply the design system's
-          typography styles.
+          readability across all devices. Use these utility classes to apply the design
+          system&apos;s typography styles.
         </p>
 
         <div className="border rounded-lg overflow-hidden mt-8">

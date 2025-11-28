@@ -76,7 +76,7 @@ export function CaseStudyLayout({ data }: CaseStudyLayoutProps) {
           ) : null}
 
           <div className="space-y-0">
-            {data.content?.map((block: any, i: number) => (
+            {data.content?.map((block: NonNullable<CaseStudy['content']>[number], i: number) => (
               <CaseStudyBlock key={block._key || i} block={block} />
             ))}
           </div>

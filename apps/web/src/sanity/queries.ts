@@ -61,6 +61,7 @@ export type SanityImage = {
 
 export type ImageBlock = {
   _type: 'imageBlock'
+  _key?: string
   image: SanityImage
   title?: string
   description?: string
@@ -68,6 +69,7 @@ export type ImageBlock = {
 
 export type VideoBlock = {
   _type: 'videoBlock'
+  _key?: string
   video: { asset: { playbackId: string } }
   title?: string
   description?: string
@@ -75,6 +77,7 @@ export type VideoBlock = {
 
 export type CarouselBlock = {
   _type: 'carouselBlock'
+  _key?: string
   items: (
     | { kind: 'image'; image: SanityImage }
     | { kind: 'video'; video: { asset: { playbackId: string } } }
@@ -85,6 +88,7 @@ export type CarouselBlock = {
 
 export type TwoColumnImageBlock = {
   _type: 'twoColumnImageBlock'
+  _key?: string
   leftImage: SanityImage
   rightImage: SanityImage
 }
@@ -110,7 +114,8 @@ export type CaseStudy = {
     link?: string
   }
   content?: // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (| { _type: 'block'; [key: string]: any }
+  (
+    | { _type: 'block'; [key: string]: any }
     | ImageBlock
     | VideoBlock
     | CarouselBlock
