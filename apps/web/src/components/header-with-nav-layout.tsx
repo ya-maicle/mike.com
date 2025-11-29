@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { Button } from '@/components/ui/button'
-import { PanelRight, PanelLeft } from 'lucide-react'
+import { SideMenuClosed, SideMenuOpen } from '@/components/icons/menu-icons'
 import { cn } from '@/lib/utils'
 import { Logotype } from '@/components/ui/logotype'
 
@@ -85,8 +85,8 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
           )}
         >
           <div className="h-full px-6 md:px-8 flex items-center justify-between">
-            {/* Left cluster (Logo + toggle on desktop) */}
-            <div className="flex items-center gap-2 md:gap-12">
+            {/* Left cluster (Logo) */}
+            <div className="flex items-center relative">
               <Link
                 href="/"
                 aria-label="Go to home"
@@ -99,34 +99,43 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
                   className="[&_svg]:w-[36px] md:[&_svg]:w-[42px] [&_svg]:h-auto"
                 />
               </Link>
+
+              {/* Toggle button - positioned at right edge of 230px sidebar width on desktop */}
               <Button
                 aria-label="Toggle navigation"
                 variant="ghost"
                 size="icon"
-                className="hidden md:inline-flex pointer-events-auto"
+                className="hidden md:inline-flex pointer-events-auto md:absolute md:left-[148px]"
                 onClick={() => setNavOpen((v) => !v)}
               >
                 {navOpen ? (
-                  <PanelLeft size={20} className="text-zinc-500" />
+                  <SideMenuOpen size={20} className="text-zinc-500" />
                 ) : (
-                  <PanelRight size={20} className="text-zinc-500" />
+                  <SideMenuClosed size={20} className="text-zinc-500" />
                 )}
               </Button>
             </div>
 
-            {/* Right cluster (Search + mobile toggle + Login) */}
+            {/* Right cluster (mobile toggle + Login) */}
             <div className="flex items-center gap-3">
               <Button
                 aria-label="Toggle navigation"
                 variant="ghost"
                 size="icon"
                 className="md:hidden"
-                onClick={() => setNavOpen((v) => !v)}
+                onClick={() => {
+                  const willOpen = !navOpen
+                  setNavOpen(willOpen)
+                  // Dispatch custom event on mobile when opening nav
+                  if (willOpen && typeof window !== 'undefined') {
+                    window.dispatchEvent(new CustomEvent('mobile-nav-opening'))
+                  }
+                }}
               >
                 {navOpen ? (
-                  <PanelLeft size={20} className="text-zinc-500" />
+                  <SideMenuOpen size={20} className="text-zinc-500" />
                 ) : (
-                  <PanelRight size={20} className="text-zinc-500" />
+                  <SideMenuClosed size={20} className="text-zinc-500" />
                 )}
               </Button>
               {user ? (
@@ -152,7 +161,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
           aria-hidden={!navOpen}
           suppressHydrationWarning
           className={cn(
-            'fixed left-0 top-14 md:top-16 bottom-0 z-40 w-[80vw] md:w-[230px] p-5 bg-transparent text-foreground',
+            'fixed left-0 top-14 md:top-16 bottom-0 z-[48] w-[80vw] md:w-[230px] p-5 bg-transparent text-foreground',
             'transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform',
             navOpen ? 'translate-x-0' : '-translate-x-full',
           )}

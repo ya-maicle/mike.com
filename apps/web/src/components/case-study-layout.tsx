@@ -20,6 +20,18 @@ export function CaseStudyLayout({ data }: CaseStudyLayoutProps) {
 
   const togglePanel = () => setIsPanelOpen(!isPanelOpen)
 
+  // Close panel when mobile navigation opens
+  React.useEffect(() => {
+    const handleNavOpening = () => {
+      setIsPanelOpen(false)
+    }
+
+    window.addEventListener('mobile-nav-opening', handleNavOpening)
+    return () => {
+      window.removeEventListener('mobile-nav-opening', handleNavOpening)
+    }
+  }, [])
+
   // Lock body scroll when mobile panel is open
   React.useEffect(() => {
     const mobileMediaQuery = window.matchMedia('(max-width: 767px)')
@@ -125,13 +137,20 @@ export function CaseStudyLayout({ data }: CaseStudyLayoutProps) {
       {isPanelOpen &&
         typeof document !== 'undefined' &&
         createPortal(
-          <div className="md:hidden fixed top-0 right-0 w-full h-[100dvh] z-40 bg-background overflow-y-auto animate-in slide-in-from-right duration-300">
+          <div className="md:hidden fixed top-0 right-0 w-full h-[100dvh] z-[45] bg-background overflow-y-auto animate-in slide-in-from-right duration-300">
             <div className="p-8 pt-14 pb-32 min-h-full flex flex-col">
               <PanelContent data={data} />
             </div>
-            {/* Mobile Close Button */}
-            <div className="fixed left-0 right-0 bottom-0 pointer-events-none z-[110]">
-              <div className="sticky bottom-0 flex flex-col justify-end pb-8 items-center">
+          </div>,
+          document.body,
+        )}
+
+      {/* Sticky Button - Mobile uses portal, Desktop uses absolute positioning */}
+      {isPanelOpen && typeof document !== 'undefined'
+        ? // Mobile: Render button as portal when panel is open to ensure proper z-index stacking
+          createPortal(
+            <div className="md:hidden fixed left-0 right-0 bottom-0 pointer-events-none z-[70]">
+              <div className="flex flex-col justify-end pb-8 items-center">
                 <div className="pointer-events-auto">
                   <Button
                     variant="secondary"
@@ -144,13 +163,17 @@ export function CaseStudyLayout({ data }: CaseStudyLayoutProps) {
                   </Button>
                 </div>
               </div>
-            </div>
-          </div>,
-          document.body,
+            </div>,
+            document.body,
+          )
+        : null}
+      {/* Desktop button and mobile button when panel is closed */}
+      <div
+        className={cn(
+          'absolute left-0 right-0 bottom-0 top-[-5rem] md:top-[-6rem] pointer-events-none z-[70]',
+          isPanelOpen && 'max-md:hidden',
         )}
-
-      {/* Sticky Button - Restored "Absolute + Sticky" behavior */}
-      <div className="absolute left-0 right-0 bottom-0 top-[-5rem] md:top-[-6rem] pointer-events-none z-[60]">
+      >
         <div className="sticky top-0 h-[100dvh] flex flex-col justify-end pb-8 items-center">
           <div className="pointer-events-auto">
             <Button
