@@ -70,8 +70,8 @@
   "dependencies": {
     "@sanity/vision": "^4.6.1",
     "lucide-react": "^0.541.0",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
     "sanity": "^4.6.1",
     "sanity-plugin-mux-input": "^2.9.0",
     "styled-components": "^6.1.19"
