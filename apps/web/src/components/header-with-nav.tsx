@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { Button } from '@/components/ui/button'
-import { PanelRight, PanelLeft } from 'lucide-react'
+import { SideMenuClosed, SideMenuOpen } from '@/components/icons/menu-icons'
 import { cn } from '@/lib/utils'
 import { Logotype } from '@/components/ui/logotype'
 
@@ -29,9 +29,9 @@ export function HeaderWithNav() {
               onClick={() => setOpen((v) => !v)}
             >
               {open ? (
-                <PanelLeft size={20} className="text-zinc-500" />
+                <SideMenuOpen size={20} className="text-zinc-500" />
               ) : (
-                <PanelRight size={20} className="text-zinc-500" />
+                <SideMenuClosed size={20} className="text-zinc-500" />
               )}
             </Button>
           </div>
@@ -46,9 +46,9 @@ export function HeaderWithNav() {
               onClick={() => setOpen((v) => !v)}
             >
               {open ? (
-                <PanelLeft size={20} className="text-zinc-500" />
+                <SideMenuOpen size={20} className="text-zinc-500" />
               ) : (
-                <PanelRight size={20} className="text-zinc-500" />
+                <SideMenuClosed size={20} className="text-zinc-500" />
               )}
             </Button>
             <Button className="hidden md:inline-flex" variant="secondary" size="default">
