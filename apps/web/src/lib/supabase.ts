@@ -15,8 +15,7 @@ export function getSupabaseClient(): SupabaseClient {
     }
     client = createClient(url, anonKey, {
       auth: {
-        // Use implicit for both magic link and OAuth to avoid code_verifier coupling
-        flowType: 'implicit',
+        flowType: 'pkce',
         autoRefreshToken: true,
         persistSession: true,
         detectSessionInUrl: true,

@@ -4,6 +4,7 @@ import * as React from 'react'
 import getSupabaseClient from '@/lib/supabase'
 import type { Session, User } from '@supabase/supabase-js'
 import { upsertProfileFromUser } from '@/lib/profile'
+import { isValidReturnPath } from '@/lib/url-validation'
 
 type AuthContextValue = {
   user: User | null
@@ -19,7 +20,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [session, setSession] = React.useState<Session | null>(null)
   const [loading, setLoading] = React.useState(true)
 
-  // Debug logger (enable by setting NEXT_PUBLIC_AUTH_DEBUG=1 or localStorage.setItem('auth-debug','1'))
   const isDebug = React.useMemo(() => {
     if (typeof window === 'undefined') return process.env.NEXT_PUBLIC_AUTH_DEBUG === '1'
     try {
@@ -32,7 +32,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return process.env.NEXT_PUBLIC_AUTH_DEBUG === '1'
     }
   }, [])
-  const mask = (v?: string | null) => (v ? `${v.slice(0, 6)}…` : v)
+
   const dlog = React.useCallback(
     (...args: unknown[]) => {
       if (!isDebug) return
@@ -42,159 +42,87 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [isDebug],
   )
 
-  const cleanupAuthParams = React.useCallback(() => {
-    if (typeof window === 'undefined') return
-    try {
-      const url = new URL(window.location.href)
-      const isAuthReturn =
-        url.searchParams.has('code') ||
-        url.searchParams.has('token_hash') ||
-        url.searchParams.has('error_description') ||
-        (window.location.hash &&
-          /access_token|refresh_token|token_type|expires_in/i.test(window.location.hash))
-      if (!isAuthReturn) return
-      ;['code', 'state', 'error_description', 'error', 'provider', 'token_hash', 'type'].forEach(
-        (p) => url.searchParams.delete(p),
-      )
-      let next = url.pathname + (url.searchParams.toString() ? `?${url.searchParams}` : '')
-      // Drop auth fragments from hash entirely
-      if (
-        window.location.hash &&
-        /access_token|refresh_token|token_type|expires_in/i.test(window.location.hash)
-      ) {
-        // skip appending hash to avoid leaking tokens in the URL bar
-      } else {
-        next += url.hash
-      }
-      window.history.replaceState({}, '', next)
-    } catch {}
-  }, [])
-
   React.useEffect(() => {
     let mounted = true
-
-    // 0) Detect PKCE vs Magic Link, prep code_verifier for PKCE
-    let hasPkceCode = false
-    let hasTokenHash = false
-    let tokenHash: string | null = null
-    let tokenType: string | null = null
-    if (typeof window !== 'undefined') {
-      try {
-        const href = window.location.href
-        const url = new URL(href)
-        hasPkceCode = !!url.searchParams.get('code')
-        tokenHash = url.searchParams.get('token_hash')
-        tokenType = url.searchParams.get('type')
-        hasTokenHash = !!tokenHash
-        const hasHashTokens = (window.location.hash || '').includes('access_token=')
-        dlog('Mount href:', href)
-        dlog('Detected return flags:', {
-          hasPkceCode,
-          hasTokenHash,
-          type: tokenType,
-          hasHashTokens,
-        })
-        if (hasPkceCode) {
-          for (let i = 0; i < localStorage.length; i++) {
-            const k = localStorage.key(i)
-            if (!k) continue
-            if (/^sb-.*-auth-token-code-verifier$/.test(k) && !sessionStorage.getItem(k)) {
-              const v = localStorage.getItem(k)
-              if (v) sessionStorage.setItem(k, v)
-              dlog('Copied code_verifier to sessionStorage from', k)
-            }
-          }
-        }
-      } catch {}
-    }
-
     const supabase = getSupabaseClient()
 
-    // 1) Subscribe first so SIGNED_IN from code exchange is captured
+    const isOAuthCallback =
+      typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('code')
+
+    if (isOAuthCallback) {
+      dlog('OAuth callback detected')
+    }
+
     const { data: sub } = supabase.auth.onAuthStateChange(async (event, newSession) => {
       dlog('onAuthStateChange:', event, {
         hasSession: !!newSession,
         userId: newSession?.user?.id,
-        exp: newSession?.expires_at,
       })
       setSession(newSession)
       setUser(newSession?.user ?? null)
-      // Ensure we never get stuck in loading after an auth event
       setLoading(false)
-      if (event === 'SIGNED_IN' && newSession?.user) {
+
+      const shouldHandlePostLogin = (event === 'SIGNED_IN' || isOAuthCallback) && !!newSession?.user
+
+      if (shouldHandlePostLogin) {
+        upsertProfileFromUser(newSession.user).catch(() => {})
+
         try {
-          await upsertProfileFromUser(newSession.user)
+          const url = new URL(window.location.href)
+          const params = url.searchParams
+          if (params.has('code') || params.has('error')) {
+            params.delete('code')
+            params.delete('error')
+            params.delete('error_description')
+            params.delete('error_code')
+            window.history.replaceState({}, '', url.toString())
+            dlog('Cleaned up URL params')
+          }
         } catch {}
-        // Remove OAuth/Magic Link query params once we've processed the session
-        cleanupAuthParams()
+
+        try {
+          const returnUrl = localStorage.getItem('auth-return-url')
+          if (isValidReturnPath(returnUrl)) {
+            dlog('Redirecting to:', returnUrl)
+            localStorage.removeItem('auth-return-url')
+            window.location.replace(returnUrl!)
+          }
+        } catch {}
       }
     })
 
-    // 2) Attempt PKCE (code) exchange or Magic Link (token_hash) verify, then read session
-    ;(async () => {
-      try {
-        if (typeof window !== 'undefined') {
-          const href = window.location.href
-          try {
-            if (hasTokenHash && tokenHash) {
-              const rawType = (tokenType || '').toLowerCase()
-              const type =
-                rawType === 'recovery' ||
-                rawType === 'email_change' ||
-                rawType === 'invite' ||
-                rawType === 'signup'
-                  ? rawType
-                  : 'magiclink'
-              dlog('Verifying magic link via verifyOtp…', { type, tokenHash: mask(tokenHash) })
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              await (supabase.auth as any).verifyOtp({ token_hash: tokenHash, type })
-              cleanupAuthParams()
-            } else if ((window.location.hash || '').includes('access_token=')) {
-              // Hash tokens present; let detectSessionInUrl set the session.
-              dlog('Hash tokens detected; awaiting detectSessionInUrl…')
-              await new Promise((r) => setTimeout(r, 50))
-            } else if (hasPkceCode) {
-              // Some providers may still return ?code=. Try exchange with same client.
-              dlog('Exchanging code via exchangeCodeForSession (implicit client)…')
-              await Promise.race([
-                supabase.auth.exchangeCodeForSession(href),
-                new Promise((resolve) => setTimeout(resolve, 4000)),
-              ])
-              cleanupAuthParams()
-            }
-          } catch (err) {
-            dlog('Exchange/verify error:', err instanceof Error ? err.message : String(err))
-          }
-        }
-        const { data } = await supabase.auth.getSession()
-        if (!mounted) return
-        dlog('Post-exchange getSession:', {
-          hasSession: !!data.session,
-          userId: data.session?.user?.id,
-        })
-        setSession(data.session ?? null)
-        setUser(data.session?.user ?? null)
-        setLoading(false)
-        if (data.session?.user) {
-          // Ensure profile exists/updates after initial load (non-blocking)
-          upsertProfileFromUser(data.session.user).catch(() => {})
-        }
-      } catch {
-        if (!mounted) return
-        setLoading(false)
-      }
-    })()
+    supabase.auth.getSession().then(({ data }) => {
+      if (!mounted) return
+      dlog('Initial getSession:', {
+        hasSession: !!data.session,
+        userId: data.session?.user?.id,
+      })
+      setSession(data.session ?? null)
+      setUser(data.session?.user ?? null)
+      setLoading(false)
 
-    // Fallback: listen to storage changes across tabs and resync session
+      if (data.session?.user) {
+        upsertProfileFromUser(data.session.user).catch(() => {})
+
+        if (isOAuthCallback) {
+          try {
+            const returnUrl = localStorage.getItem('auth-return-url')
+            if (isValidReturnPath(returnUrl)) {
+              dlog('Redirecting to:', returnUrl)
+              localStorage.removeItem('auth-return-url')
+              window.location.replace(returnUrl!)
+            }
+          } catch {}
+        }
+      }
+    })
+
     const onStorage = (e: StorageEvent) => {
       const key = e.key || ''
-      // Our custom broadcast: force local sign-out to clear Supabase client memory
       if (key === 'app-auth-event') {
         try {
           const payload = JSON.parse(e.newValue || '{}') as { event?: string }
-          dlog('storage: app-auth-event', payload)
           if (payload?.event === 'SIGNED_OUT') {
-            // do not await; ensure immediate state update
             supabase.auth.signOut({ scope: 'local' }).catch(() => {})
             setSession(null)
             setUser(null)
@@ -203,10 +131,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         } catch {}
       }
-      // Supabase token changes: resync session
       if (/^sb-.*-auth-token(\..*)?$/.test(key)) {
-        dlog('storage: supabase token key changed', { key, present: e.newValue != null })
-        // If token removed (e.newValue === null), treat as signed out
         if (e.newValue === null) {
           supabase.auth.signOut({ scope: 'local' }).catch(() => {})
           setSession(null)
@@ -223,10 +148,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     window.addEventListener('storage', onStorage)
 
-    // Visibility change: resync when a tab becomes active (last-ditch fix)
     const onVisible = () => {
       if (document.visibilityState === 'visible') {
-        dlog('visibilitychange: visible → revalidate session')
         supabase.auth.getSession().then(({ data }) => {
           setSession(data.session ?? null)
           setUser(data.session?.user ?? null)
@@ -242,20 +165,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       window.removeEventListener('storage', onStorage)
       document.removeEventListener('visibilitychange', onVisible)
     }
-  }, [cleanupAuthParams, dlog])
+  }, [dlog])
 
   const signOut = React.useCallback(async () => {
     const supabase = getSupabaseClient()
-    // 1) Immediately clear local session to avoid UI hang
+
     try {
-      dlog('signOut: local')
       await Promise.race([
         supabase.auth.signOut({ scope: 'local' }),
         new Promise((resolve) => setTimeout(resolve, 500)),
       ])
     } catch {}
 
-    // 1b) Hard purge any lingering Supabase auth keys as a safety net (Safari/localStorage quirks)
     try {
       const toDelete: string[] = []
       for (let i = 0; i < localStorage.length; i++) {
@@ -268,23 +189,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       toDelete.forEach((k) => localStorage.removeItem(k))
     } catch {}
 
-    // 1c) Clear context so UI updates instantly
     setSession(null)
     setUser(null)
     setLoading(false)
-    // Broadcast to other tabs to resync
+
     try {
-      dlog('signOut: broadcast app-auth-event')
       localStorage.setItem('app-auth-event', JSON.stringify({ event: 'SIGNED_OUT', t: Date.now() }))
     } catch {}
 
-    // 2) Fire-and-forget a global revoke in the background (non-blocking)
     try {
-      dlog('signOut: global (background)')
       const p = supabase.auth.signOut({ scope: 'global' })
       Promise.race([p, new Promise((resolve) => setTimeout(resolve, 2000))]).catch(() => {})
     } catch {}
-  }, [dlog])
+  }, [])
 
   const value = React.useMemo(
     () => ({ user, session, loading, signOut }),
