@@ -14,7 +14,7 @@ const meta = {
     argTypes: {
         variant: {
             control: { type: 'select' },
-            options: ['default', 'secondary', 'outline', 'ghost', 'destructive'],
+            options: ['default', 'secondary', 'destructive', 'success', 'warning', 'info', 'outline', 'ghost'],
         },
         size: {
             control: { type: 'select' },
@@ -54,6 +54,24 @@ export const Destructive = {
     name: 'Destructive',
     args: {
         variant: 'destructive',
+    },
+};
+export const Success = {
+    name: 'Success',
+    args: {
+        variant: 'success',
+    },
+};
+export const Warning = {
+    name: 'Warning',
+    args: {
+        variant: 'warning',
+    },
+};
+export const Info = {
+    name: 'Info',
+    args: {
+        variant: 'info',
     },
 };
 export const Small = {

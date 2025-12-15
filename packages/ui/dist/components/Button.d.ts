@@ -1,6 +1,6 @@
 import { type VariantProps } from '../utils/cva';
 declare const buttonVariants: (props?: ({
-    variant?: "default" | "secondary" | "outline" | "ghost" | "destructive" | null | undefined;
+    variant?: "default" | "secondary" | "outline" | "ghost" | "destructive" | "success" | "warning" | "info" | null | undefined;
     size?: "sm" | "md" | "lg" | "icon" | null | undefined;
 } & import("class-variance-authority/types").ClassProp) | undefined) => string;
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
