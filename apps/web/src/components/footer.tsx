@@ -5,7 +5,7 @@ import Link from 'next/link'
 export function Footer() {
   return (
     <footer className="mt-auto">
-      <div className="max-w-[var(--content-max-width)] mx-auto">
+      <div className="max-w-[var(--content-max-width)] mx-auto px-6 md:px-8">
         <div className="border-t border-border py-8">
           <div className="flex flex-col md:flex-row md:items-center gap-4 text-base text-foreground">
             <span>{new Date().getFullYear()} Mike Y.</span>
