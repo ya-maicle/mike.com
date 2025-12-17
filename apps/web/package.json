@@ -45,6 +45,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@maicle/config": "workspace:*",
+    "@portabletext/types": "^4.0.0",
     "@storybook/addon-a11y": "^9.1.3",
     "@storybook/addon-docs": "^9.1.3",
     "@storybook/addon-onboarding": "^9.1.3",

@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { cn } from '@/lib/utils'
 
 interface IconProps extends React.SVGProps<SVGSVGElement> {
   size?: number | string

@@ -1,6 +1,7 @@
 'use client'
 
 import { PortableText, type PortableTextComponents } from 'next-sanity'
+import type { PortableTextBlock } from '@portabletext/types'
 import { cn } from '@/lib/utils'
 
 const spacerSizes: Record<string, string> = {
@@ -124,7 +125,7 @@ const components: PortableTextComponents = {
 }
 
 interface LegalPageContentProps {
-  content: any
+  content: PortableTextBlock[]
   className?: string
 }
 
