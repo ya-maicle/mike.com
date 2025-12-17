@@ -1,4 +1,5 @@
 import { defineType, defineField } from 'sanity'
+import { blockStyles } from './objects/block-styles'
 
 export const caseStudy = defineType({
   name: 'caseStudy',
@@ -135,16 +136,12 @@ export const caseStudy = defineType({
       of: [
         {
           type: 'block',
-          styles: [
-            { title: 'Normal', value: 'normal' },
-            { title: 'H2', value: 'h2' },
-            { title: 'H3', value: 'h3' },
-            { title: 'Quote', value: 'blockquote' },
-          ],
+          styles: blockStyles,
         },
         { type: 'imageBlock' },
         { type: 'videoBlock' },
         { type: 'carouselBlock' },
+        { type: 'spacerBlock' },
         {
           name: 'twoColumnImageBlock',
           title: 'Two Column Images',
@@ -212,16 +209,12 @@ export const caseStudy = defineType({
       of: [
         {
           type: 'block',
-          styles: [
-            { title: 'Normal', value: 'normal' },
-            { title: 'H2', value: 'h2' },
-            { title: 'H3', value: 'h3' },
-            { title: 'Quote', value: 'blockquote' },
-          ],
+          styles: blockStyles,
         },
         { type: 'imageBlock' },
         { type: 'videoBlock' },
         { type: 'carouselBlock' },
+        { type: 'spacerBlock' },
         {
           name: 'twoColumnImageBlock',
           title: 'Two Column Images',

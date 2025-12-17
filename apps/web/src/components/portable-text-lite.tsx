@@ -23,7 +23,7 @@ function withMarks(text: React.ReactNode, marks: string[] = [], markDefs: MarkDe
       return (
         <a
           href={def.href}
-          className="text-primary underline underline-offset-4"
+          className="text-foreground underline decoration-1 underline-offset-4 hover:text-muted-foreground hover:decoration-muted-foreground transition-colors"
           target="_blank"
           rel="noreferrer"
         >
