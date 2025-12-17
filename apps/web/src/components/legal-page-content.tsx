@@ -26,7 +26,7 @@ const styleClasses: Record<string, string> = {
 
 const components: PortableTextComponents = {
   types: {
-    spacerBlock: ({ value }) => {
+    spacerBlock: ({ value }: { value: { size?: string } }) => {
       const size = value?.size || 'md'
       return <div className={spacerSizes[size] || spacerSizes.md} aria-hidden="true" />
     },
