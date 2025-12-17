@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { SITE_CONFIG } from '@/lib/constants'
 
 export function Footer() {
   const [year, setYear] = useState<number>(2025)
@@ -15,7 +16,9 @@ export function Footer() {
       <div className="max-w-[var(--content-max-width)] mx-auto">
         <div className="border-t border-border py-8">
           <div className="flex flex-col md:flex-row md:items-center gap-4 text-base text-foreground">
-            <span>{year} Mike Y.</span>
+            <span>
+              {year} {SITE_CONFIG.name}
+            </span>
             <a
               href="#"
               className="font-normal underline decoration-1 underline-offset-4 hover:text-muted-foreground hover:decoration-muted-foreground transition-colors"

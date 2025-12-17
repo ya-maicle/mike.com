@@ -7,14 +7,19 @@ import { AuthProvider } from '@/components/providers/auth-provider'
 import { LoginModalProvider } from '@/components/providers/login-modal-provider'
 import { HeaderWithNavLayout } from '@/components/header-with-nav-layout'
 
+import { SITE_CONFIG } from '@/lib/constants'
+
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
   subsets: ['latin'],
 })
 
 export const metadata: Metadata = {
-  title: 'Mike Y.',
-  description: 'Personal website and portfolio',
+  title: {
+    default: SITE_CONFIG.name,
+    template: `%s – ${SITE_CONFIG.name}`,
+  },
+  description: SITE_CONFIG.description,
 }
 
 export default function RootLayout({
