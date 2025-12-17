@@ -22,15 +22,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const isDebug = React.useMemo(() => {
     if (typeof window === 'undefined') return process.env.NEXT_PUBLIC_AUTH_DEBUG === '1'
-    try {
-      return (
-        process.env.NEXT_PUBLIC_AUTH_DEBUG === '1' ||
-        localStorage.getItem('auth-debug') === '1' ||
-        process.env.NODE_ENV !== 'production'
-      )
-    } catch {
+
+    if ((process.env.NODE_ENV as string) === 'production') {
       return process.env.NEXT_PUBLIC_AUTH_DEBUG === '1'
     }
+
+    return (
+      process.env.NEXT_PUBLIC_AUTH_DEBUG === '1' ||
+      localStorage.getItem('auth-debug') === '1' ||
+      process.env.NODE_ENV !== 'production'
+    )
   }, [])
 
   const dlog = React.useCallback(
