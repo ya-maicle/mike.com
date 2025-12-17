@@ -1,8 +1,14 @@
 'use client'
 
+import type { ReactNode } from 'react'
 import { PortableText, type PortableTextComponents } from 'next-sanity'
 import type { PortableTextBlock } from '@portabletext/types'
 import { cn } from '@/lib/utils'
+
+// Helper types for PortableText component props
+type BlockProps = { children?: ReactNode }
+type ListItemProps = { children?: ReactNode; value?: { style?: string } }
+type MarkProps = { children?: ReactNode; value?: { href?: string; weight?: string } }
 
 const spacerSizes: Record<string, string> = {
   sm: 'h-4', // 16px
@@ -32,75 +38,80 @@ const components: PortableTextComponents = {
     },
   },
   block: {
-    // Normal paragraphs - standard bottom margin, no top margin (contextual spacing)
-    normal: ({ children }) => <p className="leading-7 text-foreground mb-5">{children}</p>,
-    // Headings - larger top margin for visual separation from previous content
-    h1: ({ children }) => (
+    normal: ({ children }: BlockProps) => (
+      <p className="leading-7 text-foreground mb-5">{children}</p>
+    ),
+    h1: ({ children }: BlockProps) => (
       <h1 className="text-6xl font-medium tracking-tight text-foreground mb-6 mt-10 first:mt-0">
         {children}
       </h1>
     ),
-    h2: ({ children }) => (
+    h2: ({ children }: BlockProps) => (
       <h2 className="text-5xl font-medium tracking-tight text-foreground mb-5 mt-10 first:mt-0">
         {children}
       </h2>
     ),
-    h3: ({ children }) => (
+    h3: ({ children }: BlockProps) => (
       <h3 className="text-4xl font-medium tracking-tight text-foreground mb-4 mt-8 first:mt-0">
         {children}
       </h3>
     ),
-    h4: ({ children }) => (
+    h4: ({ children }: BlockProps) => (
       <h4 className="text-3xl font-medium tracking-tight text-foreground mb-4 mt-8 first:mt-0">
         {children}
       </h4>
     ),
-    h5: ({ children }) => (
+    h5: ({ children }: BlockProps) => (
       <h5 className="text-2xl font-medium tracking-tight text-foreground mb-3 mt-6 first:mt-0">
         {children}
       </h5>
     ),
-    h6: ({ children }) => (
+    h6: ({ children }: BlockProps) => (
       <h6 className="text-lg font-medium tracking-tight text-foreground mb-3 mt-6 first:mt-0">
         {children}
       </h6>
     ),
-    // Lead paragraph - slightly more breathing room
-    lead: ({ children }) => <p className="text-xl leading-7 text-foreground mb-6">{children}</p>,
-    small: ({ children }) => (
+    lead: ({ children }: BlockProps) => (
+      <p className="text-xl leading-7 text-foreground mb-6">{children}</p>
+    ),
+    small: ({ children }: BlockProps) => (
       <p className="text-sm leading-6 text-muted-foreground mb-4">{children}</p>
     ),
-    blockquote: ({ children }) => (
+    blockquote: ({ children }: BlockProps) => (
       <blockquote className="border-l-2 border-border pl-6 italic text-muted-foreground my-8">
         {children}
       </blockquote>
     ),
   },
   list: {
-    bullet: ({ children }) => <ul className="list-disc pl-6 space-y-2 mb-5 mt-2">{children}</ul>,
-    number: ({ children }) => <ol className="list-decimal pl-6 space-y-2 mb-5 mt-2">{children}</ol>,
+    bullet: ({ children }: BlockProps) => (
+      <ul className="list-disc pl-6 space-y-2 mb-5 mt-2">{children}</ul>
+    ),
+    number: ({ children }: BlockProps) => (
+      <ol className="list-decimal pl-6 space-y-2 mb-5 mt-2">{children}</ol>
+    ),
   },
   listItem: {
-    bullet: ({ children, value }) => {
+    bullet: ({ children, value }: ListItemProps) => {
       const style = value?.style || 'normal'
       const classes = styleClasses[style] || styleClasses.normal
       return <li className={classes}>{children}</li>
     },
-    number: ({ children, value }) => {
+    number: ({ children, value }: ListItemProps) => {
       const style = value?.style || 'normal'
       const classes = styleClasses[style] || styleClasses.normal
       return <li className={classes}>{children}</li>
     },
   },
   marks: {
-    strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
-    em: ({ children }) => <em className="italic">{children}</em>,
-    code: ({ children }) => (
+    strong: ({ children }: MarkProps) => <strong className="font-semibold">{children}</strong>,
+    em: ({ children }: MarkProps) => <em className="italic">{children}</em>,
+    code: ({ children }: MarkProps) => (
       <code className="rounded bg-muted/60 px-1.5 py-0.5 text-sm font-mono">{children}</code>
     ),
-    underline: ({ children }) => <span className="underline">{children}</span>,
-    'strike-through': ({ children }) => <span className="line-through">{children}</span>,
-    link: ({ value, children }) => (
+    underline: ({ children }: MarkProps) => <span className="underline">{children}</span>,
+    'strike-through': ({ children }: MarkProps) => <span className="line-through">{children}</span>,
+    link: ({ value, children }: MarkProps) => (
       <a
         href={value?.href}
         target="_blank"
@@ -110,7 +121,7 @@ const components: PortableTextComponents = {
         {children}
       </a>
     ),
-    fontWeight: ({ value, children }) => {
+    fontWeight: ({ value, children }: MarkProps) => {
       const weightMap: Record<string, string> = {
         light: 'font-light',
         normal: 'font-normal',
@@ -118,7 +129,7 @@ const components: PortableTextComponents = {
         semibold: 'font-semibold',
         bold: 'font-bold',
       }
-      const weightClass = weightMap[value?.weight] || ''
+      const weightClass = weightMap[value?.weight || ''] || ''
       return <span className={weightClass}>{children}</span>
     },
   },
