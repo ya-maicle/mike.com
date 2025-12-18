@@ -3,8 +3,8 @@ export const SITE_CONFIG = {
   description: 'Personal website and portfolio',
   url: 'https://mike.com',
   links: {
-    instagram: 'https://www.instagram.com/mike/', // Placeholder
-    linkedin: 'https://www.linkedin.com/in/mike/', // Placeholder
-    youtube: 'https://www.youtube.com/@mike', // Placeholder
+    instagram: 'https://www.instagram.com/ya.maicle/',
+    linkedin: 'https://www.linkedin.com/in/yamaicle/',
+    youtube: 'https://www.youtube.com/@ya-maicle',
   },
 } as const
