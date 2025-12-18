@@ -27,7 +27,7 @@ export default async function TermsPage() {
     : null
 
   return (
-    <main className="min-h-screen pb-24">
+    <div className="pb-24">
       <div className="mx-auto max-w-[648px] pt-6 pb-16 space-y-8 text-center flex flex-col items-center">
         {formattedDate && (
           <div className="text-sm text-muted-foreground font-medium">Updated: {formattedDate}</div>
@@ -41,6 +41,6 @@ export default async function TermsPage() {
       <div className="mx-auto max-w-[648px]">
         <LegalPageContent content={page.content} />
       </div>
-    </main>
+    </div>
   )
 }

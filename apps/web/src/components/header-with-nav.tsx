@@ -18,7 +18,6 @@ export function HeaderWithNav() {
             <Logotype
               size="2xl"
               showText={false}
-              text="Maicle"
               className="[&_svg]:w-[36px] md:[&_svg]:w-[42px] [&_svg]:h-auto text-foreground"
             />
             <Button

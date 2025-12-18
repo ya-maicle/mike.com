@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button'
 import { SanityImage } from '@/components/sanity-image'
 
 export const metadata: Metadata = {
-  title: 'Work - Mike Y.',
+  title: 'Work',
   description: 'Portfolio of work and projects',
 }
 

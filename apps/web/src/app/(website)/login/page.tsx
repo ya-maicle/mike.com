@@ -2,9 +2,10 @@ import type { Metadata } from 'next'
 import { GalleryVerticalEnd } from '@/components/ui/icons'
 import { LoginForm } from '@/components/login-form'
 import { Icon } from '@/components/ui/icon'
+import { SITE_CONFIG } from '@/lib/constants'
 
 export const metadata: Metadata = {
-  title: 'Login - Mike Y.',
+  title: 'Login',
   description: 'Login to access your account',
 }
 
@@ -16,7 +17,7 @@ export default function LoginPage() {
           <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
             <Icon icon={GalleryVerticalEnd} size="sm" />
           </div>
-          Acme Inc.
+          {SITE_CONFIG.name}
         </a>
         <LoginForm />
       </div>
