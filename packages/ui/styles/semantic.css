@@ -7,7 +7,7 @@
 /* Light theme */
 :root {
   --background: var(--white);
-  --foreground: var(--zinc-900);
+  --foreground: var(--zinc-950);
 
   --card: var(--white);
   --card-foreground: var(--zinc-900);
@@ -48,7 +48,7 @@
 
 /* Dark theme (class-based) */
 .dark {
-  --background: var(--zinc-900);
+  --background: var(--zinc-950);
   --foreground: var(--zinc-50);
 
   --card: var(--zinc-900);

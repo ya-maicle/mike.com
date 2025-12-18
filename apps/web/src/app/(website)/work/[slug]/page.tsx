@@ -28,7 +28,7 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
   )
   if (!data) return { title: 'Case Study not found' }
   return {
-    title: data.seoSettings?.metaTitle || `${data.title} – Work – Mike Y.`,
+    title: data.seoSettings?.metaTitle || data.title,
     description: data.seoSettings?.metaDescription || data.summary || undefined,
   }
 }

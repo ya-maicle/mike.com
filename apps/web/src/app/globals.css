@@ -159,6 +159,18 @@
     line-height: 1.4;
     margin-bottom: 1em;
   }
+
+  a {
+    text-decoration-color: color-mix(in srgb, currentColor 50%, transparent);
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1px;
+    transition: text-decoration-color 0.2s ease;
+  }
+
+  a:hover {
+    text-decoration-color: currentColor;
+  }
+
   code,
   kbd,
   samp,

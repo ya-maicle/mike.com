@@ -14,6 +14,7 @@ import { UserMenu } from '@/components/user-menu'
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { Footer } from '@/components/footer'
 
 export function HeaderWithNavLayout({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = React.useState(false)
@@ -74,7 +75,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
   }, [])
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
       {/* Header */}
       {mounted && (
         <header
@@ -95,7 +96,6 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
                 <Logotype
                   size="2xl"
                   showText={false}
-                  text="Maicle"
                   className="[&_svg]:w-[36px] md:[&_svg]:w-[42px] [&_svg]:h-auto"
                 />
               </Link>
@@ -257,15 +257,17 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
         suppressHydrationWarning
         className={cn(
           'transition-[transform,margin-left] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]',
+          'flex flex-col flex-1',
           isMobile && 'transform-gpu will-change-transform',
           navOpen ? 'md:ml-[230px]' : 'md:ml-0',
         )}
         style={isMobile ? { transform: navOpen ? 'translateX(80vw)' : 'translateX(0)' } : undefined}
       >
         {/* Content Area */}
-        <main className="min-h-[calc(100vh-56px)] md:min-h-[calc(100vh-64px)] px-6 md:px-8 py-6 md:py-8">
+        <main className="px-6 md:px-8 py-6 md:py-8">
           <div className="max-w-[var(--content-max-width)] mx-auto">{children}</div>
         </main>
+        <Footer />
       </div>
 
       {/* Login Modal */}

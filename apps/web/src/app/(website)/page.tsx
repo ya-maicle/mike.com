@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
+import { SITE_CONFIG } from '@/lib/constants'
 
 export const metadata: Metadata = {
-  title: 'Home - Mike Y.',
-  description: "Welcome to Mike Y.'s personal website and portfolio",
+  title: 'Home',
+  description: SITE_CONFIG.description,
 }
 
 export default function Home() {
