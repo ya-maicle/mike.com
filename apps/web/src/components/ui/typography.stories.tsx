@@ -230,3 +230,193 @@ export const FontWeights: Story = {
     </div>
   ),
 }
+
+export const Paragraphs: Story = {
+  render: () => (
+    <div className="space-y-12 max-w-2xl">
+      <div className="space-y-4">
+        <h2 className="text-2xl font-semibold tracking-tight">Paragraph Typography</h2>
+        <p className="text-muted-foreground">
+          Multiple paragraphs demonstrating body text styling, line height, and spacing. Use this to
+          evaluate readability and visual rhythm.
+        </p>
+      </div>
+
+      {/* Standard Body Text */}
+      <section className="space-y-6">
+        <h3 className="text-lg font-medium border-b pb-2">Standard Body Text</h3>
+        <article className="space-y-4">
+          <p>
+            Typography is the art and technique of arranging type to make written language legible,
+            readable, and appealing when displayed. The arrangement of type involves selecting
+            typefaces, point sizes, line lengths, line-spacing, and letter-spacing, as well as
+            adjusting the space between pairs of letters.
+          </p>
+          <p>
+            Good typography establishes a strong visual hierarchy, provides a graphic balance to the
+            website, and sets the product&apos;s overall tone. It should guide and inform users,
+            optimize readability and accessibility, and ensure an excellent user experience.
+          </p>
+          <p>
+            The goal is to create a seamless reading experience where the reader can focus on the
+            content without being distracted by the formatting. Proper line height, letter spacing,
+            and paragraph spacing all contribute to this goal.
+          </p>
+        </article>
+      </section>
+
+      {/* Long-form Content */}
+      <section className="space-y-6">
+        <h3 className="text-lg font-medium border-b pb-2">Long-form Content</h3>
+        <article className="space-y-4">
+          <p>
+            In the realm of digital design, typography serves as the backbone of communication.
+            Every choice—from font family to weight to size—carries meaning and influences how users
+            perceive and interact with content. The subtle art lies in making these choices
+            invisible, allowing the message to shine through without interference.
+          </p>
+          <p>
+            Consider the rhythm of reading: the eye moves across lines, drops to the next, and
+            continues its dance across the page. This rhythm must be comfortable, predictable, and
+            effortless. Too tight, and words blur together; too loose, and the text becomes
+            scattered and hard to follow.
+          </p>
+          <p>
+            Modern web typography has evolved significantly with variable fonts, improved rendering
+            engines, and better screen technologies. We now have more control than ever over how
+            text appears across different devices and contexts. This power comes with
+            responsibility—the responsibility to create accessible, beautiful, and functional text.
+          </p>
+          <p>
+            The best typography is invisible. It doesn&apos;t call attention to itself but rather
+            serves the content. When readers finish an article feeling informed and satisfied,
+            without once thinking about the font or spacing, the typographer has succeeded.
+          </p>
+        </article>
+      </section>
+
+      {/* Mixed Content */}
+      <section className="space-y-6">
+        <h3 className="text-lg font-medium border-b pb-2">Mixed Content with Links</h3>
+        <article className="space-y-4">
+          <p>
+            Typography extends beyond simple paragraphs. It encompasses{' '}
+            <a href="#" className="underline underline-offset-4 hover:text-muted-foreground">
+              inline links
+            </a>{' '}
+            that guide users to related content, <strong>bold text</strong> that emphasizes key
+            points, and <em>italics</em> that add nuance and tone to the written word.
+          </p>
+          <p>
+            The interplay between these elements creates texture in text. A wall of uniform
+            paragraphs can feel monotonous, while strategic use of emphasis and variation keeps
+            readers engaged. The key is balance—enough variety to maintain interest, but not so much
+            that it becomes chaotic or distracting.
+          </p>
+          <p>
+            Consider also the role of{' '}
+            <code className="bg-muted px-1.5 py-0.5 rounded text-sm">inline code</code> in technical
+            content, or the impact of properly styled quotations. Each element must harmonize with
+            the others while serving its specific purpose.
+          </p>
+        </article>
+      </section>
+
+      {/* Size Variations */}
+      <section className="space-y-6">
+        <h3 className="text-lg font-medium border-b pb-2">Size Variations</h3>
+        <div className="space-y-8">
+          <div className="space-y-3">
+            <span className="text-xs text-muted-foreground font-mono">text-xl</span>
+            <p className="text-xl">
+              Larger body text for lead paragraphs or introductions. This size commands attention
+              while remaining comfortable to read in shorter passages.
+            </p>
+          </div>
+          <div className="space-y-3">
+            <span className="text-xs text-muted-foreground font-mono">text-base (default)</span>
+            <p className="text-base">
+              Standard body text optimized for extended reading. This is the workhorse of web
+              typography, used for the majority of content.
+            </p>
+          </div>
+          <div className="space-y-3">
+            <span className="text-xs text-muted-foreground font-mono">text-sm</span>
+            <p className="text-sm">
+              Smaller text for captions, footnotes, or secondary information. Use sparingly as it
+              can strain readability over long passages.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Article Layout with Headlines */}
+      <section className="space-y-6">
+        <h3 className="text-lg font-medium border-b pb-2">Article Layout with Headlines</h3>
+        <article>
+          <h1>The Art of Digital Typography: A Comprehensive Guide to Modern Web Standards</h1>
+          <p>
+            Typography is more than just choosing fonts—it&apos;s about creating a visual language
+            that communicates meaning, establishes hierarchy, and guides readers through content
+            with clarity and purpose.
+          </p>
+
+          <h2>Understanding Visual Hierarchy: Why Spacing and Weight Matter in Digital Content</h2>
+          <p>
+            Visual hierarchy is the arrangement of elements in order of importance. In typography,
+            this is achieved through variations in size, weight, color, and spacing. A well-crafted
+            hierarchy allows readers to scan content quickly and find what they need.
+          </p>
+          <p>
+            Headlines serve as signposts, breaking up long passages and giving readers mental
+            anchors. The spacing between a headline and the text that follows is crucial—it must be
+            close enough to show relationship, yet distinct enough to create clear separation.
+          </p>
+
+          <h3>The Role of Heading Levels in Semantic Structure and Accessibility Best Practices</h3>
+          <p>
+            Each heading level serves a specific purpose. H1 typically appears once per page as the
+            main title. H2 headings divide major sections, while H3 and H4 create subdivisions
+            within those sections.
+          </p>
+
+          <h4>Spacing Considerations for Multi-line Headlines and Paragraph Transitions</h4>
+          <p>
+            The space above a heading should generally be larger than the space below it. This
+            creates a clear visual break from the preceding content while maintaining connection to
+            the content that follows.
+          </p>
+          <p>
+            Consistent spacing ratios help establish rhythm. Many designers use a scale based on the
+            base line height—for example, 1.5x above headings and 0.75x below.
+          </p>
+
+          <h5>Fine-Tuning Details and Subtle Typographic Adjustments for Enhanced Legibility</h5>
+          <p>
+            Smaller headings like H5 and H6 require careful attention. They must be distinct from
+            body text while not overwhelming the content. This is often achieved through weight or
+            subtle size differences rather than dramatic changes.
+          </p>
+
+          <h6>Micro-Typography and the Importance of Smallest Visual Elements and Spacing</h6>
+          <p>
+            Even the smallest typographic decisions matter. Letter spacing, word spacing, and the
+            treatment of punctuation all contribute to the overall reading experience. These details
+            may seem minor, but they accumulate to create either friction or flow.
+          </p>
+
+          <h2>Putting It All Together: Creating a Harmonious and Balanced Typographic System</h2>
+          <p>
+            A complete typography system considers all these elements holistically. Headlines and
+            body text must work in harmony, with consistent spacing, complementary weights, and a
+            coherent visual rhythm that guides readers effortlessly through content.
+          </p>
+          <p>
+            The best typography systems are invisible—readers engage with the content without
+            noticing the design decisions that make that engagement possible.
+          </p>
+        </article>
+      </section>
+    </div>
+  ),
+}
