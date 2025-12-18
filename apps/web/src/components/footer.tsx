@@ -11,6 +11,9 @@ export function Footer() {
     setYear(new Date().getFullYear())
   }, [])
 
+import Link from 'next/link'
+
+export function Footer() {
   return (
     <footer className="mt-auto px-6 md:px-8">
       <div className="max-w-[var(--content-max-width)] mx-auto">
@@ -19,6 +22,7 @@ export function Footer() {
             <span>
               {year} {SITE_CONFIG.name}
             </span>
+            <span>{new Date().getFullYear()} Mike Y.</span>
             <a
               href="#"
               className="font-normal underline decoration-1 underline-offset-4 hover:text-muted-foreground hover:decoration-muted-foreground transition-colors"
