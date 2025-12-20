@@ -33,12 +33,33 @@ export const imageBlock = defineType({
       rows: 3,
       validation: (Rule) => Rule.max(300),
     }),
+
+    defineField({
+      name: 'width',
+      title: 'Width',
+      type: 'string',
+      description: 'Control how wide the image appears',
+      options: {
+        list: [
+          { title: 'Narrow (Content Width)', value: 'narrow' },
+          { title: 'Medium', value: 'medium' },
+          { title: 'Wide', value: 'wide' },
+          { title: 'Full Width', value: 'full' },
+        ],
+        layout: 'dropdown',
+      },
+      initialValue: 'full',
+    }),
   ],
 
   preview: {
-    select: { title: 'title', media: 'image' },
-    prepare({ title, media }) {
-      return { title: title || 'Image Block', media }
+    select: { title: 'title', media: 'image', width: 'width' },
+    prepare({ title, media, width }) {
+      return {
+        title: title || 'Image Block',
+        subtitle: `Width: ${width || 'full'}`,
+        media,
+      }
     },
   },
 })

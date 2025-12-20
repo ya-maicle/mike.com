@@ -4,8 +4,7 @@ import * as React from 'react'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { SanityImage } from '@/components/sanity-image'
-import { MuxPlayer } from '@/components/mux-player'
+import { PageTemplate } from '@/components/page-template'
 import { CaseStudyBlock } from '@/components/case-study-block'
 import type { CaseStudy } from '@/sanity/queries'
 import { cn } from '@/lib/utils'
@@ -65,58 +64,28 @@ export function CaseStudyLayout({ data }: CaseStudyLayoutProps) {
           isPanelOpen ? 'md:w-1/2' : 'w-full',
         )}
       >
-        <div className="min-h-screen pb-24 relative">
-          <div className="mx-auto max-w-[592px] pt-6 pb-16 space-y-8 text-center flex flex-col items-center">
-            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground font-medium">
-              {data.projectInfo?.year && <span>{data.projectInfo.year}</span>}
-              {data.projectInfo?.year && data.projectInfo?.sector && <span>&nbsp;&nbsp;</span>}
-              {data.projectInfo?.sector && <span>{data.projectInfo.sector}</span>}
-            </div>
+        <PageTemplate
+          title={data.title}
+          metadata={[data.projectInfo?.year, data.projectInfo?.sector].filter(Boolean) as string[]}
+          subtitle={data.summary}
+          className="pb-0"
+          coverMedia={
+            data.headerMedia?.type === 'video' && data.headerMedia?.video?.asset?.playbackId
+              ? { type: 'video', video: data.headerMedia.video }
+              : data.headerMedia?.image
+                ? { type: 'image', image: data.headerMedia.image }
+                : data.coverImage
+                  ? { type: 'image', image: data.coverImage }
+                  : undefined
+          }
+        >
+          <></>
+        </PageTemplate>
 
-            <h1 className="text-5xl font-medium tracking-tight text-foreground leading-none">
-              {data.title}
-            </h1>
-
-            {data.summary ? (
-              <p className="text-lg leading-relaxed text-black dark:text-white">{data.summary}</p>
-            ) : null}
-          </div>
-
-          {data.headerMedia ? (
-            <section className="w-full my-2">
-              {data.headerMedia.type === 'video' && data.headerMedia.video?.asset?.playbackId ? (
-                <MuxPlayer
-                  playbackId={data.headerMedia.video.asset.playbackId}
-                  className="w-full h-auto max-h-[90vh] object-cover rounded-[8px] overflow-hidden"
-                  autoPlay
-                  muted
-                  loop
-                />
-              ) : data.headerMedia.image ? (
-                <SanityImage
-                  image={data.headerMedia.image}
-                  className="w-full h-auto object-cover max-h-[90vh] rounded-[8px]"
-                  priority
-                  sizes="100vw"
-                />
-              ) : null}
-            </section>
-          ) : data.coverImage ? (
-            <section className="w-full my-2">
-              <SanityImage
-                image={data.coverImage}
-                className="w-full h-auto object-cover max-h-[90vh] rounded-[8px]"
-                priority
-                sizes="100vw"
-              />
-            </section>
-          ) : null}
-
-          <div className="space-y-0">
-            {data.content?.map((block: NonNullable<CaseStudy['content']>[number], i: number) => (
-              <CaseStudyBlock key={block._key || i} block={block} />
-            ))}
-          </div>
+        <div className="max-w-[var(--content-max-width)] mx-auto px-4 space-y-0">
+          {data.content?.map((block: NonNullable<CaseStudy['content']>[number], i: number) => (
+            <CaseStudyBlock key={block._key || i} block={block} />
+          ))}
         </div>
       </div>
 
@@ -202,7 +171,7 @@ function PanelContent({ data }: { data: CaseStudy }) {
     <div className="max-w-[592px] mx-auto w-full space-y-8 pb-24">
       {/* Panel Content */}
       {data.panelContent && (
-        <div className="space-y-0 text-xl leading-relaxed text-black dark:text-white">
+        <div className="space-y-0">
           {data.panelContent.map((block, i) => (
             <CaseStudyBlock key={block._key || i} block={block} />
           ))}

@@ -1,5 +1,6 @@
 import { sanityFetch } from '@/sanity/client'
 import { notFound } from 'next/navigation'
+import { PageTemplate } from '@/components/page-template'
 import { LegalPageContent } from '@/components/legal-page-content'
 import type { PortableTextBlock } from '@portabletext/types'
 
@@ -10,9 +11,10 @@ export const metadata = {
 export default async function TermsPage() {
   const page = await sanityFetch<{
     title: string
+    subtitle?: string
     content: PortableTextBlock[]
     publishedAt: string
-  }>(`*[_type == "legalPage" && slug.current == "terms"][0]{ title, content, publishedAt }`)
+  }>(`*[_type == "page" && slug.current == "terms"][0]{ title, subtitle, content, publishedAt }`)
 
   if (!page) {
     notFound()
@@ -24,23 +26,11 @@ export default async function TermsPage() {
         month: 'long',
         day: 'numeric',
       })
-    : null
+    : undefined
 
   return (
-    <div className="pb-24">
-      <div className="mx-auto max-w-[648px] pt-6 pb-16 space-y-8 text-center flex flex-col items-center">
-        {formattedDate && (
-          <div className="text-sm text-muted-foreground font-medium">Updated: {formattedDate}</div>
-        )}
-
-        <h1 className="text-5xl font-medium tracking-tight text-foreground leading-none">
-          {page.title}
-        </h1>
-      </div>
-
-      <div className="mx-auto max-w-[648px]">
-        <LegalPageContent content={page.content} />
-      </div>
-    </div>
+    <PageTemplate title={page.title} subtitle={page.subtitle} metadata={formattedDate}>
+      <LegalPageContent content={page.content} />
+    </PageTemplate>
   )
 }

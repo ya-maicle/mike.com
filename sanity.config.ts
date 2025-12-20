@@ -1,6 +1,7 @@
 import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
 import { muxInput } from 'sanity-plugin-mux-input'
+import { media } from 'sanity-plugin-media'
 import { visionTool } from '@sanity/vision'
 import { schemaTypes } from './apps/web/src/sanity/schemas'
 import { LinkToCaseStudyAction } from './apps/web/src/sanity/schemas/actions/link-to-case-study'
@@ -36,6 +37,7 @@ export default defineConfig({
     }),
 
     muxInput(),
+    media(),
     visionTool({
       defaultApiVersion: '2025-01-01',
       defaultDataset: dataset,

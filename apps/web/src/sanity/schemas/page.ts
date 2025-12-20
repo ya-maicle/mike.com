@@ -6,9 +6,9 @@ import {
   fontWeightAnnotation,
 } from './objects/block-styles'
 
-export const legalPage = defineType({
-  name: 'legalPage',
-  title: 'Legal Page',
+export const page = defineType({
+  name: 'page',
+  title: 'Page',
   type: 'document',
   fields: [
     defineField({
@@ -16,7 +16,6 @@ export const legalPage = defineType({
       title: 'Title',
       type: 'string',
       validation: (Rule) => Rule.required(),
-      description: 'The title of the legal page (e.g., Privacy Policy)',
     }),
     defineField({
       name: 'slug',
@@ -27,7 +26,56 @@ export const legalPage = defineType({
         maxLength: 96,
       },
       validation: (Rule) => Rule.required(),
-      description: 'The URL path for this page (e.g., "privacy-policy" for /legal/privacy-policy)',
+      description: 'The URL path for this page (e.g., "about" for /about)',
+    }),
+    defineField({
+      name: 'subtitle',
+      title: 'Subtitle',
+      type: 'text',
+      rows: 2,
+      description: 'Optional lead text displayed below the title',
+    }),
+    defineField({
+      name: 'coverMedia',
+      title: 'Cover Media',
+      type: 'object',
+      description: 'Optional cover image or video displayed below the header',
+      fields: [
+        defineField({
+          name: 'type',
+          title: 'Media Type',
+          type: 'string',
+          options: {
+            list: [
+              { title: 'Image', value: 'image' },
+              { title: 'Video', value: 'video' },
+            ],
+            layout: 'radio',
+          },
+          initialValue: 'image',
+        }),
+        defineField({
+          name: 'image',
+          title: 'Image',
+          type: 'image',
+          options: { hotspot: true },
+          hidden: ({ parent }) => parent?.type !== 'image',
+          fields: [
+            defineField({
+              name: 'alt',
+              title: 'Alt Text',
+              type: 'string',
+              description: 'Alternative text for accessibility',
+            }),
+          ],
+        }),
+        defineField({
+          name: 'video',
+          title: 'Video',
+          type: 'mux.video',
+          hidden: ({ parent }) => parent?.type !== 'video',
+        }),
+      ],
     }),
     defineField({
       name: 'content',
@@ -43,14 +91,17 @@ export const legalPage = defineType({
             annotations: [fontWeightAnnotation],
           },
         },
+        { type: 'imageBlock' },
+        { type: 'videoBlock' },
+        { type: 'carouselBlock' },
+        { type: 'spacerBlock' },
       ],
     }),
     defineField({
       name: 'publishedAt',
-      title: 'Last Updated',
+      title: 'Published At',
       type: 'datetime',
       initialValue: () => new Date().toISOString(),
-      description: 'The date shown as "Last Updated" on the page',
     }),
     defineField({
       name: 'seoSettings',

@@ -80,15 +80,32 @@ export const carouselBlock = defineType({
       rows: 3,
       validation: (Rule) => Rule.max(300),
     }),
+
+    defineField({
+      name: 'width',
+      title: 'Width',
+      type: 'string',
+      description: 'Control how wide the carousel appears',
+      options: {
+        list: [
+          { title: 'Narrow (Content Width)', value: 'narrow' },
+          { title: 'Medium', value: 'medium' },
+          { title: 'Wide', value: 'wide' },
+          { title: 'Full Width', value: 'full' },
+        ],
+        layout: 'dropdown',
+      },
+      initialValue: 'full',
+    }),
   ],
 
   preview: {
-    select: { title: 'title', items: 'items' },
-    prepare({ title, items }) {
+    select: { title: 'title', items: 'items', width: 'width' },
+    prepare({ title, items, width }) {
       const count = Array.isArray(items) ? items.length : 0
       return {
         title: title || 'Carousel Block',
-        subtitle: `${count} item${count === 1 ? '' : 's'}`,
+        subtitle: `${count} item${count === 1 ? '' : 's'} · Width: ${width || 'full'}`,
       }
     },
   },
