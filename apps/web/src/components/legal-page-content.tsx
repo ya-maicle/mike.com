@@ -5,10 +5,7 @@ import { PortableText, type PortableTextComponents } from 'next-sanity'
 import type { PortableTextBlock } from '@portabletext/types'
 import { cn } from '@/lib/utils'
 import { gridCols } from '@/lib/grid-columns'
-import { SanityImage } from '@/components/sanity-image'
-import { CustomVideoPlayer } from '@/components/custom-video-player'
-import { DecorativeVideoBlock } from '@/components/decorative-video-block'
-import { CaseStudyCarousel } from '@/components/case-study-carousel'
+import { ContentBlock } from '@/components/content-block'
 
 type BlockProps = { children?: ReactNode }
 type ListItemProps = { children?: ReactNode; value?: { style?: string } }
@@ -36,7 +33,6 @@ const styleClasses: Record<string, string> = {
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-/** Get grid column class from width value, defaulting to full */
 const getWidthClass = (width?: string) => {
   if (width && width in gridCols) {
     return gridCols[width as keyof typeof gridCols]
@@ -55,63 +51,26 @@ const components: PortableTextComponents = {
         />
       )
     },
-    imageBlock: ({ value }: { value: any }) => {
-      if (!value?.image) return null
-      const widthClass = getWidthClass(value.width)
-      return (
-        <section className={cn(widthClass, 'space-y-3 mt-4 mb-6 md:mt-8 md:mb-12')}>
-          <SanityImage
-            image={value.image}
-            className="w-full h-auto rounded-[8px] border border-foreground/20"
-          />
-          {value.image?.caption && (
-            <div className="text-center text-sm text-muted-foreground">{value.image.caption}</div>
-          )}
-          {value.title && <h3 className="text-xl font-semibold tracking-tight">{value.title}</h3>}
-          {value.description && <p className="text-muted-foreground">{value.description}</p>}
-        </section>
-      )
-    },
-    videoBlock: ({ value }: { value: any }) => {
-      const playbackId: string | undefined = value?.video?.asset?.playbackId
-      if (!playbackId) return null
-      const widthClass = getWidthClass(value.width)
-      const isDecorative = value.mode === 'decorative'
-
-      if (isDecorative) {
-        return (
-          <div className={cn(widthClass, 'mt-4 mb-6 md:mt-8 md:mb-12')}>
-            <DecorativeVideoBlock
-              playbackId={playbackId}
-              title={value.title}
-              description={value.description}
-            />
-          </div>
-        )
-      }
-
-      return (
-        <section className={cn(widthClass, 'space-y-3 mt-4 mb-6 md:mt-8 md:mb-12')}>
-          <CustomVideoPlayer
-            playbackId={playbackId}
-            title={value.title}
-            className="w-full h-auto rounded-[8px] overflow-hidden border border-foreground/20"
-          />
-          {value.title && <h3 className="text-xl font-semibold tracking-tight">{value.title}</h3>}
-          {value.description && <p className="text-muted-foreground">{value.description}</p>}
-        </section>
-      )
-    },
-    carouselBlock: ({ value }: { value: any }) => {
-      const items: any[] = Array.isArray(value?.items) ? value.items : []
-      if (items.length === 0) return null
-      const widthClass = getWidthClass(value.width)
-      return (
-        <div className={cn(widthClass, 'mt-4 mb-6 md:mt-8 md:mb-12')}>
-          <CaseStudyCarousel items={items} title={value.title} description={value.description} />
-        </div>
-      )
-    },
+    imageBlock: ({ value }: { value: any }) => (
+      <div className={cn(getWidthClass(value?.width), 'mt-4 mb-6 md:mt-8 md:mb-12')}>
+        <ContentBlock block={{ ...value, _type: 'imageBlock' }} layout="grid" />
+      </div>
+    ),
+    videoBlock: ({ value }: { value: any }) => (
+      <div className={cn(getWidthClass(value?.width), 'mt-4 mb-6 md:mt-8 md:mb-12')}>
+        <ContentBlock block={{ ...value, _type: 'videoBlock' }} layout="grid" />
+      </div>
+    ),
+    carouselBlock: ({ value }: { value: any }) => (
+      <div className={cn(getWidthClass(value?.width), 'mt-4 mb-6 md:mt-8 md:mb-12')}>
+        <ContentBlock block={{ ...value, _type: 'carouselBlock' }} layout="grid" />
+      </div>
+    ),
+    twoColumnImageBlock: ({ value }: { value: any }) => (
+      <div className={gridCols.full}>
+        <ContentBlock block={{ ...value, _type: 'twoColumnImageBlock' }} layout="grid" />
+      </div>
+    ),
   },
   block: {
     normal: ({ children }: BlockProps) => <p className={gridCols.narrow}>{children}</p>,
