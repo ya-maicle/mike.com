@@ -94,7 +94,10 @@ export function PortableTextLite({ value, className }: { value?: Block[]; classN
         break
       case 'blockquote':
         elements.push(
-          <blockquote key={i} className="border-l-2 pl-4 text-muted-foreground italic my-4">
+          <blockquote
+            key={i}
+            className="w-full max-w-[885px] mx-auto text-4xl font-normal tracking-tight text-foreground text-center my-16"
+          >
             {content}
           </blockquote>,
         )

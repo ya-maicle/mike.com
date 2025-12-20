@@ -32,7 +32,7 @@ export function CaseStudyCarousel({ items, title, description }: CaseStudyCarous
 
   return (
     <section className="w-full space-y-4 py-2 max-w-[var(--content-max-width)] mx-auto">
-      <div className="relative group overflow-hidden rounded-[8px]">
+      <div className="relative group overflow-hidden rounded-[8px] border border-foreground/20">
         <Carousel
           setApi={setApi}
           opts={{
@@ -66,40 +66,40 @@ export function CaseStudyCarousel({ items, title, description }: CaseStudyCarous
           </CarouselContent>
         </Carousel>
 
-        <div className="absolute bottom-4 right-4 flex items-center gap-2 z-10">
+        <div className="absolute bottom-4 right-4 flex items-center gap-1.5 md:gap-2 z-10">
           <Button
             variant="secondary"
             size="icon"
-            className="rounded-full w-10 h-10 bg-background/80 hover:bg-background backdrop-blur-sm text-foreground border border-border/10 shadow-sm"
+            className="rounded-full w-6 h-6 md:w-7 md:h-7 bg-background/80 hover:bg-background backdrop-blur-sm text-foreground border border-border/10"
             onClick={() => setIsPlaying(!isPlaying)}
           >
             {isPlaying ? (
-              <Pause className="h-4 w-4 fill-current" />
+              <Pause className="h-2.5 w-2.5 md:h-3 md:w-3 fill-current" />
             ) : (
-              <Play className="h-4 w-4 fill-current" />
+              <Play className="h-2.5 w-2.5 md:h-3 md:w-3 fill-current" />
             )}
           </Button>
           <Button
             variant="secondary"
             size="icon"
-            className="rounded-full w-10 h-10 bg-background/80 hover:bg-background backdrop-blur-sm text-foreground border border-border/10 shadow-sm"
+            className="rounded-full w-6 h-6 md:w-7 md:h-7 bg-background/80 hover:bg-background backdrop-blur-sm text-foreground border border-border/10"
             onClick={() => {
               onUserInteract()
               api?.scrollPrev()
             }}
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-2.5 w-2.5 md:h-3 md:w-3" />
           </Button>
           <Button
             variant="secondary"
             size="icon"
-            className="rounded-full w-10 h-10 bg-background/80 hover:bg-background backdrop-blur-sm text-foreground border border-border/10 shadow-sm"
+            className="rounded-full w-6 h-6 md:w-7 md:h-7 bg-background/80 hover:bg-background backdrop-blur-sm text-foreground border border-border/10"
             onClick={() => {
               onUserInteract()
               api?.scrollNext()
             }}
           >
-            <ArrowRight className="h-4 w-4" />
+            <ArrowRight className="h-2.5 w-2.5 md:h-3 md:w-3" />
           </Button>
         </div>
       </div>

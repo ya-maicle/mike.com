@@ -4,6 +4,11 @@ import type { ReactNode } from 'react'
 import { PortableText, type PortableTextComponents } from 'next-sanity'
 import type { PortableTextBlock } from '@portabletext/types'
 import { cn } from '@/lib/utils'
+import { gridCols } from '@/lib/grid-columns'
+import { SanityImage } from '@/components/sanity-image'
+import { CustomVideoPlayer } from '@/components/custom-video-player'
+import { DecorativeVideoBlock } from '@/components/decorative-video-block'
+import { CaseStudyCarousel } from '@/components/case-study-carousel'
 
 // Helper types for PortableText component props
 type BlockProps = { children?: ReactNode }
@@ -27,68 +32,121 @@ const styleClasses: Record<string, string> = {
   h6: 'text-lg font-medium tracking-tight text-foreground',
   lead: 'text-xl leading-7 text-foreground',
   small: 'text-sm leading-6 text-muted-foreground',
-  blockquote: 'italic text-muted-foreground',
+  blockquote: 'text-4xl font-normal tracking-tight text-foreground',
+}
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+/** Get grid column class from width value, defaulting to full */
+const getWidthClass = (width?: string) => {
+  if (width && width in gridCols) {
+    return gridCols[width as keyof typeof gridCols]
+  }
+  return gridCols.full
 }
 
 const components: PortableTextComponents = {
   types: {
     spacerBlock: ({ value }: { value: { size?: string } }) => {
       const size = value?.size || 'md'
-      return <div className={spacerSizes[size] || spacerSizes.md} aria-hidden="true" />
+      return (
+        <div
+          className={cn(gridCols.full, spacerSizes[size] || spacerSizes.md)}
+          aria-hidden="true"
+        />
+      )
+    },
+    imageBlock: ({ value }: { value: any }) => {
+      if (!value?.image) return null
+      const widthClass = getWidthClass(value.width)
+      return (
+        <section className={cn(widthClass, 'space-y-3 mt-4 mb-6 md:mt-8 md:mb-12')}>
+          <SanityImage
+            image={value.image}
+            className="w-full h-auto rounded-[8px] border border-foreground/20"
+          />
+          {value.image?.caption && (
+            <div className="text-center text-sm text-muted-foreground">{value.image.caption}</div>
+          )}
+          {value.title && <h3 className="text-xl font-semibold tracking-tight">{value.title}</h3>}
+          {value.description && <p className="text-muted-foreground">{value.description}</p>}
+        </section>
+      )
+    },
+    videoBlock: ({ value }: { value: any }) => {
+      const playbackId: string | undefined = value?.video?.asset?.playbackId
+      if (!playbackId) return null
+      const widthClass = getWidthClass(value.width)
+      const isDecorative = value.mode === 'decorative'
+
+      if (isDecorative) {
+        return (
+          <div className={cn(widthClass, 'mt-4 mb-6 md:mt-8 md:mb-12')}>
+            <DecorativeVideoBlock
+              playbackId={playbackId}
+              title={value.title}
+              description={value.description}
+            />
+          </div>
+        )
+      }
+
+      return (
+        <section className={cn(widthClass, 'space-y-3 mt-4 mb-6 md:mt-8 md:mb-12')}>
+          <CustomVideoPlayer
+            playbackId={playbackId}
+            title={value.title}
+            className="w-full h-auto rounded-[8px] overflow-hidden border border-foreground/20"
+          />
+          {value.title && <h3 className="text-xl font-semibold tracking-tight">{value.title}</h3>}
+          {value.description && <p className="text-muted-foreground">{value.description}</p>}
+        </section>
+      )
+    },
+    carouselBlock: ({ value }: { value: any }) => {
+      const items: any[] = Array.isArray(value?.items) ? value.items : []
+      if (items.length === 0) return null
+      const widthClass = getWidthClass(value.width)
+      return (
+        <div className={cn(widthClass, 'mt-4 mb-6 md:mt-8 md:mb-12')}>
+          <CaseStudyCarousel items={items} title={value.title} description={value.description} />
+        </div>
+      )
     },
   },
   block: {
-    normal: ({ children }: BlockProps) => (
-      <p className="leading-7 text-foreground mb-5">{children}</p>
-    ),
-    h1: ({ children }: BlockProps) => (
-      <h1 className="text-6xl font-medium tracking-tight text-foreground mb-6 mt-10 first:mt-0">
-        {children}
-      </h1>
-    ),
-    h2: ({ children }: BlockProps) => (
-      <h2 className="text-5xl font-medium tracking-tight text-foreground mb-5 mt-10 first:mt-0">
-        {children}
-      </h2>
-    ),
-    h3: ({ children }: BlockProps) => (
-      <h3 className="text-4xl font-medium tracking-tight text-foreground mb-4 mt-8 first:mt-0">
-        {children}
-      </h3>
-    ),
-    h4: ({ children }: BlockProps) => (
-      <h4 className="text-3xl font-medium tracking-tight text-foreground mb-4 mt-8 first:mt-0">
-        {children}
-      </h4>
-    ),
-    h5: ({ children }: BlockProps) => (
-      <h5 className="text-2xl font-medium tracking-tight text-foreground mb-3 mt-6 first:mt-0">
-        {children}
-      </h5>
-    ),
-    h6: ({ children }: BlockProps) => (
-      <h6 className="text-lg font-medium tracking-tight text-foreground mb-3 mt-6 first:mt-0">
-        {children}
-      </h6>
-    ),
+    normal: ({ children }: BlockProps) => <p className={gridCols.narrow}>{children}</p>,
+    h1: ({ children }: BlockProps) => <h1 className={gridCols.narrow}>{children}</h1>,
+    h2: ({ children }: BlockProps) => <h2 className={gridCols.narrow}>{children}</h2>,
+    h3: ({ children }: BlockProps) => <h3 className={gridCols.narrow}>{children}</h3>,
+    h4: ({ children }: BlockProps) => <h4 className={gridCols.narrow}>{children}</h4>,
+    h5: ({ children }: BlockProps) => <h5 className={gridCols.narrow}>{children}</h5>,
+    h6: ({ children }: BlockProps) => <h6 className={gridCols.narrow}>{children}</h6>,
     lead: ({ children }: BlockProps) => (
-      <p className="text-xl leading-7 text-foreground mb-6">{children}</p>
+      <p className={cn(gridCols.narrow, 'text-xl leading-7 text-foreground mb-6')}>{children}</p>
     ),
     small: ({ children }: BlockProps) => (
-      <p className="text-sm leading-6 text-muted-foreground mb-4">{children}</p>
+      <p className={cn(gridCols.narrow, 'text-sm leading-6 text-muted-foreground mb-4')}>
+        {children}
+      </p>
     ),
     blockquote: ({ children }: BlockProps) => (
-      <blockquote className="border-l-2 border-border pl-6 italic text-muted-foreground my-8">
+      <blockquote
+        className={cn(
+          gridCols.medium,
+          'text-4xl font-normal tracking-tight text-foreground text-center my-16',
+        )}
+      >
         {children}
       </blockquote>
     ),
   },
   list: {
     bullet: ({ children }: BlockProps) => (
-      <ul className="list-disc pl-6 space-y-2 mb-5 mt-2">{children}</ul>
+      <ul className={cn(gridCols.narrow, 'list-disc pl-6 space-y-2 mb-5 mt-2')}>{children}</ul>
     ),
     number: ({ children }: BlockProps) => (
-      <ol className="list-decimal pl-6 space-y-2 mb-5 mt-2">{children}</ol>
+      <ol className={cn(gridCols.narrow, 'list-decimal pl-6 space-y-2 mb-5 mt-2')}>{children}</ol>
     ),
   },
   listItem: {
@@ -134,6 +192,7 @@ const components: PortableTextComponents = {
     },
   },
 }
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 interface LegalPageContentProps {
   content: PortableTextBlock[]
@@ -144,7 +203,7 @@ export function LegalPageContent({ content, className }: LegalPageContentProps) 
   if (!content) return null
 
   return (
-    <div className={cn('', className)}>
+    <div className={cn('contents', className)}>
       <PortableText value={content} components={components} />
     </div>
   )

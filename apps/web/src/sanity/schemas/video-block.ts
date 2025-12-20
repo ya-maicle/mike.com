@@ -42,12 +42,32 @@ export const videoBlock = defineType({
       },
       initialValue: 'standard',
     }),
+
+    defineField({
+      name: 'width',
+      title: 'Width',
+      type: 'string',
+      description: 'Control how wide the video appears',
+      options: {
+        list: [
+          { title: 'Narrow (Content Width)', value: 'narrow' },
+          { title: 'Medium', value: 'medium' },
+          { title: 'Wide', value: 'wide' },
+          { title: 'Full Width', value: 'full' },
+        ],
+        layout: 'dropdown',
+      },
+      initialValue: 'full',
+    }),
   ],
 
   preview: {
-    select: { title: 'title' },
-    prepare({ title }) {
-      return { title: title || 'Video Block' }
+    select: { title: 'title', width: 'width' },
+    prepare({ title, width }) {
+      return {
+        title: title || 'Video Block',
+        subtitle: `Width: ${width || 'full'}`,
+      }
     },
   },
 })

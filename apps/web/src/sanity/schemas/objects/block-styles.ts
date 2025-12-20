@@ -3,7 +3,23 @@
  * Matches the typography system defined in globals.css and typography.stories.tsx
  */
 
-import { createElement } from 'react'
+import { createElement, type ReactNode } from 'react'
+
+/** Custom blockquote component for Sanity Studio editor to avoid DOM nesting issues */
+const BlockquoteComponent = ({ children }: { children: ReactNode }) =>
+  createElement(
+    'blockquote',
+    {
+      style: {
+        fontStyle: 'italic',
+        borderLeft: '3px solid #888',
+        paddingLeft: '1em',
+        margin: '0.5em 0',
+        color: '#555',
+      },
+    },
+    children,
+  )
 
 export const blockStyles = [
   { title: 'Normal', value: 'normal' },
@@ -15,7 +31,7 @@ export const blockStyles = [
   { title: 'Heading 6', value: 'h6' },
   { title: 'Lead (P1)', value: 'lead' },
   { title: 'Small', value: 'small' },
-  { title: 'Quote', value: 'blockquote' },
+  { title: 'Quote', value: 'blockquote', component: BlockquoteComponent },
 ]
 
 export const blockLists = [
