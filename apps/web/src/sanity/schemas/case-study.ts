@@ -142,62 +142,7 @@ export const caseStudy = defineType({
         { type: 'videoBlock' },
         { type: 'carouselBlock' },
         { type: 'spacerBlock' },
-        {
-          name: 'twoColumnImageBlock',
-          title: 'Two Column Images',
-          type: 'object',
-          fields: [
-            defineField({
-              name: 'leftImage',
-              title: 'Left Image',
-              type: 'image',
-              options: { hotspot: true },
-              fields: [
-                {
-                  name: 'alt',
-                  type: 'string',
-                  title: 'Alt text',
-                  validation: (Rule) => Rule.required(),
-                },
-                {
-                  name: 'caption',
-                  type: 'string',
-                  title: 'Caption',
-                },
-              ],
-            }),
-            defineField({
-              name: 'rightImage',
-              title: 'Right Image',
-              type: 'image',
-              options: { hotspot: true },
-              fields: [
-                {
-                  name: 'alt',
-                  type: 'string',
-                  title: 'Alt text',
-                  validation: (Rule) => Rule.required(),
-                },
-                {
-                  name: 'caption',
-                  type: 'string',
-                  title: 'Caption',
-                },
-              ],
-            }),
-          ],
-          preview: {
-            select: {
-              media: 'leftImage',
-            },
-            prepare({ media }) {
-              return {
-                title: 'Two Column Images',
-                media,
-              }
-            },
-          },
-        },
+        { type: 'twoColumnImageBlock' },
       ],
       description: 'Content for the side panel (About the Project)',
     }),
@@ -215,60 +160,7 @@ export const caseStudy = defineType({
         { type: 'videoBlock' },
         { type: 'carouselBlock' },
         { type: 'spacerBlock' },
-        {
-          name: 'twoColumnImageBlock',
-          title: 'Two Column Images',
-          type: 'object',
-          fields: [
-            defineField({
-              name: 'leftImage',
-              title: 'Left Image',
-              type: 'image',
-              options: { hotspot: true },
-              fields: [
-                {
-                  name: 'alt',
-                  type: 'string',
-                  title: 'Alt text',
-                },
-                {
-                  name: 'caption',
-                  type: 'string',
-                  title: 'Caption',
-                },
-              ],
-            }),
-            defineField({
-              name: 'rightImage',
-              title: 'Right Image',
-              type: 'image',
-              options: { hotspot: true },
-              fields: [
-                {
-                  name: 'alt',
-                  type: 'string',
-                  title: 'Alt text',
-                },
-                {
-                  name: 'caption',
-                  type: 'string',
-                  title: 'Caption',
-                },
-              ],
-            }),
-          ],
-          preview: {
-            select: {
-              media: 'leftImage',
-            },
-            prepare({ media }) {
-              return {
-                title: 'Two Column Images',
-                media,
-              }
-            },
-          },
-        },
+        { type: 'twoColumnImageBlock' },
       ],
       description: 'Add content blocks to the case study',
     }),

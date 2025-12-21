@@ -5,6 +5,7 @@ import { imageBlock } from './image-block'
 import { videoBlock } from './video-block'
 import { carouselBlock } from './carousel-block'
 import { spacerBlock } from './objects/spacer-block'
+import { twoColumnImageBlock } from './objects/two-column-image-block'
 
 export const schemaTypes = [
   caseStudy,
@@ -14,4 +15,5 @@ export const schemaTypes = [
   videoBlock,
   carouselBlock,
   spacerBlock,
+  twoColumnImageBlock,
 ]

@@ -10,16 +10,15 @@ import { CustomVideoPlayer } from '@/components/custom-video-player'
 import { DecorativeVideoBlock } from '@/components/decorative-video-block'
 import { CaseStudyCarousel } from '@/components/case-study-carousel'
 
-// Helper types for PortableText component props
 type BlockProps = { children?: ReactNode }
 type ListItemProps = { children?: ReactNode; value?: { style?: string } }
 type MarkProps = { children?: ReactNode; value?: { href?: string; weight?: string } }
 
 const spacerSizes: Record<string, string> = {
-  sm: 'h-4', // 16px
-  md: 'h-8', // 32px
-  lg: 'h-16', // 64px
-  xl: 'h-24', // 96px
+  sm: 'h-4',
+  md: 'h-8',
+  lg: 'h-16',
+  xl: 'h-24',
 }
 
 const styleClasses: Record<string, string> = {
