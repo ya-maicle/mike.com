@@ -6,7 +6,6 @@ import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { PageTemplate } from '@/components/page-template'
 import { CaseStudyBlock } from '@/components/case-study-block'
-import { ContentGrid } from '@/components/content-grid'
 import { PortableText } from 'next-sanity'
 import { gridComponents } from '@/components/portable-text-grid'
 import type { CaseStudy } from '@/sanity/queries'
@@ -82,12 +81,8 @@ export function CaseStudyLayout({ data }: CaseStudyLayoutProps) {
                   : undefined
           }
         >
-          <></>
-        </PageTemplate>
-
-        <ContentGrid>
           {data.content && <PortableText value={data.content} components={gridComponents} />}
-        </ContentGrid>
+        </PageTemplate>
       </div>
 
       {/* Side Panel (Desktop) */}

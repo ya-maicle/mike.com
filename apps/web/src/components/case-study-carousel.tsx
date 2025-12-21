@@ -70,36 +70,36 @@ export function CaseStudyCarousel({ items, title, description }: CaseStudyCarous
           <Button
             variant="secondary"
             size="icon"
-            className="rounded-full w-6 h-6 md:w-7 md:h-7 bg-background/80 hover:bg-background backdrop-blur-sm text-foreground border border-border/10"
+            className="rounded-full w-7 h-7 bg-background/80 hover:bg-background backdrop-blur-sm text-foreground border border-border/10"
             onClick={() => setIsPlaying(!isPlaying)}
           >
             {isPlaying ? (
-              <Pause className="h-2.5 w-2.5 md:h-3 md:w-3 fill-current" />
+              <Pause className="h-3 w-3 fill-current" />
             ) : (
-              <Play className="h-2.5 w-2.5 md:h-3 md:w-3 fill-current" />
+              <Play className="h-3 w-3 fill-current" />
             )}
           </Button>
           <Button
             variant="secondary"
             size="icon"
-            className="rounded-full w-6 h-6 md:w-7 md:h-7 bg-background/80 hover:bg-background backdrop-blur-sm text-foreground border border-border/10"
+            className="rounded-full w-7 h-7 bg-background/80 hover:bg-background backdrop-blur-sm text-foreground border border-border/10"
             onClick={() => {
               onUserInteract()
               api?.scrollPrev()
             }}
           >
-            <ArrowLeft className="h-2.5 w-2.5 md:h-3 md:w-3" />
+            <ArrowLeft className="h-3 w-3" />
           </Button>
           <Button
             variant="secondary"
             size="icon"
-            className="rounded-full w-6 h-6 md:w-7 md:h-7 bg-background/80 hover:bg-background backdrop-blur-sm text-foreground border border-border/10"
+            className="rounded-full w-7 h-7 bg-background/80 hover:bg-background backdrop-blur-sm text-foreground border border-border/10"
             onClick={() => {
               onUserInteract()
               api?.scrollNext()
             }}
           >
-            <ArrowRight className="h-2.5 w-2.5 md:h-3 md:w-3" />
+            <ArrowRight className="h-3 w-3" />
           </Button>
         </div>
       </div>

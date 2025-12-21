@@ -43,7 +43,6 @@ const getWidthClass = (width?: string) => {
 const getMediaClasses = (isFull: boolean) => {
   return cn(
     'media-item peer',
-    isFull ? '-mx-4 md:-mx-0' : '',
     // Default margins: large (24px/48px)
     'mt-6 mb-6 md:mt-12 md:mb-12',
     // If followed by media-item, reduce bottom margin to 8px

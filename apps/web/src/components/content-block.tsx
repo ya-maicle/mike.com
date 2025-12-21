@@ -29,7 +29,14 @@ function getWidthClass(width: string | undefined, layout: LayoutMode): string {
     return gridCols.full
   }
 
-  return 'w-full'
+  // max-width mode: use max-width classes for different widths
+  const maxWidths: Record<string, string> = {
+    narrow: 'max-w-[592px] mx-auto w-full',
+    medium: 'max-w-[800px] mx-auto w-full',
+    wide: 'max-w-[1000px] mx-auto w-full',
+    full: 'w-full',
+  }
+  return maxWidths[width || 'full'] || 'w-full'
 }
 
 function getNarrowClass(layout: LayoutMode): string {
