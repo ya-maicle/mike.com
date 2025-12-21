@@ -29,7 +29,14 @@ function getWidthClass(width: string | undefined, layout: LayoutMode): string {
     return gridCols.full
   }
 
-  return 'w-full'
+  // max-width mode: use max-width classes for different widths
+  const maxWidths: Record<string, string> = {
+    narrow: 'max-w-[592px] mx-auto w-full',
+    medium: 'max-w-[800px] mx-auto w-full',
+    wide: 'max-w-[1000px] mx-auto w-full',
+    full: 'w-full',
+  }
+  return maxWidths[width || 'full'] || 'w-full'
 }
 
 function getNarrowClass(layout: LayoutMode): string {
@@ -127,8 +134,6 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
   }
 
   if (block._type === 'twoColumnImageBlock') {
-    const narrowClass = getNarrowClass(layout)
-
     return (
       <section className="w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

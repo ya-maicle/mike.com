@@ -40,15 +40,11 @@ const getWidthClass = (width?: string) => {
 
 // "media-item" class identifies blocks for sibling selectors
 // "peer" allows the *next* sibling to target this one
-const getMediaClasses = (isFull: boolean) => {
+const getMediaClasses = () => {
   return cn(
     'media-item peer',
-    isFull ? '-mx-4 md:-mx-0' : '',
-    // Default margins: large (24px/48px)
     'mt-6 mb-6 md:mt-12 md:mb-12',
-    // If followed by media-item, reduce bottom margin to 8px
     'has-[+_.media-item]:mb-2 has-[+_.media-item]:md:mb-2',
-    // If preceded by media-item, reduce top margin to 8px
     'peer-[.media-item]:mt-2 peer-[.media-item]:md:mt-2',
   )
 }
@@ -64,32 +60,23 @@ export const gridComponents: PortableTextComponents = {
         />
       )
     },
-    imageBlock: ({ value }: { value: any }) => {
-      const isFull = !value.width || value.width === 'full'
-      return (
-        <div className={cn(getWidthClass(value?.width), getMediaClasses(isFull))}>
-          <ContentBlock block={{ ...value, _type: 'imageBlock' }} layout="grid" />
-        </div>
-      )
-    },
-    videoBlock: ({ value }: { value: any }) => {
-      const isFull = !value.width || value.width === 'full'
-      return (
-        <div className={cn(getWidthClass(value?.width), getMediaClasses(isFull))}>
-          <ContentBlock block={{ ...value, _type: 'videoBlock' }} layout="grid" />
-        </div>
-      )
-    },
-    carouselBlock: ({ value }: { value: any }) => {
-      const isFull = !value.width || value.width === 'full'
-      return (
-        <div className={cn(getWidthClass(value?.width), getMediaClasses(isFull))}>
-          <ContentBlock block={{ ...value, _type: 'carouselBlock' }} layout="grid" />
-        </div>
-      )
-    },
+    imageBlock: ({ value }: { value: any }) => (
+      <div className={cn(getWidthClass(value?.width), getMediaClasses())}>
+        <ContentBlock block={{ ...value, _type: 'imageBlock' }} layout="grid" />
+      </div>
+    ),
+    videoBlock: ({ value }: { value: any }) => (
+      <div className={cn(getWidthClass(value?.width), getMediaClasses())}>
+        <ContentBlock block={{ ...value, _type: 'videoBlock' }} layout="grid" />
+      </div>
+    ),
+    carouselBlock: ({ value }: { value: any }) => (
+      <div className={cn(getWidthClass(value?.width), getMediaClasses())}>
+        <ContentBlock block={{ ...value, _type: 'carouselBlock' }} layout="grid" />
+      </div>
+    ),
     twoColumnImageBlock: ({ value }: { value: any }) => (
-      <div className={cn(gridCols.full, getMediaClasses(true))}>
+      <div className={cn(gridCols.full, getMediaClasses())}>
         <ContentBlock block={{ ...value, _type: 'twoColumnImageBlock' }} layout="grid" />
       </div>
     ),

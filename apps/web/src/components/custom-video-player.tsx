@@ -8,7 +8,6 @@ import {
   MediaTimeRange,
   MediaTimeDisplay,
   MediaMuteButton,
-  MediaVolumeRange,
   MediaFullscreenButton,
 } from 'media-chrome/react'
 import { Play, Pause, Volume2, VolumeX, Maximize, Minimize } from 'lucide-react'

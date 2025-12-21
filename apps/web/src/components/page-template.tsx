@@ -47,8 +47,8 @@ export function PageTemplate({
         <header
           className={cn(
             'max-w-[592px] mx-auto',
-            'pt-6 space-y-6',
-            hasCover ? 'pb-8' : 'pb-16',
+            'pt-4 md:pt-6 space-y-4 md:space-y-6',
+            hasCover ? 'pb-6 md:pb-8' : 'pb-10 md:pb-16',
             headerAlign === 'center' && 'text-center flex flex-col items-center',
           )}
         >
