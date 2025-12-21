@@ -29,7 +29,6 @@ export const MuxPlayer = React.forwardRef<any, MuxPlayerProps>(
     },
     ref,
   ) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const videoRef = React.useRef<HTMLVideoElement>(null)
 
     React.useImperativeHandle(ref, () => videoRef.current)

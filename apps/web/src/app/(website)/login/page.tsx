@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
-import { GalleryVerticalEnd } from '@/components/ui/icons'
+import { GalleryVerticalEnd } from 'lucide-react'
 import { LoginForm } from '@/components/login-form'
-import { Icon } from '@/components/ui/icon'
 import { SITE_CONFIG } from '@/lib/constants'
 
 export const metadata: Metadata = {
@@ -15,7 +14,7 @@ export default function LoginPage() {
       <div className="flex w-full max-w-sm flex-col gap-6">
         <a href="#" className="flex items-center gap-2 self-center font-medium">
           <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
-            <Icon icon={GalleryVerticalEnd} size="sm" />
+            <GalleryVerticalEnd className="size-4" />
           </div>
           {SITE_CONFIG.name}
         </a>

@@ -134,8 +134,6 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
   }
 
   if (block._type === 'twoColumnImageBlock') {
-    const narrowClass = getNarrowClass(layout)
-
     return (
       <section className="w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
