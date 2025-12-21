@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import sanityLoader from '@/sanity/loader'
 import { urlFor } from '@/sanity/image-builder'
 import type { SanityImage as SanityImageType } from '@/sanity/queries'
 
@@ -33,6 +34,7 @@ export function SanityImage({
   return (
     <Image
       src={src}
+      loader={sanityLoader}
       alt={image.alt || ''}
       width={width}
       height={height}
