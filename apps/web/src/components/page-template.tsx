@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils'
 import { SanityImage } from '@/components/sanity-image'
 import { ContentGrid } from '@/components/content-grid'
 import { gridCols } from '@/lib/grid-columns'
-import { MuxPlayer } from '@/components/mux-player'
+import { DecorativeVideoPlayer } from '@/components/decorative-video-player'
 import type { ReactNode } from 'react'
 import type { SanityImage as SanityImageType } from '@/sanity/queries'
 
@@ -75,18 +75,14 @@ export function PageTemplate({
         <ContentGrid>
           <section className={cn(gridCols.full, 'mb-8')}>
             {coverMedia.type === 'video' && coverMedia.video?.asset?.playbackId ? (
-              <MuxPlayer
+              <DecorativeVideoPlayer
                 playbackId={coverMedia.video.asset.playbackId}
-                className="w-full h-auto max-h-[90vh] object-cover rounded-[8px] overflow-hidden border border-foreground/20"
-                autoPlay
-                muted
-                loop
-                showControls={false}
+                className="max-h-[90vh] object-cover"
               />
             ) : coverMedia.type === 'image' && coverMedia.image ? (
               <SanityImage
                 image={coverMedia.image}
-                className="w-full h-auto object-cover max-h-[90vh] rounded-[8px] border border-foreground/20"
+                className="w-full h-auto object-cover max-h-[90vh] rounded-[8px]"
                 priority
                 sizes="100vw"
               />

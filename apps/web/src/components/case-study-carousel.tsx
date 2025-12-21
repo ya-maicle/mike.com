@@ -31,8 +31,8 @@ export function CaseStudyCarousel({ items, title, description }: CaseStudyCarous
   }
 
   return (
-    <section className="w-full space-y-4 py-2 max-w-[var(--content-max-width)] mx-auto">
-      <div className="relative group overflow-hidden rounded-[8px] border border-foreground/20">
+    <section className="w-full space-y-4 max-w-[var(--content-max-width)] mx-auto">
+      <div className="relative group overflow-hidden rounded-[8px]">
         <Carousel
           setApi={setApi}
           opts={{
