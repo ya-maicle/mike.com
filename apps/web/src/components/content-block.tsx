@@ -52,11 +52,8 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
     const narrowClass = getNarrowClass(layout)
 
     return (
-      <section className={cn(widthClass, 'space-y-3 py-2')}>
-        <SanityImage
-          image={block.image}
-          className="w-full h-auto rounded-[8px] border border-foreground/20"
-        />
+      <section className={cn(widthClass, 'space-y-3')}>
+        <SanityImage image={block.image} className="w-full h-auto rounded-[8px]" />
         {block.image?.caption && (
           <div className={cn(narrowClass, 'text-center text-sm text-muted-foreground')}>
             {block.image.caption}
@@ -86,7 +83,7 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
 
     if (isDecorative) {
       return (
-        <div className={cn(widthClass, 'py-2')}>
+        <div className={widthClass}>
           <DecorativeVideoBlock
             playbackId={playbackId}
             title={block.title}
@@ -97,11 +94,11 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
     }
 
     return (
-      <section className={cn(widthClass, 'space-y-3 py-2')}>
+      <section className={cn(widthClass, 'space-y-3')}>
         <CustomVideoPlayer
           playbackId={playbackId}
           title={block.title}
-          className="w-full h-auto rounded-[8px] overflow-hidden border border-foreground/20"
+          className="w-full h-auto rounded-[8px] overflow-hidden"
         />
         {block.title && (
           <div className={narrowClass}>
@@ -123,7 +120,7 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
     const widthClass = getWidthClass(block.width, layout)
 
     return (
-      <div className={cn(widthClass, 'py-2')}>
+      <div className={widthClass}>
         <CaseStudyCarousel items={items} title={block.title} description={block.description} />
       </div>
     )
@@ -133,7 +130,7 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
     const narrowClass = getNarrowClass(layout)
 
     return (
-      <section className="w-full py-2">
+      <section className="w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <SanityImage
@@ -174,7 +171,7 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
   if (block._type === 'block') {
     const narrowClass = getNarrowClass(layout)
     return (
-      <section className={cn(narrowClass, 'space-y-3 py-2')}>
+      <section className={cn(narrowClass, 'space-y-3')}>
         <PortableTextLite value={[block]} className="text-xl" />
       </section>
     )
