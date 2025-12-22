@@ -7,7 +7,8 @@ import { SanityImage } from '@/components/sanity-image'
 import { CustomVideoPlayer } from '@/components/custom-video-player'
 import { DecorativeVideoBlock } from '@/components/decorative-video-block'
 import { CaseStudyCarousel } from '@/components/case-study-carousel'
-import { PortableTextLite } from '@/components/portable-text-lite'
+import { PortableText } from 'next-sanity'
+import { typographyComponents } from '@/components/portable-text-grid'
 
 export type LayoutMode = 'grid' | 'max-width'
 
@@ -177,7 +178,7 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
     const narrowClass = getNarrowClass(layout)
     return (
       <section className={cn(narrowClass, 'space-y-3')}>
-        <PortableTextLite value={[block]} className="text-xl" />
+        <PortableText value={[block]} components={typographyComponents} />
       </section>
     )
   }

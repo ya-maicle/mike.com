@@ -82,18 +82,37 @@ export const gridComponents: PortableTextComponents = {
     ),
   },
   block: {
-    normal: ({ children }: BlockProps) => <p className={gridCols.narrow}>{children}</p>,
-    h1: ({ children }: BlockProps) => <h1 className={gridCols.narrow}>{children}</h1>,
-    h2: ({ children }: BlockProps) => <h2 className={gridCols.narrow}>{children}</h2>,
-    h3: ({ children }: BlockProps) => <h3 className={gridCols.narrow}>{children}</h3>,
-    h4: ({ children }: BlockProps) => <h4 className={gridCols.narrow}>{children}</h4>,
-    h5: ({ children }: BlockProps) => <h5 className={gridCols.narrow}>{children}</h5>,
-    h6: ({ children }: BlockProps) => <h6 className={gridCols.narrow}>{children}</h6>,
+    normal: ({ children }: BlockProps) => (
+      <p className={cn(gridCols.narrow, 'text-xl leading-7')}>{children}</p>
+    ),
+    h1: ({ children }: BlockProps) => (
+      <h1 className={cn(gridCols.narrow, 'text-5xl mt-12 mb-6 md:mt-24 md:mb-12')}>{children}</h1>
+    ),
+    h2: ({ children }: BlockProps) => (
+      <h2 className={cn(gridCols.narrow, 'mt-12 mb-6 md:mt-20 md:mb-10')}>{children}</h2>
+    ),
+    h3: ({ children }: BlockProps) => (
+      <h3 className={cn(gridCols.narrow, 'mt-10 mb-5 md:mt-16 md:mb-8')}>{children}</h3>
+    ),
+    h4: ({ children }: BlockProps) => (
+      <h4 className={cn(gridCols.narrow, 'mt-10 mb-5 md:mt-16 md:mb-8 font-normal')}>{children}</h4>
+    ),
+    h5: ({ children }: BlockProps) => (
+      <h5 className={cn(gridCols.narrow, 'mt-10 mb-5 md:mt-16 md:mb-8 font-medium')}>{children}</h5>
+    ),
+    h6: ({ children }: BlockProps) => (
+      <h6 className={cn(gridCols.narrow, 'mt-6 mb-3 font-medium')}>{children}</h6>
+    ),
     lead: ({ children }: BlockProps) => (
-      <p className={cn(gridCols.narrow, 'text-xl leading-7 text-foreground mb-6')}>{children}</p>
+      <p className={cn(gridCols.narrow, 'text-foreground mb-6 text-base leading-7')}>{children}</p>
     ),
     small: ({ children }: BlockProps) => (
-      <p className={cn(gridCols.narrow, 'text-sm leading-6 text-muted-foreground mb-4')}>
+      <p
+        className={cn(
+          gridCols.narrow,
+          'text-muted-foreground mb-4 text-sm leading-5 tracking-wide',
+        )}
+      >
         {children}
       </p>
     ),
@@ -101,7 +120,7 @@ export const gridComponents: PortableTextComponents = {
       <blockquote
         className={cn(
           gridCols.medium,
-          'text-4xl font-normal tracking-tight text-foreground text-center my-16',
+          'text-4xl font-normal tracking-tight text-foreground text-center my-16 leading-snug',
         )}
       >
         {children}
@@ -129,7 +148,7 @@ export const gridComponents: PortableTextComponents = {
     },
   },
   marks: {
-    strong: ({ children }: MarkProps) => <strong className="font-semibold">{children}</strong>,
+    strong: ({ children }: MarkProps) => <strong className="font-medium">{children}</strong>,
     em: ({ children }: MarkProps) => <em className="italic">{children}</em>,
     code: ({ children }: MarkProps) => (
       <code className="rounded bg-muted/60 px-1.5 py-0.5 text-sm font-mono">{children}</code>
@@ -159,4 +178,47 @@ export const gridComponents: PortableTextComponents = {
     },
   },
 }
-/* eslint-enable @typescript-eslint/no-explicit-any */
+
+/**
+ * Components for using the typography system WITHOUT the grid layout classes.
+ * Useful for containers that handle their own layout (e.g., max-width containers, side panels).
+ */
+export const typographyComponents: PortableTextComponents = {
+  types: gridComponents.types,
+  block: {
+    normal: ({ children }: BlockProps) => <p className="text-xl leading-7">{children}</p>,
+    h1: ({ children }: BlockProps) => (
+      <h1 className="text-5xl mt-12 mb-6 md:mt-24 md:mb-12">{children}</h1>
+    ),
+    h2: ({ children }: BlockProps) => <h2 className="mt-12 mb-6 md:mt-20 md:mb-10">{children}</h2>,
+    h3: ({ children }: BlockProps) => <h3 className="mt-10 mb-5 md:mt-16 md:mb-8">{children}</h3>,
+    h4: ({ children }: BlockProps) => (
+      <h4 className="mt-10 mb-5 md:mt-16 md:mb-8 font-normal">{children}</h4>
+    ),
+    h5: ({ children }: BlockProps) => (
+      <h5 className="mt-10 mb-5 md:mt-16 md:mb-8 font-medium">{children}</h5>
+    ),
+    h6: ({ children }: BlockProps) => <h6 className="mt-6 mb-3 font-medium">{children}</h6>,
+    lead: ({ children }: BlockProps) => (
+      <p className="text-foreground mb-6 text-base leading-7">{children}</p>
+    ),
+    small: ({ children }: BlockProps) => (
+      <p className="text-muted-foreground mb-4 text-sm leading-5 tracking-wide">{children}</p>
+    ),
+    blockquote: ({ children }: BlockProps) => (
+      <blockquote className="text-4xl font-normal tracking-tight text-foreground text-center my-16 leading-snug">
+        {children}
+      </blockquote>
+    ),
+  },
+  list: {
+    bullet: ({ children }: BlockProps) => (
+      <ul className="list-disc pl-6 space-y-2 mb-5 mt-2">{children}</ul>
+    ),
+    number: ({ children }: BlockProps) => (
+      <ol className="list-decimal pl-6 space-y-2 mb-5 mt-2">{children}</ol>
+    ),
+  },
+  listItem: gridComponents.listItem,
+  marks: gridComponents.marks,
+}

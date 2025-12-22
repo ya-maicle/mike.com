@@ -22,15 +22,15 @@ const BlockquoteComponent = ({ children }: { children: ReactNode }) =>
   )
 
 export const blockStyles = [
-  { title: 'Normal', value: 'normal' },
+  { title: 'Normal (P1 / Lead)', value: 'normal' },
   { title: 'Hero (H1)', value: 'h1' },
   { title: 'Heading 2', value: 'h2' },
   { title: 'Heading 3', value: 'h3' },
   { title: 'Heading 4', value: 'h4' },
   { title: 'Heading 5', value: 'h5' },
   { title: 'Heading 6', value: 'h6' },
-  { title: 'Lead (P1)', value: 'lead' },
-  { title: 'Small', value: 'small' },
+  { title: 'Body Small', value: 'lead' },
+  { title: 'Small (Caption)', value: 'small' },
   { title: 'Quote', value: 'blockquote', component: BlockquoteComponent },
 ]
 
