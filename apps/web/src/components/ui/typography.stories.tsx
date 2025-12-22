@@ -40,66 +40,66 @@ export const Overview: Story = {
             <tbody className="divide-y">
               {[
                 {
-                  token: 'Hero',
-                  class: 'text-6xl',
-                  specs: 'Medium (500), -0.03em',
-                  styles: 'font-medium tracking-[-0.03em]',
+                  token: 'Hero (H1)',
+                  class: 'text-5xl',
+                  specs: 'Medium (500), -0.02em',
+                  styles: 'font-medium tracking-tight',
                   example: 'The quick brown fox',
                 },
                 {
                   token: 'H2',
                   class: 'text-5xl',
                   specs: 'Medium (500), -0.02em',
-                  styles: 'font-medium tracking-[-0.02em]',
+                  styles: 'font-medium tracking-tight',
                   example: 'The quick brown fox',
                 },
                 {
                   token: 'H3',
                   class: 'text-4xl',
                   specs: 'Medium (500), -0.02em',
-                  styles: 'font-medium tracking-[-0.02em]',
+                  styles: 'font-medium tracking-tight',
                   example: 'The quick brown fox',
                 },
                 {
                   token: 'H4',
                   class: 'text-3xl',
-                  specs: 'Medium (500), -0.02em',
-                  styles: 'font-medium tracking-[-0.02em]',
+                  specs: 'Regular (400), -0.02em',
+                  styles: 'font-normal tracking-tight',
                   example: 'The quick brown fox',
                 },
                 {
                   token: 'H5',
                   class: 'text-2xl',
                   specs: 'Medium (500), -0.02em',
-                  styles: 'font-medium tracking-[-0.02em]',
+                  styles: 'font-medium tracking-tight',
                   example: 'The quick brown fox',
-                },
-                {
-                  token: 'P1',
-                  class: 'text-xl',
-                  specs: 'Normal (400)',
-                  styles: 'font-normal',
-                  example: 'The quick brown fox jumps over the lazy dog.',
                 },
                 {
                   token: 'H6',
                   class: 'text-lg',
                   specs: 'Medium (500), -0.02em',
-                  styles: 'font-medium tracking-[-0.02em]',
+                  styles: 'font-medium tracking-tight',
                   example: 'The quick brown fox',
                 },
                 {
-                  token: 'P2',
+                  token: 'P1 (Lead)',
+                  class: 'text-xl',
+                  specs: 'Regular (400), Leading-7',
+                  styles: 'font-normal leading-7',
+                  example: 'The quick brown fox jumps over the lazy dog.',
+                },
+                {
+                  token: 'P2 (Body)',
                   class: 'text-base',
-                  specs: 'Normal (400)',
-                  styles: 'font-normal',
+                  specs: 'Regular (400), Leading-7',
+                  styles: 'font-normal leading-7',
                   example: 'The quick brown fox jumps over the lazy dog.',
                 },
                 {
                   token: 'Small',
                   class: 'text-sm',
-                  specs: 'Normal (400)',
-                  styles: 'font-normal',
+                  specs: 'Regular (400), Leading-5, Tracking-wide',
+                  styles: 'font-normal leading-5 tracking-wide',
                   example: 'The quick brown fox jumps over the lazy dog.',
                 },
                 {
@@ -242,64 +242,56 @@ export const Paragraphs: Story = {
         </p>
       </div>
 
-      {/* Standard Body Text */}
+      {/* Standard Body Text (P1 / Normal) */}
       <section className="space-y-6">
-        <h3 className="text-lg font-medium border-b pb-2">Standard Body Text</h3>
+        <h3 className="text-lg font-medium border-b pb-2">Standard Body Text (P1 / Normal)</h3>
+        <p className="text-sm text-muted-foreground">
+          This is the default text style for content blocks (Sanity "Normal"). It uses{' '}
+          <code>text-xl</code> size.
+        </p>
         <article className="space-y-4">
-          <p>
+          <p className="text-xl leading-7">
             Typography is the art and technique of arranging type to make written language legible,
             readable, and appealing when displayed. The arrangement of type involves selecting
             typefaces, point sizes, line lengths, line-spacing, and letter-spacing, as well as
             adjusting the space between pairs of letters.
           </p>
-          <p>
+          <p className="text-xl leading-7">
             Good typography establishes a strong visual hierarchy, provides a graphic balance to the
             website, and sets the product&apos;s overall tone. It should guide and inform users,
             optimize readability and accessibility, and ensure an excellent user experience.
           </p>
-          <p>
-            The goal is to create a seamless reading experience where the reader can focus on the
-            content without being distracted by the formatting. Proper line height, letter spacing,
-            and paragraph spacing all contribute to this goal.
-          </p>
         </article>
       </section>
 
-      {/* Long-form Content */}
+      {/* Detail Text (P2 / Body Small) */}
       <section className="space-y-6">
-        <h3 className="text-lg font-medium border-b pb-2">Long-form Content</h3>
+        <h3 className="text-lg font-medium border-b pb-2">Detail Text (P2 / Body Small)</h3>
+        <p className="text-sm text-muted-foreground">
+          This is for secondary content or denser information (Sanity "Lead" / UI Elements). It uses{' '}
+          <code>text-base</code> size.
+        </p>
         <article className="space-y-4">
-          <p>
+          <p className="text-base leading-7">
             In the realm of digital design, typography serves as the backbone of communication.
             Every choice—from font family to weight to size—carries meaning and influences how users
             perceive and interact with content. The subtle art lies in making these choices
             invisible, allowing the message to shine through without interference.
           </p>
-          <p>
+          <p className="text-base leading-7">
             Consider the rhythm of reading: the eye moves across lines, drops to the next, and
             continues its dance across the page. This rhythm must be comfortable, predictable, and
             effortless. Too tight, and words blur together; too loose, and the text becomes
             scattered and hard to follow.
-          </p>
-          <p>
-            Modern web typography has evolved significantly with variable fonts, improved rendering
-            engines, and better screen technologies. We now have more control than ever over how
-            text appears across different devices and contexts. This power comes with
-            responsibility—the responsibility to create accessible, beautiful, and functional text.
-          </p>
-          <p>
-            The best typography is invisible. It doesn&apos;t call attention to itself but rather
-            serves the content. When readers finish an article feeling informed and satisfied,
-            without once thinking about the font or spacing, the typographer has succeeded.
           </p>
         </article>
       </section>
 
       {/* Mixed Content */}
       <section className="space-y-6">
-        <h3 className="text-lg font-medium border-b pb-2">Mixed Content with Links</h3>
+        <h3 className="text-lg font-medium border-b pb-2">Mixed Content with Links (P1)</h3>
         <article className="space-y-4">
-          <p>
+          <p className="text-xl leading-7">
             Typography extends beyond simple paragraphs. It encompasses{' '}
             <a href="#" className="underline underline-offset-4 hover:text-muted-foreground">
               inline links
@@ -307,17 +299,11 @@ export const Paragraphs: Story = {
             that guide users to related content, <strong>bold text</strong> that emphasizes key
             points, and <em>italics</em> that add nuance and tone to the written word.
           </p>
-          <p>
+          <p className="text-xl leading-7">
             The interplay between these elements creates texture in text. A wall of uniform
             paragraphs can feel monotonous, while strategic use of emphasis and variation keeps
             readers engaged. The key is balance—enough variety to maintain interest, but not so much
             that it becomes chaotic or distracting.
-          </p>
-          <p>
-            Consider also the role of{' '}
-            <code className="bg-muted px-1.5 py-0.5 rounded text-sm">inline code</code> in technical
-            content, or the impact of properly styled quotations. Each element must harmonize with
-            the others while serving its specific purpose.
           </p>
         </article>
       </section>
@@ -327,22 +313,21 @@ export const Paragraphs: Story = {
         <h3 className="text-lg font-medium border-b pb-2">Size Variations</h3>
         <div className="space-y-8">
           <div className="space-y-3">
-            <span className="text-xs text-muted-foreground font-mono">text-xl</span>
-            <p className="text-xl">
-              Larger body text for lead paragraphs or introductions. This size commands attention
-              while remaining comfortable to read in shorter passages.
+            <span className="text-xs text-muted-foreground font-mono">P1 / Normal (text-xl)</span>
+            <p className="text-xl leading-7">
+              Larger body text for standard content paragraphs. This size commands attention while
+              remaining comfortable to read in shorter passages.
             </p>
           </div>
           <div className="space-y-3">
-            <span className="text-xs text-muted-foreground font-mono">text-base (default)</span>
-            <p className="text-base">
-              Standard body text optimized for extended reading. This is the workhorse of web
-              typography, used for the majority of content.
+            <span className="text-xs text-muted-foreground font-mono">P2 / Detail (text-base)</span>
+            <p className="text-base leading-7">
+              Standard body text optimized for denser information or UI elements.
             </p>
           </div>
           <div className="space-y-3">
-            <span className="text-xs text-muted-foreground font-mono">text-sm</span>
-            <p className="text-sm">
+            <span className="text-xs text-muted-foreground font-mono">Small (text-sm)</span>
+            <p className="text-sm leading-6">
               Smaller text for captions, footnotes, or secondary information. Use sparingly as it
               can strain readability over long passages.
             </p>
@@ -353,69 +338,77 @@ export const Paragraphs: Story = {
       {/* Article Layout with Headlines */}
       <section className="space-y-6">
         <h3 className="text-lg font-medium border-b pb-2">Article Layout with Headlines</h3>
-        <article>
-          <h1>The Art of Digital Typography: A Comprehensive Guide to Modern Web Standards</h1>
-          <p>
-            Typography is more than just choosing fonts—it&apos;s about creating a visual language
-            that communicates meaning, establishes hierarchy, and guides readers through content
-            with clarity and purpose.
-          </p>
+        <div className="border rounded-lg p-8 md:p-12">
+          <article className="max-w-[688px] mx-auto">
+            <h1 className="text-5xl mt-12 mb-6 md:mt-24 md:mb-12">The Art of Digital Typography</h1>
+            <p className="text-xl leading-7">
+              Typography is more than just choosing fonts—it&apos;s about creating a visual language
+              that communicates meaning, establishes hierarchy, and guides readers through content
+              with clarity and purpose.
+            </p>
 
-          <h2>Understanding Visual Hierarchy: Why Spacing and Weight Matter in Digital Content</h2>
-          <p>
-            Visual hierarchy is the arrangement of elements in order of importance. In typography,
-            this is achieved through variations in size, weight, color, and spacing. A well-crafted
-            hierarchy allows readers to scan content quickly and find what they need.
-          </p>
-          <p>
-            Headlines serve as signposts, breaking up long passages and giving readers mental
-            anchors. The spacing between a headline and the text that follows is crucial—it must be
-            close enough to show relationship, yet distinct enough to create clear separation.
-          </p>
+            <h2 className="text-5xl mt-12 mb-6 md:mt-20 md:mb-10">
+              Understanding Visual Hierarchy
+            </h2>
+            <p className="text-xl leading-7">
+              Visual hierarchy is the arrangement of elements in order of importance. In typography,
+              this is achieved through variations in size, weight, color, and spacing. A
+              well-crafted hierarchy allows readers to scan content quickly and find what they need.
+            </p>
+            <p className="text-xl leading-7">
+              Headlines serve as signposts, breaking up long passages and giving readers mental
+              anchors. The spacing between a headline and the text that follows is crucial—it must
+              be close enough to show relationship, yet distinct enough to create clear separation.
+            </p>
 
-          <h3>The Role of Heading Levels in Semantic Structure and Accessibility Best Practices</h3>
-          <p>
-            Each heading level serves a specific purpose. H1 typically appears once per page as the
-            main title. H2 headings divide major sections, while H3 and H4 create subdivisions
-            within those sections.
-          </p>
+            <h3 className="text-4xl mt-10 mb-5 md:mt-16 md:mb-8">The Role of Heading Levels</h3>
+            <p className="text-xl leading-7">
+              Each heading level serves a specific purpose. H1 typically appears once per page as
+              the main title. H2 headings divide major sections, while H3 and H4 create subdivisions
+              within those sections.
+            </p>
 
-          <h4>Spacing Considerations for Multi-line Headlines and Paragraph Transitions</h4>
-          <p>
-            The space above a heading should generally be larger than the space below it. This
-            creates a clear visual break from the preceding content while maintaining connection to
-            the content that follows.
-          </p>
-          <p>
-            Consistent spacing ratios help establish rhythm. Many designers use a scale based on the
-            base line height—for example, 1.5x above headings and 0.75x below.
-          </p>
+            <h4 className="text-3xl font-normal mt-10 mb-5 md:mt-16 md:mb-8">
+              Spacing Considerations
+            </h4>
+            <p className="text-xl leading-7">
+              The space above a heading should generally be larger than the space below it. This
+              creates a clear visual break from the preceding content while maintaining connection
+              to the content that follows.
+            </p>
+            <p className="text-xl leading-7">
+              Consistent spacing ratios help establish rhythm. Many designers use a scale based on
+              the base line height—for example, 1.5x above headings and 0.75x below.
+            </p>
 
-          <h5>Fine-Tuning Details and Subtle Typographic Adjustments for Enhanced Legibility</h5>
-          <p>
-            Smaller headings like H5 and H6 require careful attention. They must be distinct from
-            body text while not overwhelming the content. This is often achieved through weight or
-            subtle size differences rather than dramatic changes.
-          </p>
+            <h5 className="text-2xl font-medium mt-10 mb-5 md:mt-16 md:mb-8">
+              Fine-Tuning Details
+            </h5>
+            <p className="text-xl leading-7">
+              Smaller headings like H5 and H6 require careful attention. They must be distinct from
+              body text while not overwhelming the content. This is often achieved through weight or
+              subtle size differences rather than dramatic changes.
+            </p>
 
-          <h6>Micro-Typography and the Importance of Smallest Visual Elements and Spacing</h6>
-          <p>
-            Even the smallest typographic decisions matter. Letter spacing, word spacing, and the
-            treatment of punctuation all contribute to the overall reading experience. These details
-            may seem minor, but they accumulate to create either friction or flow.
-          </p>
+            <h6 className="text-lg font-medium mt-6 mb-3">Micro-Typography</h6>
+            <p className="text-xl leading-7">
+              Even the smallest typographic decisions matter. Letter spacing, word spacing, and the
+              treatment of punctuation all contribute to the overall reading experience. These
+              details may seem minor, but they accumulate to create either friction or flow.
+            </p>
 
-          <h2>Putting It All Together: Creating a Harmonious and Balanced Typographic System</h2>
-          <p>
-            A complete typography system considers all these elements holistically. Headlines and
-            body text must work in harmony, with consistent spacing, complementary weights, and a
-            coherent visual rhythm that guides readers effortlessly through content.
-          </p>
-          <p>
-            The best typography systems are invisible—readers engage with the content without
-            noticing the design decisions that make that engagement possible.
-          </p>
-        </article>
+            <h2 className="text-5xl mt-12 mb-6 md:mt-20 md:mb-10">Putting It All Together</h2>
+            <p className="text-xl leading-7">
+              A complete typography system considers all these elements holistically. Headlines and
+              body text must work in harmony, with consistent spacing, complementary weights, and a
+              coherent visual rhythm that guides readers effortlessly through content.
+            </p>
+            <p className="text-xl leading-7">
+              The best typography systems are invisible—readers engage with the content without
+              noticing the design decisions that make that engagement possible.
+            </p>
+          </article>
+        </div>
       </section>
     </div>
   ),

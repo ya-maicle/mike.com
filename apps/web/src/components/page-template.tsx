@@ -48,12 +48,13 @@ export function PageTemplate({
           className={cn(
             'max-w-[592px] mx-auto',
             'pt-4 md:pt-6 space-y-4 md:space-y-6',
-            hasCover ? 'pb-6 md:pb-8' : 'pb-10 md:pb-16',
+            // Finalized spacing
+            hasCover ? 'pb-12 md:pb-16' : 'pb-20 md:pb-32',
             headerAlign === 'center' && 'text-center flex flex-col items-center',
           )}
         >
           {metadata && (
-            <div className="flex items-center gap-4 text-sm text-muted-foreground font-normal">
+            <div className="flex items-center gap-4 text-sm font-normal text-foreground">
               {Array.isArray(metadata) ? (
                 metadata.map((item, i) => <span key={i}>{item}</span>)
               ) : (
@@ -62,7 +63,7 @@ export function PageTemplate({
             </div>
           )}
 
-          <h2>{title}</h2>
+          <h1>{title}</h1>
 
           {subtitle && (
             <p className="text-xl text-foreground leading-relaxed max-w-prose mt-2">{subtitle}</p>

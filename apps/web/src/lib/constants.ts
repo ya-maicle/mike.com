@@ -1,6 +1,6 @@
 export const SITE_CONFIG = {
-  name: 'Mike Y.',
-  description: 'Personal website and portfolio',
+  name: 'Mike Yukhtenko',
+  description: 'Product Designer, Mentor, Lecturer',
   url: 'https://mike.com',
   links: {
     instagram: 'https://www.instagram.com/ya.maicle/',
