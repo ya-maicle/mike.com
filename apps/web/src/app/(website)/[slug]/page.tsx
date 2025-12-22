@@ -27,7 +27,7 @@ type PageData = {
 type PageProps = { params: Promise<{ slug: string }> }
 
 // Reserved slugs that have their own routes
-const RESERVED_SLUGS = ['work', 'login', 'privacy', 'terms', 'stories', 'biography']
+const RESERVED_SLUGS = ['work', 'login', 'privacy', 'terms', 'stories']
 
 export async function generateStaticParams() {
   const pages = await sanityFetch<{ slug: string }[]>(
