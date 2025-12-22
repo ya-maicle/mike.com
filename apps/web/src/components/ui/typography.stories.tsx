@@ -246,7 +246,7 @@ export const Paragraphs: Story = {
       <section className="space-y-6">
         <h3 className="text-lg font-medium border-b pb-2">Standard Body Text (P1 / Normal)</h3>
         <p className="text-sm text-muted-foreground">
-          This is the default text style for content blocks (Sanity "Normal"). It uses{' '}
+          This is the default text style for content blocks (Sanity &ldquo;Normal&rdquo;). It uses{' '}
           <code>text-xl</code> size.
         </p>
         <article className="space-y-4">
@@ -268,8 +268,8 @@ export const Paragraphs: Story = {
       <section className="space-y-6">
         <h3 className="text-lg font-medium border-b pb-2">Detail Text (P2 / Body Small)</h3>
         <p className="text-sm text-muted-foreground">
-          This is for secondary content or denser information (Sanity "Lead" / UI Elements). It uses{' '}
-          <code>text-base</code> size.
+          This is for secondary content or denser information (Sanity &ldquo;Lead&rdquo; / UI
+          Elements). It uses <code>text-base</code> size.
         </p>
         <article className="space-y-4">
           <p className="text-base leading-7">
