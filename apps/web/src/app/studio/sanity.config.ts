@@ -6,8 +6,6 @@ import { visionTool } from '@sanity/vision'
 import { schemaTypes } from '../../sanity/schemas'
 import { LinkToCaseStudyAction } from '../../sanity/schemas/actions/link-to-case-study'
 
-// Reading time calculation will be implemented in Stage 3 (Assembly Engine)
-
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID || process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
 const dataset = process.env.SANITY_STUDIO_DATASET || process.env.NEXT_PUBLIC_SANITY_DATASET
 
@@ -31,6 +29,11 @@ export default defineConfig({
               .title('Work')
               .icon(() => '💼')
               .child(S.documentTypeList('caseStudy').title('Case Studies')),
+            // Pages section
+            S.listItem()
+              .title('Pages')
+              .icon(() => '📄')
+              .child(S.documentTypeList('page').title('Pages')),
           ]),
     }),
 
@@ -44,6 +47,8 @@ export default defineConfig({
 
   schema: {
     types: schemaTypes,
+    templates: (templates) =>
+      templates.filter(({ schemaType }) => ['caseStudy', 'page'].includes(schemaType)),
   },
 
   document: {
@@ -54,10 +59,11 @@ export default defineConfig({
       }
       return prev
     },
+    newDocumentOptions: (prev) =>
+      prev.filter(({ templateId }) => ['caseStudy', 'page'].includes(templateId)),
   },
 
   tools: (prev) => {
-    // Future custom tools can be added here
     return prev
   },
 })
