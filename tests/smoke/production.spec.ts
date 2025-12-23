@@ -1,14 +1,7 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('Production Smoke', () => {
-  // Health API test only runs on production (preview has Vercel Deployment Protection)
   test('Health API returns 200 and expected body', async ({ request }) => {
-    // Skip on preview environment due to Vercel Deployment Protection (SSO)
-    const baseUrl = process.env.PLAYWRIGHT_BASE_URL || ''
-    if (baseUrl.includes('preview')) {
-      test.skip()
-    }
-
     const res = await request.get('/api/health')
     expect(res.status()).toBe(200)
 
@@ -21,8 +14,8 @@ test.describe('Production Smoke', () => {
     await page.goto('/')
     await page.waitForLoadState('networkidle')
 
-    // Check that the page loaded successfully (navigation exists)
-    await expect(page.getByRole('navigation')).toBeVisible()
+    // Check that the page loaded successfully (navigation exists - use first() since there are multiple navs)
+    await expect(page.getByRole('navigation').first()).toBeVisible()
 
     // Check that main content area exists
     await expect(page.locator('main')).toBeVisible()

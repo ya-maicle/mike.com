@@ -73,6 +73,8 @@ jobs:
         env:
           # Test against the preview domain (preview branch code) before promoting to main
           PLAYWRIGHT_BASE_URL: https://preview.mikeiu.com
+          # Bypass Vercel Deployment Protection
+          VERCEL_AUTOMATION_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4

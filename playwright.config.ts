@@ -1,5 +1,8 @@
 import { defineConfig } from '@playwright/test'
 
+// Vercel Automation Bypass for Deployment Protection
+const bypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET
+
 export default defineConfig({
   testDir: './tests/smoke',
   timeout: 30_000,
@@ -17,5 +20,7 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
+    // Bypass Vercel Deployment Protection when secret is provided
+    extraHTTPHeaders: bypassSecret ? { 'x-vercel-protection-bypass': bypassSecret } : undefined,
   },
 })
