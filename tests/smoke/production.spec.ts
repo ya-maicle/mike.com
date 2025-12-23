@@ -1,8 +1,14 @@
 import { test, expect } from '@playwright/test'
 
+// Vercel Deployment Protection bypass secret
+const bypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET
+
 test.describe('Production Smoke', () => {
   test('Health API returns 200 and expected body', async ({ request }) => {
-    const res = await request.get('/api/health')
+    // Pass bypass header explicitly for API requests (extraHTTPHeaders only applies to browser contexts)
+    const res = await request.get('/api/health', {
+      headers: bypassSecret ? { 'x-vercel-protection-bypass': bypassSecret } : {},
+    })
     expect(res.status()).toBe(200)
 
     const body = await res.json()
