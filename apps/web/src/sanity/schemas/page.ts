@@ -4,6 +4,7 @@ import {
   blockLists,
   blockDecorators,
   fontWeightAnnotation,
+  linkAnnotation,
 } from './objects/block-styles'
 
 export const page = defineType({
@@ -88,7 +89,7 @@ export const page = defineType({
           lists: blockLists,
           marks: {
             decorators: blockDecorators,
-            annotations: [fontWeightAnnotation],
+            annotations: [fontWeightAnnotation, linkAnnotation],
           },
         },
         { type: 'imageBlock' },
