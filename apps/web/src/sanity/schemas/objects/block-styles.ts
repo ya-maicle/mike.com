@@ -69,3 +69,29 @@ export const fontWeightAnnotation = {
     },
   ],
 }
+
+export const linkAnnotation = {
+  name: 'link',
+  title: 'Link',
+  type: 'object',
+  fields: [
+    {
+      name: 'href',
+      title: 'URL',
+      type: 'url',
+      validation: (Rule: {
+        uri: (opts: { allowRelative: boolean; scheme: string[] }) => unknown
+      }) =>
+        Rule.uri({
+          allowRelative: true,
+          scheme: ['http', 'https', 'mailto', 'tel'],
+        }),
+    },
+    {
+      name: 'openInNewTab',
+      title: 'Open in new tab',
+      type: 'boolean',
+      initialValue: false,
+    },
+  ],
+}

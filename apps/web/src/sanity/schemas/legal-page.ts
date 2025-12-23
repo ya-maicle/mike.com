@@ -4,6 +4,7 @@ import {
   blockLists,
   blockDecorators,
   fontWeightAnnotation,
+  linkAnnotation,
 } from './objects/block-styles'
 
 export const legalPage = defineType({
@@ -40,7 +41,7 @@ export const legalPage = defineType({
           lists: blockLists,
           marks: {
             decorators: blockDecorators,
-            annotations: [fontWeightAnnotation],
+            annotations: [fontWeightAnnotation, linkAnnotation],
           },
         },
       ],
