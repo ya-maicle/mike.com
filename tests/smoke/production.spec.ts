@@ -1,15 +1,20 @@
 import { test, expect } from '@playwright/test'
 
+// Vercel Deployment Protection bypass headers
+const bypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET
+const bypassHeaders = bypassSecret
+  ? {
+      'x-vercel-protection-bypass': bypassSecret,
+      'x-vercel-set-bypass-cookie': 'true',
+    }
+  : {}
+
 test.describe('Production Smoke', () => {
   test('Health API returns 200 and expected body', async ({ request }) => {
-    // Skip on preview - Vercel Deployment Protection blocks API requests
-    // even with bypass header (works for browser but not API routes)
-    const baseUrl = process.env.PLAYWRIGHT_BASE_URL || ''
-    if (baseUrl.includes('preview')) {
-      test.skip(true, 'Skipping on preview due to Vercel Deployment Protection')
-    }
-
-    const res = await request.get('/api/health')
+    // Pass bypass headers explicitly for API requests
+    const res = await request.get('/api/health', {
+      headers: bypassHeaders,
+    })
     expect(res.status()).toBe(200)
 
     const body = await res.json()

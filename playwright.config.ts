@@ -21,6 +21,12 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',
     // Bypass Vercel Deployment Protection when secret is provided
-    extraHTTPHeaders: bypassSecret ? { 'x-vercel-protection-bypass': bypassSecret } : undefined,
+    // x-vercel-set-bypass-cookie is required for follow-up requests (like API calls)
+    extraHTTPHeaders: bypassSecret
+      ? {
+          'x-vercel-protection-bypass': bypassSecret,
+          'x-vercel-set-bypass-cookie': 'true',
+        }
+      : undefined,
   },
 })
