@@ -1,23 +1,17 @@
 import { test, expect } from '@playwright/test'
 
-// Vercel Deployment Protection bypass headers
-const bypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET
-const bypassHeaders = bypassSecret
-  ? {
-      'x-vercel-protection-bypass': bypassSecret,
-      'x-vercel-set-bypass-cookie': 'true',
-    }
-  : {}
-
 test.describe('Production Smoke', () => {
-  test('Health API returns 200 and expected body', async ({ request }) => {
-    // Pass bypass headers explicitly for API requests
-    const res = await request.get('/api/health', {
-      headers: bypassHeaders,
-    })
-    expect(res.status()).toBe(200)
+  test('Health API returns 200 and expected body', async ({ page }) => {
+    // Use browser navigation instead of request fixture
+    // Browser context has the bypass cookie set via extraHTTPHeaders
+    const response = await page.goto('/api/health')
 
-    const body = await res.json()
+    expect(response?.status()).toBe(200)
+
+    // Get JSON body from page content
+    const bodyText = await page.textContent('body')
+    const body = JSON.parse(bodyText || '{}')
+
     expect(body).toHaveProperty('status', 'ok')
     expect(body).toHaveProperty('service', 'web')
   })
