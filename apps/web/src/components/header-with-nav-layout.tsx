@@ -2,9 +2,10 @@
 
 import * as React from 'react'
 import { Button } from '@/components/ui/button'
-import { PanelRight, PanelLeft, Search } from 'lucide-react'
+import { SideMenuClosed, SideMenuOpen } from '@/components/icons/menu-icons'
 import { cn } from '@/lib/utils'
-import { CommandMenu } from '@/components/command-menu'
+import { Logotype } from '@/components/ui/logotype'
+
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
 import { LoginForm } from '@/components/login-form'
 import { useLoginModal } from '@/components/providers/login-modal-provider'
@@ -13,11 +14,12 @@ import { UserMenu } from '@/components/user-menu'
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { Footer } from '@/components/footer'
 
 export function HeaderWithNavLayout({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = React.useState(false)
   const [navOpen, setNavOpen] = React.useState(false)
-  const [commandOpen, setCommandOpen] = React.useState(false)
+
   const { open: loginOpen, setOpen: setLoginOpen, openLogin } = useLoginModal()
   const { user } = useAuth()
   const pathname = usePathname()
@@ -25,19 +27,28 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
   const [atTop, setAtTop] = React.useState(true)
   const lastYRef = React.useRef(0)
   const [isMobile, setIsMobile] = React.useState(false)
-
-  // Mark as mounted to avoid hydration mismatches for interactive UI
   React.useEffect(() => setMounted(true), [])
-
-  // Default: open on desktop, closed on mobile (initial load)
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
-      const mq = window.matchMedia('(min-width: 768px)')
-      setNavOpen(mq.matches)
-      setIsMobile(!mq.matches)
-      const onChange = (e: MediaQueryListEvent) => setIsMobile(!e.matches)
-      mq.addEventListener('change', onChange)
-      return () => mq.removeEventListener('change', onChange)
+      const mqMobile = window.matchMedia('(min-width: 768px)')
+      setIsMobile(!mqMobile.matches)
+
+      const onMobileChange = (e: MediaQueryListEvent) => {
+        setIsMobile(!e.matches)
+      }
+      mqMobile.addEventListener('change', onMobileChange)
+      const mqNav = window.matchMedia('(min-width: 1000px)')
+      setNavOpen(mqNav.matches)
+
+      const onNavChange = (e: MediaQueryListEvent) => {
+        setNavOpen(e.matches)
+      }
+      mqNav.addEventListener('change', onNavChange)
+
+      return () => {
+        mqMobile.removeEventListener('change', onMobileChange)
+        mqNav.removeEventListener('change', onNavChange)
+      }
     }
   }, [])
 
@@ -64,7 +75,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
   }, [])
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
       {/* Header */}
       {mounted && (
         <header
@@ -75,51 +86,56 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
           )}
         >
           <div className="h-full px-6 md:px-8 flex items-center justify-between">
-            {/* Left cluster (Logo + toggle on desktop) */}
-            <div className="flex items-center gap-2 md:gap-12">
+            {/* Left cluster (Logo) */}
+            <div className="flex items-center relative">
               <Link
                 href="/"
                 aria-label="Go to home"
-                className="text-xl md:text-2xl font-semibold text-foreground hover:text-primary transition-colors"
+                className="text-foreground hover:text-primary transition-colors"
               >
-                Mike Y.
+                <Logotype
+                  size="2xl"
+                  showText={false}
+                  className="[&_svg]:w-[36px] md:[&_svg]:w-[42px] [&_svg]:h-auto"
+                />
               </Link>
+
+              {/* Toggle button - positioned at right edge of 230px sidebar width on desktop */}
               <Button
                 aria-label="Toggle navigation"
                 variant="ghost"
                 size="icon"
-                className="hidden md:inline-flex pointer-events-auto"
+                className="hidden md:inline-flex pointer-events-auto md:absolute md:left-[148px]"
                 onClick={() => setNavOpen((v) => !v)}
               >
                 {navOpen ? (
-                  <PanelLeft size={20} className="text-zinc-500" />
+                  <SideMenuOpen size={20} className="text-zinc-500" />
                 ) : (
-                  <PanelRight size={20} className="text-zinc-500" />
+                  <SideMenuClosed size={20} className="text-zinc-500" />
                 )}
               </Button>
             </div>
 
-            {/* Right cluster (Search + mobile toggle + Login) */}
+            {/* Right cluster (mobile toggle + Login) */}
             <div className="flex items-center gap-3">
-              <Button
-                aria-label="Search"
-                variant="ghost"
-                size="icon"
-                onClick={() => setCommandOpen(true)}
-              >
-                <Search size={20} className="text-zinc-500" />
-              </Button>
               <Button
                 aria-label="Toggle navigation"
                 variant="ghost"
                 size="icon"
                 className="md:hidden"
-                onClick={() => setNavOpen((v) => !v)}
+                onClick={() => {
+                  const willOpen = !navOpen
+                  setNavOpen(willOpen)
+                  // Dispatch custom event on mobile when opening nav
+                  if (willOpen && typeof window !== 'undefined') {
+                    window.dispatchEvent(new CustomEvent('mobile-nav-opening'))
+                  }
+                }}
               >
                 {navOpen ? (
-                  <PanelLeft size={20} className="text-zinc-500" />
+                  <SideMenuOpen size={20} className="text-zinc-500" />
                 ) : (
-                  <PanelRight size={20} className="text-zinc-500" />
+                  <SideMenuClosed size={20} className="text-zinc-500" />
                 )}
               </Button>
               {user ? (
@@ -145,7 +161,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
           aria-hidden={!navOpen}
           suppressHydrationWarning
           className={cn(
-            'fixed left-0 top-14 md:top-16 bottom-0 z-40 w-[80vw] md:w-[230px] p-5 bg-transparent text-foreground',
+            'fixed left-0 top-14 md:top-16 bottom-0 z-[48] w-[80vw] md:w-[230px] p-5 bg-transparent text-foreground',
             'transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform',
             navOpen ? 'translate-x-0' : '-translate-x-full',
           )}
@@ -157,11 +173,11 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
                   <Link
                     href="/work"
                     onClick={() => {
-                      if (typeof window !== 'undefined' && window.innerWidth < 768)
+                      if (typeof window !== 'undefined' && window.innerWidth < 1000)
                         setNavOpen(false)
                     }}
                     className={cn(
-                      'group flex w-full items-center gap-3 rounded-md px-4 py-3 md:px-3 md:py-2 text-base md:text-sm font-medium [font-family:var(--font-geist-sans)] transition-colors',
+                      'group flex w-full items-center gap-3 rounded-md px-4 py-3 md:px-3 md:py-2 text-xl md:text-base font-normal [font-family:var(--font-geist-sans)] transition-colors',
                       pathname === '/work'
                         ? 'bg-accent text-accent-foreground'
                         : 'text-foreground hover:bg-accent hover:text-accent-foreground',
@@ -172,30 +188,30 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
                 </li>
                 <li>
                   <Link
-                    href="/biography"
+                    href="/bio"
                     onClick={() => {
-                      if (typeof window !== 'undefined' && window.innerWidth < 768)
+                      if (typeof window !== 'undefined' && window.innerWidth < 1000)
                         setNavOpen(false)
                     }}
                     className={cn(
-                      'group flex w-full items-center gap-3 rounded-md px-4 py-3 md:px-3 md:py-2 text-base md:text-sm font-medium [font-family:var(--font-geist-sans)] transition-colors',
-                      pathname === '/biography'
+                      'group flex w-full items-center gap-3 rounded-md px-4 py-3 md:px-3 md:py-2 text-xl md:text-base font-normal [font-family:var(--font-geist-sans)] transition-colors',
+                      pathname === '/bio'
                         ? 'bg-accent text-accent-foreground'
                         : 'text-foreground hover:bg-accent hover:text-accent-foreground',
                     )}
                   >
-                    <span>Biography</span>
+                    <span>Bio</span>
                   </Link>
                 </li>
                 <li>
                   <Link
                     href="/stories"
                     onClick={() => {
-                      if (typeof window !== 'undefined' && window.innerWidth < 768)
+                      if (typeof window !== 'undefined' && window.innerWidth < 1000)
                         setNavOpen(false)
                     }}
                     className={cn(
-                      'group flex w-full items-center gap-3 rounded-md px-4 py-3 md:px-3 md:py-2 text-base md:text-sm font-medium [font-family:var(--font-geist-sans)] transition-colors',
+                      'group flex w-full items-center gap-3 rounded-md px-4 py-3 md:px-3 md:py-2 text-xl md:text-base font-normal [font-family:var(--font-geist-sans)] transition-colors',
                       pathname === '/stories'
                         ? 'bg-accent text-accent-foreground'
                         : 'text-foreground hover:bg-accent hover:text-accent-foreground',
@@ -240,18 +256,19 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
       <div
         suppressHydrationWarning
         className={cn(
-          'transform-gpu transition-[transform,margin-left] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform',
+          'transition-[transform,margin-left] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]',
+          'flex flex-col flex-1',
+          isMobile && 'transform-gpu will-change-transform',
           navOpen ? 'md:ml-[230px]' : 'md:ml-0',
         )}
-        style={{ transform: isMobile && navOpen ? 'translateX(80vw)' : 'translateX(0)' }}
+        style={isMobile ? { transform: navOpen ? 'translateX(80vw)' : 'translateX(0)' } : undefined}
       >
         {/* Content Area */}
-        <main className="min-h-[calc(100vh-56px)] md:min-h-[calc(100vh-64px)] px-6 md:px-8 py-6 md:py-8">
+        <main className="px-6 md:px-8 py-6 md:py-8">
           <div className="max-w-[var(--content-max-width)] mx-auto">{children}</div>
         </main>
+        <Footer />
       </div>
-
-      {mounted && <CommandMenu open={commandOpen} onOpenChange={setCommandOpen} />}
 
       {/* Login Modal */}
       {mounted && (

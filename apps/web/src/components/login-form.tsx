@@ -6,19 +6,55 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { isValidReturnPath } from '@/lib/url-validation'
 import * as React from 'react'
 
 export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
   const RAW_SITE_URL =
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    (typeof window !== 'undefined' ? window.location.origin : '')
-  // Sanitize: remove whitespace/newlines and trailing slashes
+    (typeof window !== 'undefined' ? window.location.origin : '') ||
+    process.env.NEXT_PUBLIC_SITE_URL
   const SITE_URL = (RAW_SITE_URL || '').toString().trim().replace(/\/+$/, '')
   const [email, setEmail] = React.useState('')
   const [pending, setPending] = React.useState(false)
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null)
   const [infoMsg, setInfoMsg] = React.useState<string | null>(null)
   const [sent, setSent] = React.useState(false)
+  const [cooldown, setCooldown] = React.useState(0)
+
+  React.useEffect(() => {
+    const checkCooldown = () => {
+      const expires = localStorage.getItem('magic-link-cooldown-expires')
+      if (expires) {
+        const remaining = Math.ceil((parseInt(expires, 10) - Date.now()) / 1000)
+        if (remaining > 0) {
+          setCooldown(remaining)
+          setSent(true)
+        } else {
+          localStorage.removeItem('magic-link-cooldown-expires')
+          setCooldown(0)
+        }
+      }
+    }
+
+    checkCooldown()
+
+    let interval: NodeJS.Timeout
+    if (cooldown > 0) {
+      interval = setInterval(() => {
+        setCooldown((prev) => {
+          if (prev <= 1) {
+            localStorage.removeItem('magic-link-cooldown-expires')
+            return 0
+          }
+          return prev - 1
+        })
+      }, 1000)
+    }
+
+    return () => {
+      if (interval) clearInterval(interval)
+    }
+  }, [cooldown])
 
   const handleGoogleLogin = async () => {
     try {
@@ -27,19 +63,21 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
         typeof window !== 'undefined'
           ? `${window.location.pathname}${window.location.search}${window.location.hash}`
           : '/'
-      const redirectTo = `${SITE_URL}${currentPath || '/'}`
+      const redirectTo = SITE_URL
+
+      if (typeof window !== 'undefined' && isValidReturnPath(currentPath)) {
+        localStorage.setItem('auth-return-url', currentPath)
+      }
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: {
-          // Return the user to the same path they initiated login from
-          redirectTo,
-        },
+        options: { redirectTo },
       })
       if (error) {
-        console.error('Google OAuth error:', error.message)
+        console.error('[AUTH] Google OAuth error:', error.message)
       }
     } catch (e) {
-      console.error(e)
+      console.error('[AUTH] Google OAuth exception:', e)
     }
   }
 
@@ -54,27 +92,37 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
         typeof window !== 'undefined'
           ? `${window.location.pathname}${window.location.search}${window.location.hash}`
           : '/'
-      const emailRedirectTo = `${SITE_URL}${currentPath || '/'}`
+      const emailRedirectTo = SITE_URL
+
+      if (typeof window !== 'undefined' && isValidReturnPath(currentPath)) {
+        localStorage.setItem('auth-return-url', currentPath)
+      }
+
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          // Return to same page after email link confirmation
           emailRedirectTo,
           shouldCreateUser: true,
         },
       })
       if (error) {
         setErrorMsg(error.message || 'Unable to send magic link. Please try again.')
+        console.error('[AUTH] Magic link error:', error)
       } else {
         setSent(true)
         setInfoMsg('Check your email for a magic link to sign in.')
+        const expires = Date.now() + 60000
+        localStorage.setItem('magic-link-cooldown-expires', expires.toString())
+        setCooldown(60)
       }
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : 'Unexpected error. Please try again.')
+      console.error('[AUTH] Magic link exception:', err)
     } finally {
       setPending(false)
     }
   }
+
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
@@ -118,30 +166,42 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
                     placeholder="m@example.com"
                     required
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={pending || sent}
+                    onChange={(e) => {
+                      setEmail(e.target.value)
+                      if (sent) setSent(false)
+                      if (infoMsg) setInfoMsg(null)
+                      if (errorMsg) setErrorMsg(null)
+                    }}
+                    disabled={pending || (sent && cooldown > 0)}
                   />
-                  <p className="text-muted-foreground text-xs">
-                    We’ll send you a magic link to sign in.
-                  </p>
+                  {!infoMsg ? (
+                    <p className="text-muted-foreground text-xs">
+                      We&apos;ll send you a magic link to sign in.
+                    </p>
+                  ) : (
+                    <p className="text-muted-foreground text-sm" role="status" aria-live="polite">
+                      {infoMsg}
+                    </p>
+                  )}
                 </div>
-                {infoMsg ? (
-                  <p className="text-muted-foreground text-sm" role="status" aria-live="polite">
-                    {infoMsg}
-                  </p>
-                ) : null}
                 {errorMsg ? (
                   <p className="text-destructive text-sm" role="alert" aria-live="polite">
                     {errorMsg}
                   </p>
                 ) : null}
-                <Button type="submit" className="w-full" disabled={pending || !email}>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={pending || !email || cooldown > 0}
+                >
                   {pending
                     ? sent
                       ? 'Resending…'
                       : 'Sending…'
                     : sent
-                      ? 'Resend magic link'
+                      ? cooldown > 0
+                        ? `Resend in ${cooldown}s`
+                        : 'Resend magic link'
                       : 'Send magic link'}
                 </Button>
               </div>

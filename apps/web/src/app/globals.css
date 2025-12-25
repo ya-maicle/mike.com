@@ -3,6 +3,9 @@
 @import '@maicle/ui/styles/primitives.css';
 @import '@maicle/ui/styles/semantic.css';
 
+/* Ensure Tailwind scans lib/ for class usage */
+@source '../lib';
+
 @variant dark (.dark &);
 
 @theme inline {
@@ -46,12 +49,33 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --radius: var(--radius);
+  --text-sm: var(--text-sm);
+  --text-base: var(--text-base);
+  --text-lg: var(--text-lg);
+  --text-xl: var(--text-xl);
+  --text-2xl: var(--text-2xl);
+  --text-3xl: var(--text-3xl);
+  --text-4xl: var(--text-4xl);
+  --text-5xl: var(--text-5xl);
+  --text-6xl: var(--text-6xl);
 }
 
 :root {
   --radius: 0.625rem;
   /* Central app content max width */
-  --content-max-width: 1147px;
+  --content-max-width: 1376px;
+  --content-narrow-width: 885px;
+
+  /* Fluid Typography */
+  --text-sm: clamp(12px, 2vw, 12px);
+  --text-base: clamp(14px, 2vw, 14px);
+  --text-lg: clamp(15px, 2vw, 16px);
+  --text-xl: clamp(17px, 2vw, 17px);
+  --text-2xl: clamp(16px, 3vw, 18px);
+  --text-3xl: clamp(22px, 4vw, 24px);
+  --text-4xl: clamp(25px, 5vw, 30px);
+  --text-5xl: clamp(34px, 6vw, 48px);
+  --text-6xl: clamp(36px, 8vw, 64px);
 }
 
 /* Dark variables are defined in semantic.css via the .dark class */
@@ -62,11 +86,149 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: var(--font-geist-sans, Geist), ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto,
-      Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji';
+    font-family:
+      var(--font-maicle-plain),
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      Segoe UI,
+      Roboto,
+      Helvetica,
+      Arial,
+      'Apple Color Emoji',
+      'Segoe UI Emoji';
   }
-  code, kbd, samp, pre {
-    font-family: var(--font-geist-mono, 'Geist Mono'), ui-monospace, SFMono-Regular, Menlo, Monaco,
-      Consolas, 'Liberation Mono', 'Courier New', monospace;
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    letter-spacing: -0.02em;
   }
+
+  h1 {
+    font-size: var(--text-6xl);
+    font-weight: 400;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin-top: 0;
+    margin-bottom: 0.5em;
+  }
+
+  h2 {
+    font-size: var(--text-5xl);
+    font-weight: 400;
+    line-height: 1.05;
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+  }
+
+  h3 {
+    font-size: var(--text-4xl);
+    font-weight: 400;
+    line-height: 1.1;
+    margin-top: 1.25em;
+    margin-bottom: 0.4em;
+  }
+
+  h4 {
+    font-size: var(--text-3xl);
+    font-weight: 500;
+    line-height: 1.15;
+    margin-top: 1em;
+    margin-bottom: 0.4em;
+  }
+
+  h5 {
+    font-size: var(--text-2xl);
+    font-weight: 500;
+    line-height: 1.2;
+    margin-top: 0.75em;
+    margin-bottom: 0.3em;
+  }
+
+  h6 {
+    font-size: var(--text-lg);
+    font-weight: 500;
+    line-height: 1.25;
+    margin-top: 0.75em;
+    margin-bottom: 0.3em;
+  }
+
+  p {
+    font-size: var(--text-base);
+    font-weight: normal;
+    line-height: 1.4;
+    margin-bottom: 1em;
+  }
+
+  a {
+    text-decoration-color: color-mix(in srgb, currentColor 50%, transparent);
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1px;
+    transition: text-decoration-color 0.2s ease;
+  }
+
+  a:hover {
+    text-decoration-color: currentColor;
+  }
+
+  code,
+  kbd,
+  samp,
+  pre {
+    font-family:
+      var(--font-geist-mono, 'Geist Mono'), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+      'Liberation Mono', 'Courier New', monospace;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ============================================
+   Media Chrome Video Player Theme
+   ============================================ */
+media-controller {
+  --media-control-hover-background: transparent;
+  --media-button-icon-width: 24px;
+  --media-button-icon-height: 24px;
+}
+
+media-play-button,
+media-mute-button,
+media-fullscreen-button,
+media-pip-button {
+  background: transparent !important;
+}
+
+media-play-button:hover,
+media-mute-button:hover,
+media-fullscreen-button:hover,
+media-pip-button:hover {
+  background: transparent !important;
+}
+
+media-time-range {
+  --media-range-track-height: 3px;
+  --media-range-thumb-opacity: 0;
+}
+
+media-time-display {
+  --media-font-size: 13px;
+  opacity: 0.9;
 }

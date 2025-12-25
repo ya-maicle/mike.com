@@ -1,34 +1,32 @@
-"use client"
+'use client'
 
-import * as React from "react"
-import { cva, type VariantProps } from "class-variance-authority"
-import { cn } from "@/lib/utils"
+import * as React from 'react'
+import { cva, type VariantProps } from 'class-variance-authority'
+import { cn } from '@/lib/utils'
+import { SITE_CONFIG } from '@/lib/constants'
 
-const logotypeVariants = cva(
-  "inline-flex items-center gap-2 transition-colors",
-  {
-    variants: {
-      size: {
-        xs: "h-4 text-xs",
-        sm: "h-5 text-sm",
-        md: "h-6 text-base font-medium",
-        lg: "h-8 text-lg font-semibold tracking-tight",
-        xl: "h-10 text-xl font-semibold tracking-tight",
-        "2xl": "h-12 text-2xl font-bold tracking-tight",
-      },
-      variant: {
-        default: "text-foreground",
-        muted: "text-muted-foreground",
-        destructive: "text-destructive",
-        outline: "text-foreground border border-border rounded-md p-2",
-      },
+const logotypeVariants = cva('inline-flex items-center gap-2 transition-colors', {
+  variants: {
+    size: {
+      xs: 'h-4 text-xs',
+      sm: 'h-5 text-sm',
+      md: 'h-6 text-base font-medium',
+      lg: 'h-8 text-lg font-semibold tracking-tight',
+      xl: 'h-10 text-xl font-semibold tracking-tight',
+      '2xl': 'h-12 text-2xl font-bold tracking-tight',
     },
-    defaultVariants: {
-      size: "md",
-      variant: "default",
+    variant: {
+      default: 'text-foreground',
+      muted: 'text-muted-foreground',
+      destructive: 'text-destructive',
+      outline: 'text-foreground border border-border rounded-md p-2',
     },
-  }
-)
+  },
+  defaultVariants: {
+    size: 'md',
+    variant: 'default',
+  },
+})
 
 const logoSizes = {
   xs: { width: 20, height: 11 },
@@ -36,7 +34,7 @@ const logoSizes = {
   md: { width: 30, height: 17 },
   lg: { width: 40, height: 23 },
   xl: { width: 48, height: 27 },
-  "2xl": { width: 60, height: 34 },
+  '2xl': { width: 60, height: 34 },
 }
 
 interface LogotypeProps
@@ -45,7 +43,7 @@ interface LogotypeProps
   showText?: boolean
   text?: string
   href?: string
-  as?: "div" | "a" | "button"
+  as?: 'div' | 'a' | 'button'
 }
 
 const LogoMark = React.forwardRef<
@@ -53,7 +51,7 @@ const LogoMark = React.forwardRef<
   React.SVGProps<SVGSVGElement> & { size: keyof typeof logoSizes }
 >(({ size, className, ...props }, ref) => {
   const dimensions = logoSizes[size]
-  
+
   return (
     <svg
       ref={ref}
@@ -62,7 +60,7 @@ const LogoMark = React.forwardRef<
       viewBox="0 0 60 34"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={cn("flex-shrink-0 transition-colors", className)}
+      className={cn('flex-shrink-0 transition-colors', className)}
       {...props}
     >
       <path
@@ -74,67 +72,59 @@ const LogoMark = React.forwardRef<
     </svg>
   )
 })
-LogoMark.displayName = "LogoMark"
+LogoMark.displayName = 'LogoMark'
 
-const Logotype = React.forwardRef<
-  HTMLDivElement,
-  LogotypeProps
->(({ 
-  className, 
-  size = "md", 
-  variant = "default", 
-  showText = true, 
-  text = "Maicle",
-  href,
-  as = "div",
-  ...props 
-}, ref) => {
-  const baseClassName = cn(logotypeVariants({ size, variant, className }))
-  
-  if (as === "a" && href) {
+const Logotype = React.forwardRef<HTMLDivElement, LogotypeProps>(
+  (
+    {
+      className,
+      size = 'md',
+      variant = 'default',
+      showText = true,
+      text = SITE_CONFIG.name,
+      href,
+      as = 'div',
+      ...props
+    },
+    ref,
+  ) => {
+    const baseClassName = cn(logotypeVariants({ size, variant, className }))
+
+    if (as === 'a' && href) {
+      return (
+        <a
+          className={baseClassName}
+          href={href}
+          ref={ref as any} // eslint-disable-line @typescript-eslint/no-explicit-any
+          {...(props as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
+        >
+          <LogoMark size={size!} />
+          {showText && <span className="font-inherit leading-none">{text}</span>}
+        </a>
+      )
+    }
+
+    if (as === 'button') {
+      return (
+        <button
+          className={baseClassName}
+          ref={ref as any} // eslint-disable-line @typescript-eslint/no-explicit-any
+          {...(props as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
+        >
+          <LogoMark size={size!} />
+          {showText && <span className="font-inherit leading-none">{text}</span>}
+        </button>
+      )
+    }
+
     return (
-      <a 
-        className={baseClassName}
-        href={href}
-        ref={ref as any} // eslint-disable-line @typescript-eslint/no-explicit-any
-        {...(props as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
-      >
+      <div className={baseClassName} ref={ref} {...props}>
         <LogoMark size={size!} />
-        {showText && (
-          <span className="font-inherit leading-none">{text}</span>
-        )}
-      </a>
+        {showText && <span className="font-inherit leading-none">{text}</span>}
+      </div>
     )
-  }
-  
-  if (as === "button") {
-    return (
-      <button 
-        className={baseClassName}
-        ref={ref as any} // eslint-disable-line @typescript-eslint/no-explicit-any
-        {...(props as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
-      >
-        <LogoMark size={size!} />
-        {showText && (
-          <span className="font-inherit leading-none">{text}</span>
-        )}
-      </button>
-    )
-  }
-  
-  return (
-    <div 
-      className={baseClassName}
-      ref={ref}
-      {...props}
-    >
-      <LogoMark size={size!} />
-      {showText && (
-        <span className="font-inherit leading-none">{text}</span>
-      )}
-    </div>
-  )
-})
-Logotype.displayName = "Logotype"
+  },
+)
+Logotype.displayName = 'Logotype'
 
 export { Logotype, LogoMark, logotypeVariants, type LogotypeProps }

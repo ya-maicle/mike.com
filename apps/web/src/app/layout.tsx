@@ -1,15 +1,9 @@
-import type { Metadata } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import type { Metadata, Viewport } from 'next'
+import { Geist_Mono } from 'next/font/google'
+import { plain } from '@/lib/fonts'
 import './globals.css'
-import { ThemeProvider } from '@/components/theme-provider'
-import { AuthProvider } from '@/components/providers/auth-provider'
-import { LoginModalProvider } from '@/components/providers/login-modal-provider'
-import { HeaderWithNavLayout } from '@/components/header-with-nav-layout'
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
-  subsets: ['latin'],
-})
+import { SITE_CONFIG } from '@/lib/constants'
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
@@ -17,8 +11,17 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'Mike Y.',
-  description: 'Personal website and portfolio',
+  title: {
+    default: SITE_CONFIG.name,
+    template: `%s – ${SITE_CONFIG.name}`,
+  },
+  description: SITE_CONFIG.description,
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
 }
 
 export default function RootLayout({
@@ -29,21 +32,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${plain.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
-        <AuthProvider>
-          <LoginModalProvider>
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              <HeaderWithNavLayout>{children}</HeaderWithNavLayout>
-            </ThemeProvider>
-          </LoginModalProvider>
-        </AuthProvider>
+        {children}
       </body>
     </html>
   )

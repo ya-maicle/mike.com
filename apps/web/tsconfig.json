@@ -13,5 +13,9 @@
     "incremental": true
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    // Exclude Sanity Studio schema/action code from the web app typecheck
+    "src/sanity/schemas/**"
+  ]
 }

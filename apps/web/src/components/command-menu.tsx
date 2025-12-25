@@ -73,4 +73,3 @@ export function CommandMenu({ open, onOpenChange }: CommandMenuProps) {
     </CommandDialog>
   )
 }
-

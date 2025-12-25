@@ -1,11 +1,16 @@
 import type { Preview } from '@storybook/nextjs-vite'
 import React from 'react'
+import { Geist_Mono } from 'next/font/google'
 import '../src/app/globals.css'
-<<<<<<< HEAD
-import 'geist/font/sans'
-import 'geist/font/mono'
-=======
->>>>>>> origin/preview
+// import 'geist/font/sans'
+// import 'geist/font/mono'
+
+import { plain } from '../src/lib/fonts'
+
+const geistMono = Geist_Mono({
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
+})
 
 const preview: Preview = {
   parameters: {
@@ -16,31 +21,26 @@ const preview: Preview = {
       },
     },
     backgrounds: {
-<<<<<<< HEAD
       default: 'light',
       values: [
         { name: 'light', value: '#ffffff' },
         { name: 'dark', value: '#0b0b0f' },
         { name: 'transparent', value: 'transparent' },
       ],
-=======
-      disable: true,
->>>>>>> origin/preview
     },
     a11y: {
       test: 'todo',
     },
   },
   decorators: [
-<<<<<<< HEAD
-    (Story) => <Story />,
-=======
     (Story) => (
-      <div className="bg-background text-foreground p-8">
+      <div
+        className={`${plain.variable} ${geistMono.variable} antialiased bg-background text-foreground p-8`}
+        style={{ fontFamily: 'var(--font-maicle-plain)' }}
+      >
         <Story />
       </div>
     ),
->>>>>>> origin/preview
   ],
 }
 

@@ -16,370 +16,175 @@ const meta: Meta<typeof Typography> = {
 export default meta
 type Story = StoryObj<typeof meta>
 
-export const AllTypography: Story = {
+export const Overview: Story = {
   render: () => (
-    <div className="space-y-8 max-w-4xl">
-      <div>
-        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-          Taxing Laughter: The Joke Tax Chronicles
-        </h1>
-      </div>
-      
-      <div>
-        <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
-          The People of the Kingdom
-        </h2>
-      </div>
-      
-      <div>
-        <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-          The Joke Tax
-        </h3>
-      </div>
-      
-      <div>
-        <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
-          People stopped telling jokes
-        </h4>
-      </div>
-      
-      <div>
-        <p className="leading-7 [&:not(:first-child)]:mt-6">
-          The king, seeing how much happier his subjects were, realized the error of his ways and
-          repealed the joke tax. The people rejoiced and once again filled the kingdom with
-          laughter and merriment.
+    <div className="space-y-8 max-w-5xl">
+      <div className="space-y-4">
+        <h2 className="text-2xl font-semibold tracking-tight">Typography System</h2>
+        <p className="text-muted-foreground max-w-prose">
+          Our typography system uses fluid scaling and specific font weights to ensure optimal
+          readability across all devices. Use these utility classes to apply the design
+          system&apos;s typography styles.
         </p>
+
+        <div className="border rounded-lg overflow-hidden mt-8">
+          <table className="w-full text-sm text-left">
+            <thead className="bg-muted text-muted-foreground font-medium">
+              <tr>
+                <th className="px-4 py-3">Token / Usage</th>
+                <th className="px-4 py-3">Class</th>
+                <th className="px-4 py-3">Specs</th>
+                <th className="px-4 py-3 w-1/2">Example</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y">
+              {[
+                {
+                  token: 'Hero (H1)',
+                  class: 'text-5xl',
+                  specs: 'Medium (500), -0.02em',
+                  styles: 'font-medium tracking-tight',
+                  example: 'The quick brown fox',
+                },
+                {
+                  token: 'H2',
+                  class: 'text-5xl',
+                  specs: 'Medium (500), -0.02em',
+                  styles: 'font-medium tracking-tight',
+                  example: 'The quick brown fox',
+                },
+                {
+                  token: 'H3',
+                  class: 'text-4xl',
+                  specs: 'Medium (500), -0.02em',
+                  styles: 'font-medium tracking-tight',
+                  example: 'The quick brown fox',
+                },
+                {
+                  token: 'H4',
+                  class: 'text-3xl',
+                  specs: 'Regular (400), -0.02em',
+                  styles: 'font-normal tracking-tight',
+                  example: 'The quick brown fox',
+                },
+                {
+                  token: 'H5',
+                  class: 'text-2xl',
+                  specs: 'Medium (500), -0.02em',
+                  styles: 'font-medium tracking-tight',
+                  example: 'The quick brown fox',
+                },
+                {
+                  token: 'H6',
+                  class: 'text-lg',
+                  specs: 'Medium (500), -0.02em',
+                  styles: 'font-medium tracking-tight',
+                  example: 'The quick brown fox',
+                },
+                {
+                  token: 'P1 (Lead)',
+                  class: 'text-xl',
+                  specs: 'Regular (400), Leading-7',
+                  styles: 'font-normal leading-7',
+                  example: 'The quick brown fox jumps over the lazy dog.',
+                },
+                {
+                  token: 'P2 (Body)',
+                  class: 'text-base',
+                  specs: 'Regular (400), Leading-7',
+                  styles: 'font-normal leading-7',
+                  example: 'The quick brown fox jumps over the lazy dog.',
+                },
+                {
+                  token: 'Small',
+                  class: 'text-sm',
+                  specs: 'Regular (400), Leading-5, Tracking-wide',
+                  styles: 'font-normal leading-5 tracking-wide',
+                  example: 'The quick brown fox jumps over the lazy dog.',
+                },
+                {
+                  token: 'Button',
+                  class: 'text-base',
+                  specs: 'Normal (400)',
+                  styles: 'font-normal',
+                  example: 'Button Text',
+                },
+              ].map((item) => (
+                <tr key={item.token} className="bg-card">
+                  <td className="px-4 py-4 font-medium">{item.token}</td>
+                  <td className="px-4 py-4">
+                    <code className="bg-muted px-1.5 py-0.5 rounded text-xs font-mono text-foreground">
+                      {item.class}
+                    </code>
+                  </td>
+                  <td className="px-4 py-4 text-muted-foreground text-xs">{item.specs}</td>
+                  <td className="px-4 py-4">
+                    <div className={`${item.class} ${item.styles} text-foreground truncate`}>
+                      {item.example}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-      
-      <div>
-        <blockquote className="mt-6 border-l-2 pl-6 italic">
-          &quot;After all,&quot; he said, &quot;everyone enjoys a good joke, so it&apos;s only fair that they should
-          pay for the privilege.&quot;
-        </blockquote>
-      </div>
-      
-      <div className="my-6 w-full overflow-y-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="m-0 border-t p-0 even:bg-muted">
-              <th className="border px-4 py-2 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right">
-                King&apos;s Treasury
-              </th>
-              <th className="border px-4 py-2 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right">
-                People&apos;s happiness
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="m-0 border-t p-0 even:bg-muted">
-              <td className="border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right">
-                Empty
-              </td>
-              <td className="border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right">
-                Overflowing
-              </td>
-            </tr>
-            <tr className="m-0 border-t p-0 even:bg-muted">
-              <td className="border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right">
-                Modest
-              </td>
-              <td className="border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right">
-                Satisfied
-              </td>
-            </tr>
-            <tr className="m-0 border-t p-0 even:bg-muted">
-              <td className="border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right">
-                Full
-              </td>
-              <td className="border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right">
-                Ecstatic
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      
-      <div>
-        <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
-          <li>1st level of puns: 5 gold coins</li>
-          <li>2nd level of jokes: 10 gold coins</li>
-          <li>3rd level of one-liners : 20 gold coins</li>
-        </ul>
-      </div>
-      
-      <div>
-        <p className="leading-7 [&:not(:first-child)]:mt-6">
-          You can write text with an{' '}
-          <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
-            inline code
-          </code>{' '}
-          snippet inside it.
+    </div>
+  ),
+}
+
+export const DefaultStyles: Story = {
+  render: () => (
+    <div className="space-y-8 max-w-3xl">
+      <div className="space-y-4">
+        <h2 className="text-2xl font-semibold tracking-tight">Default HTML Elements</h2>
+        <p className="text-muted-foreground">
+          These elements rely purely on global CSS styles from <code>globals.css</code> without any
+          utility classes. This ensures that markdown content or unstyled HTML renders correctly.
         </p>
-      </div>
-      
-      <div>
-        <p className="text-xl text-muted-foreground">
-          A modal dialog that interrupts the user with important content and expects a response.
-        </p>
-      </div>
-      
-      <div>
-        <p className="text-lg font-semibold">
-          Are you sure absolutely sure?
-        </p>
-      </div>
-      
-      <div>
-        <p className="text-sm text-muted-foreground">
-          Enter your email address.
-        </p>
-      </div>
-      
-      <div>
-        <p className="text-sm text-muted-foreground">
-          Built by <span className="font-medium text-foreground">shadcn</span>. The source code is
-          available on{' '}
-          <a href="#" className="font-medium text-primary underline underline-offset-4">
-            GitHub
-          </a>
-          .
-        </p>
-      </div>
-    </div>
-  ),
-}
 
-export const Headings: Story = {
-  render: () => (
-    <div className="space-y-6">
-      <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
-        Heading 1 (h1)
-      </h1>
-      <h2 className="scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0">
-        Heading 2 (h2)
-      </h2>
-      <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-        Heading 3 (h3)
-      </h3>
-      <h4 className="scroll-m-20 text-xl font-semibold tracking-tight">
-        Heading 4 (h4)
-      </h4>
-    </div>
-  ),
-}
+        <div className="border rounded-lg p-8 space-y-8 mt-4">
+          <div className="space-y-6">
+            <div className="grid grid-cols-[100px_1fr] items-baseline gap-4">
+              <span className="text-xs text-muted-foreground font-mono">&lt;h1&gt;</span>
+              <h1>Heading 1</h1>
+            </div>
 
-export const Paragraph: Story = {
-  render: () => (
-    <div className="space-y-4">
-      <p className="leading-7 [&:not(:first-child)]:mt-6">
-        The king, seeing how much happier his subjects were, realized the error of his ways and
-        repealed the joke tax. The people rejoiced and once again filled the kingdom with
-        laughter and merriment.
-      </p>
-      <p className="leading-7 [&:not(:first-child)]:mt-6">
-        This is another paragraph to demonstrate the spacing between paragraphs. Notice how the
-        margin-top is automatically applied to paragraphs that are not the first child.
-      </p>
-    </div>
-  ),
-}
+            <div className="grid grid-cols-[100px_1fr] items-baseline gap-4">
+              <span className="text-xs text-muted-foreground font-mono">&lt;h2&gt;</span>
+              <h2>Heading 2</h2>
+            </div>
 
-export const Blockquote: Story = {
-  render: () => (
-    <blockquote className="mt-6 border-l-2 pl-6 italic">
-      &quot;After all,&quot; he said, &quot;everyone enjoys a good joke, so it&apos;s only fair that they should
-      pay for the privilege.&quot;
-    </blockquote>
-  ),
-}
+            <div className="grid grid-cols-[100px_1fr] items-baseline gap-4">
+              <span className="text-xs text-muted-foreground font-mono">&lt;h3&gt;</span>
+              <h3>Heading 3</h3>
+            </div>
 
-export const Table: Story = {
-  render: () => (
-    <div className="my-6 w-full overflow-y-auto">
-      <table className="w-full">
-        <thead>
-          <tr className="m-0 border-t p-0 even:bg-muted">
-            <th className="border px-4 py-2 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right">
-              Repository
-            </th>
-            <th className="border px-4 py-2 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right">
-              Stars
-            </th>
-            <th className="border px-4 py-2 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right">
-              Forks
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr className="m-0 border-t p-0 even:bg-muted">
-            <td className="border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right">
-              shadcn/ui
-            </td>
-            <td className="border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right">
-              87,000
-            </td>
-            <td className="border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right">
-              4,500
-            </td>
-          </tr>
-          <tr className="m-0 border-t p-0 even:bg-muted">
-            <td className="border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right">
-              vercel/next.js
-            </td>
-            <td className="border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right">
-              128,000
-            </td>
-            <td className="border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right">
-              28,000
-            </td>
-          </tr>
-          <tr className="m-0 border-t p-0 even:bg-muted">
-            <td className="border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right">
-              facebook/react
-            </td>
-            <td className="border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right">
-              230,000
-            </td>
-            <td className="border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right">
-              47,000
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  ),
-}
+            <div className="grid grid-cols-[100px_1fr] items-baseline gap-4">
+              <span className="text-xs text-muted-foreground font-mono">&lt;h4&gt;</span>
+              <h4>Heading 4</h4>
+            </div>
 
-export const List: Story = {
-  render: () => (
-    <div className="space-y-6">
-      <div>
-        <h3 className="font-semibold mb-3">Unordered List</h3>
-        <ul className="my-6 ml-6 list-disc [&>li]:mt-2">
-          <li>1st level of puns: 5 gold coins</li>
-          <li>2nd level of jokes: 10 gold coins</li>
-          <li>3rd level of one-liners: 20 gold coins</li>
-          <li>
-            Nested items:
-            <ul className="ml-6 list-disc [&>li]:mt-1">
-              <li>Wordplay: 2 gold coins</li>
-              <li>Puns about puns: 3 gold coins</li>
-            </ul>
-          </li>
-        </ul>
-      </div>
-      
-      <div>
-        <h3 className="font-semibold mb-3">Ordered List</h3>
-        <ol className="my-6 ml-6 list-decimal [&>li]:mt-2">
-          <li>First, gather your materials</li>
-          <li>Then, prepare the workspace</li>
-          <li>Next, follow the instructions carefully</li>
-          <li>Finally, test the result</li>
-        </ol>
-      </div>
-    </div>
-  ),
-}
+            <div className="grid grid-cols-[100px_1fr] items-baseline gap-4">
+              <span className="text-xs text-muted-foreground font-mono">&lt;h5&gt;</span>
+              <h5>Heading 5</h5>
+            </div>
 
-export const InlineCode: Story = {
-  render: () => (
-    <p className="leading-7">
-      You can use the{' '}
-      <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
-        useState
-      </code>{' '}
-      hook to manage component state. Install packages with{' '}
-      <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
-        npm install
-      </code>{' '}
-      or{' '}
-      <code className="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold">
-        pnpm add
-      </code>
-      .
-    </p>
-  ),
-}
+            <div className="grid grid-cols-[100px_1fr] items-baseline gap-4">
+              <span className="text-xs text-muted-foreground font-mono">&lt;h6&gt;</span>
+              <h6>Heading 6</h6>
+            </div>
 
-export const Lead: Story = {
-  render: () => (
-    <p className="text-xl text-muted-foreground">
-      A modal dialog that interrupts the user with important content and expects a response.
-      This is typically used for confirmations, alerts, or important information.
-    </p>
-  ),
-}
-
-export const Large: Story = {
-  render: () => (
-    <div className="text-lg font-semibold">
-      Are you absolutely sure you want to delete this item?
-    </div>
-  ),
-}
-
-export const Small: Story = {
-  render: () => (
-    <small className="text-sm font-medium leading-none">
-      Email address
-    </small>
-  ),
-}
-
-export const Muted: Story = {
-  render: () => (
-    <div className="space-y-2">
-      <p className="text-sm text-muted-foreground">
-        Enter your email address to continue.
-      </p>
-      <p className="text-sm text-muted-foreground">
-        Built by{' '}
-        <span className="font-medium text-foreground">shadcn</span>. The source code is
-        available on{' '}
-        <a href="#" className="font-medium text-primary underline underline-offset-4">
-          GitHub
-        </a>
-        .
-      </p>
-    </div>
-  ),
-}
-
-export const Links: Story = {
-  render: () => (
-    <div className="space-y-4">
-      <p className="leading-7">
-        Visit our{' '}
-        <a href="#" className="font-medium text-primary underline underline-offset-4">
-          documentation
-        </a>{' '}
-        to learn more about the components.
-      </p>
-      <p className="leading-7">
-        You can also check out the{' '}
-        <a href="#" className="font-medium text-primary underline underline-offset-4 hover:no-underline">
-          GitHub repository
-        </a>{' '}
-        for the source code.
-      </p>
-    </div>
-  ),
-}
-
-export const TypographyScale: Story = {
-  render: () => (
-    <div className="space-y-8">
-      <div className="space-y-2">
-        <div className="text-5xl font-extrabold">5xl - The quick brown fox</div>
-        <div className="text-4xl font-bold">4xl - The quick brown fox</div>
-        <div className="text-3xl font-bold">3xl - The quick brown fox</div>
-        <div className="text-2xl font-semibold">2xl - The quick brown fox</div>
-        <div className="text-xl font-semibold">xl - The quick brown fox</div>
-        <div className="text-lg font-medium">lg - The quick brown fox</div>
-        <div className="text-base">base - The quick brown fox</div>
-        <div className="text-sm">sm - The quick brown fox</div>
-        <div className="text-xs">xs - The quick brown fox</div>
+            <div className="grid grid-cols-[100px_1fr] items-baseline gap-4">
+              <span className="text-xs text-muted-foreground font-mono">&lt;p&gt;</span>
+              <p>
+                The quick brown fox jumps over the lazy dog. This paragraph demonstrates the default
+                body text style, including line height and font weight. It flows naturally and is
+                legible.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   ),
@@ -387,29 +192,224 @@ export const TypographyScale: Story = {
 
 export const FontWeights: Story = {
   render: () => (
-    <div className="space-y-2">
-      <div className="font-thin">font-thin - The quick brown fox</div>
-      <div className="font-extralight">font-extralight - The quick brown fox</div>
-      <div className="font-light">font-light - The quick brown fox</div>
-      <div className="font-normal">font-normal - The quick brown fox</div>
-      <div className="font-medium">font-medium - The quick brown fox</div>
-      <div className="font-semibold">font-semibold - The quick brown fox</div>
-      <div className="font-bold">font-bold - The quick brown fox</div>
-      <div className="font-extrabold">font-extrabold - The quick brown fox</div>
-      <div className="font-black">font-black - The quick brown fox</div>
+    <div className="space-y-8 max-w-3xl">
+      <div className="space-y-4">
+        <h2 className="text-2xl font-semibold tracking-tight">Font Weights</h2>
+        <p className="text-muted-foreground">
+          The Plain font family includes weights from 100 to 900.
+        </p>
+        <div className="grid gap-6 mt-8">
+          {[
+            { weight: '100', label: 'Hairline', class: 'font-thin' },
+            { weight: '200', label: 'Thin', class: 'font-extralight' },
+            { weight: '300', label: 'Light', class: 'font-light' },
+            { weight: '400', label: 'Regular', class: 'font-normal' },
+            { weight: '500', label: 'Medium', class: 'font-medium' },
+            { weight: '600', label: 'Semibold', class: 'font-semibold' },
+            { weight: '700', label: 'Bold', class: 'font-bold' },
+            { weight: '800', label: 'Extrabold', class: 'font-extrabold' },
+            { weight: '900', label: 'Black', class: 'font-black' },
+          ].map((item) => (
+            <div
+              key={item.weight}
+              className="flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-8 border-b pb-4"
+            >
+              <div className="w-40 shrink-0 text-sm text-muted-foreground">
+                <span className="font-mono text-xs border rounded bg-muted px-1 mr-2">
+                  {item.weight}
+                </span>
+                {item.label}
+                <br />
+                <span className="text-xs opacity-50">{item.class}</span>
+              </div>
+              <div className={`${item.class} text-4xl`}>The quick brown fox</div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   ),
 }
 
-export const TextColors: Story = {
+export const Paragraphs: Story = {
   render: () => (
-    <div className="space-y-2">
-      <div className="text-foreground">Default foreground text</div>
-      <div className="text-muted-foreground">Muted foreground text</div>
-      <div className="text-primary">Primary color text</div>
-      <div className="text-secondary-foreground">Secondary foreground text</div>
-      <div className="text-destructive">Destructive color text</div>
-      <div className="text-accent-foreground">Accent foreground text</div>
+    <div className="space-y-12 max-w-2xl">
+      <div className="space-y-4">
+        <h2 className="text-2xl font-semibold tracking-tight">Paragraph Typography</h2>
+        <p className="text-muted-foreground">
+          Multiple paragraphs demonstrating body text styling, line height, and spacing. Use this to
+          evaluate readability and visual rhythm.
+        </p>
+      </div>
+
+      {/* Standard Body Text (P1 / Normal) */}
+      <section className="space-y-6">
+        <h3 className="text-lg font-medium border-b pb-2">Standard Body Text (P1 / Normal)</h3>
+        <p className="text-sm text-muted-foreground">
+          This is the default text style for content blocks (Sanity &ldquo;Normal&rdquo;). It uses{' '}
+          <code>text-xl</code> size.
+        </p>
+        <article className="space-y-4">
+          <p className="text-xl leading-7">
+            Typography is the art and technique of arranging type to make written language legible,
+            readable, and appealing when displayed. The arrangement of type involves selecting
+            typefaces, point sizes, line lengths, line-spacing, and letter-spacing, as well as
+            adjusting the space between pairs of letters.
+          </p>
+          <p className="text-xl leading-7">
+            Good typography establishes a strong visual hierarchy, provides a graphic balance to the
+            website, and sets the product&apos;s overall tone. It should guide and inform users,
+            optimize readability and accessibility, and ensure an excellent user experience.
+          </p>
+        </article>
+      </section>
+
+      {/* Detail Text (P2 / Body Small) */}
+      <section className="space-y-6">
+        <h3 className="text-lg font-medium border-b pb-2">Detail Text (P2 / Body Small)</h3>
+        <p className="text-sm text-muted-foreground">
+          This is for secondary content or denser information (Sanity &ldquo;Lead&rdquo; / UI
+          Elements). It uses <code>text-base</code> size.
+        </p>
+        <article className="space-y-4">
+          <p className="text-base leading-7">
+            In the realm of digital design, typography serves as the backbone of communication.
+            Every choice—from font family to weight to size—carries meaning and influences how users
+            perceive and interact with content. The subtle art lies in making these choices
+            invisible, allowing the message to shine through without interference.
+          </p>
+          <p className="text-base leading-7">
+            Consider the rhythm of reading: the eye moves across lines, drops to the next, and
+            continues its dance across the page. This rhythm must be comfortable, predictable, and
+            effortless. Too tight, and words blur together; too loose, and the text becomes
+            scattered and hard to follow.
+          </p>
+        </article>
+      </section>
+
+      {/* Mixed Content */}
+      <section className="space-y-6">
+        <h3 className="text-lg font-medium border-b pb-2">Mixed Content with Links (P1)</h3>
+        <article className="space-y-4">
+          <p className="text-xl leading-7">
+            Typography extends beyond simple paragraphs. It encompasses{' '}
+            <a href="#" className="underline underline-offset-4 hover:text-muted-foreground">
+              inline links
+            </a>{' '}
+            that guide users to related content, <strong>bold text</strong> that emphasizes key
+            points, and <em>italics</em> that add nuance and tone to the written word.
+          </p>
+          <p className="text-xl leading-7">
+            The interplay between these elements creates texture in text. A wall of uniform
+            paragraphs can feel monotonous, while strategic use of emphasis and variation keeps
+            readers engaged. The key is balance—enough variety to maintain interest, but not so much
+            that it becomes chaotic or distracting.
+          </p>
+        </article>
+      </section>
+
+      {/* Size Variations */}
+      <section className="space-y-6">
+        <h3 className="text-lg font-medium border-b pb-2">Size Variations</h3>
+        <div className="space-y-8">
+          <div className="space-y-3">
+            <span className="text-xs text-muted-foreground font-mono">P1 / Normal (text-xl)</span>
+            <p className="text-xl leading-7">
+              Larger body text for standard content paragraphs. This size commands attention while
+              remaining comfortable to read in shorter passages.
+            </p>
+          </div>
+          <div className="space-y-3">
+            <span className="text-xs text-muted-foreground font-mono">P2 / Detail (text-base)</span>
+            <p className="text-base leading-7">
+              Standard body text optimized for denser information or UI elements.
+            </p>
+          </div>
+          <div className="space-y-3">
+            <span className="text-xs text-muted-foreground font-mono">Small (text-sm)</span>
+            <p className="text-sm leading-6">
+              Smaller text for captions, footnotes, or secondary information. Use sparingly as it
+              can strain readability over long passages.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Article Layout with Headlines */}
+      <section className="space-y-6">
+        <h3 className="text-lg font-medium border-b pb-2">Article Layout with Headlines</h3>
+        <div className="border rounded-lg p-8 md:p-12">
+          <article className="max-w-[688px] mx-auto">
+            <h1 className="text-5xl mt-12 mb-6 md:mt-24 md:mb-12">The Art of Digital Typography</h1>
+            <p className="text-xl leading-7">
+              Typography is more than just choosing fonts—it&apos;s about creating a visual language
+              that communicates meaning, establishes hierarchy, and guides readers through content
+              with clarity and purpose.
+            </p>
+
+            <h2 className="text-5xl mt-12 mb-6 md:mt-20 md:mb-10">
+              Understanding Visual Hierarchy
+            </h2>
+            <p className="text-xl leading-7">
+              Visual hierarchy is the arrangement of elements in order of importance. In typography,
+              this is achieved through variations in size, weight, color, and spacing. A
+              well-crafted hierarchy allows readers to scan content quickly and find what they need.
+            </p>
+            <p className="text-xl leading-7">
+              Headlines serve as signposts, breaking up long passages and giving readers mental
+              anchors. The spacing between a headline and the text that follows is crucial—it must
+              be close enough to show relationship, yet distinct enough to create clear separation.
+            </p>
+
+            <h3 className="text-4xl mt-10 mb-5 md:mt-16 md:mb-8">The Role of Heading Levels</h3>
+            <p className="text-xl leading-7">
+              Each heading level serves a specific purpose. H1 typically appears once per page as
+              the main title. H2 headings divide major sections, while H3 and H4 create subdivisions
+              within those sections.
+            </p>
+
+            <h4 className="text-3xl font-normal mt-10 mb-5 md:mt-16 md:mb-8">
+              Spacing Considerations
+            </h4>
+            <p className="text-xl leading-7">
+              The space above a heading should generally be larger than the space below it. This
+              creates a clear visual break from the preceding content while maintaining connection
+              to the content that follows.
+            </p>
+            <p className="text-xl leading-7">
+              Consistent spacing ratios help establish rhythm. Many designers use a scale based on
+              the base line height—for example, 1.5x above headings and 0.75x below.
+            </p>
+
+            <h5 className="text-2xl font-medium mt-10 mb-5 md:mt-16 md:mb-8">
+              Fine-Tuning Details
+            </h5>
+            <p className="text-xl leading-7">
+              Smaller headings like H5 and H6 require careful attention. They must be distinct from
+              body text while not overwhelming the content. This is often achieved through weight or
+              subtle size differences rather than dramatic changes.
+            </p>
+
+            <h6 className="text-lg font-medium mt-6 mb-3">Micro-Typography</h6>
+            <p className="text-xl leading-7">
+              Even the smallest typographic decisions matter. Letter spacing, word spacing, and the
+              treatment of punctuation all contribute to the overall reading experience. These
+              details may seem minor, but they accumulate to create either friction or flow.
+            </p>
+
+            <h2 className="text-5xl mt-12 mb-6 md:mt-20 md:mb-10">Putting It All Together</h2>
+            <p className="text-xl leading-7">
+              A complete typography system considers all these elements holistically. Headlines and
+              body text must work in harmony, with consistent spacing, complementary weights, and a
+              coherent visual rhythm that guides readers effortlessly through content.
+            </p>
+            <p className="text-xl leading-7">
+              The best typography systems are invisible—readers engage with the content without
+              noticing the design decisions that make that engagement possible.
+            </p>
+          </article>
+        </div>
+      </section>
     </div>
   ),
 }
