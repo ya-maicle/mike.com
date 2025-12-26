@@ -91,8 +91,8 @@ export const Overview: Story = {
                 {
                   token: 'P2 (Body)',
                   class: 'text-base',
-                  specs: 'Regular (400), Leading-7',
-                  styles: 'font-normal leading-7',
+                  specs: 'Regular (400), Leading-6',
+                  styles: 'font-normal leading-6',
                   example: 'The quick brown fox jumps over the lazy dog.',
                 },
                 {
@@ -272,13 +272,13 @@ export const Paragraphs: Story = {
           Elements). It uses <code>text-base</code> size.
         </p>
         <article className="space-y-4">
-          <p className="text-base leading-7">
+          <p className="text-base leading-6">
             In the realm of digital design, typography serves as the backbone of communication.
             Every choice—from font family to weight to size—carries meaning and influences how users
             perceive and interact with content. The subtle art lies in making these choices
             invisible, allowing the message to shine through without interference.
           </p>
-          <p className="text-base leading-7">
+          <p className="text-base leading-6">
             Consider the rhythm of reading: the eye moves across lines, drops to the next, and
             continues its dance across the page. This rhythm must be comfortable, predictable, and
             effortless. Too tight, and words blur together; too loose, and the text becomes
@@ -321,7 +321,7 @@ export const Paragraphs: Story = {
           </div>
           <div className="space-y-3">
             <span className="text-xs text-muted-foreground font-mono">P2 / Detail (text-base)</span>
-            <p className="text-base leading-7">
+            <p className="text-base leading-6">
               Standard body text optimized for denser information or UI elements.
             </p>
           </div>
