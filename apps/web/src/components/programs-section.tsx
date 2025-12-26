@@ -27,8 +27,18 @@ export function ProgramsSection({
   footerLink,
 }: ProgramsSectionProps) {
   const [hoveredIndex, setHoveredIndex] = React.useState<number | null>(null)
+  const [isDesktop, setIsDesktop] = React.useState(false)
   const rowRefs = React.useRef<(HTMLLIElement | null)[]>([])
   const lastPosition = React.useRef<{ top: number; height: number }>({ top: 0, height: 0 })
+
+  // Detect desktop (md breakpoint = 768px)
+  React.useEffect(() => {
+    const mediaQuery = window.matchMedia('(min-width: 768px)')
+    setIsDesktop(mediaQuery.matches)
+    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches)
+    mediaQuery.addEventListener('change', handler)
+    return () => mediaQuery.removeEventListener('change', handler)
+  }, [])
 
   if (!programs || programs.length === 0) return null
 
@@ -79,11 +89,11 @@ export function ProgramsSection({
             />
 
             {programs.map((program, index) => {
-              const isHovered = hoveredIndex === index
-              const isAnyHovered = hoveredIndex !== null
+              const isHovered = isDesktop && hoveredIndex === index
+              const isAnyHovered = isDesktop && hoveredIndex !== null
               const isDimmed = isAnyHovered && !isHovered
               // Hide border if this item is hovered OR if previous item is hovered
-              const hideBorder = hoveredIndex === index || hoveredIndex === index - 1
+              const hideBorder = isDesktop && (hoveredIndex === index || hoveredIndex === index - 1)
 
               return (
                 <li
@@ -98,7 +108,7 @@ export function ProgramsSection({
                         : 'border-t border-border'
                       : ''
                   }`}
-                  onMouseEnter={() => setHoveredIndex(index)}
+                  onMouseEnter={() => isDesktop && setHoveredIndex(index)}
                 >
                   <Link
                     href="/programs"

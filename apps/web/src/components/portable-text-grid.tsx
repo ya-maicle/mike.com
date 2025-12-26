@@ -166,7 +166,7 @@ export const gridComponents: PortableTextComponents = {
       )
     },
     lead: ({ children }: BlockProps) => (
-      <p className={cn(gridCols.narrow, 'text-foreground mb-6 text-base leading-7')}>{children}</p>
+      <p className={cn(gridCols.narrow, 'text-foreground mb-6 text-base leading-6')}>{children}</p>
     ),
     small: ({ children }: BlockProps) => (
       <p
@@ -301,7 +301,7 @@ export const typographyComponents: PortableTextComponents = {
       )
     },
     lead: ({ children }: BlockProps) => (
-      <p className="text-foreground mb-6 text-base leading-7">{children}</p>
+      <p className="text-foreground mb-6 text-base leading-6">{children}</p>
     ),
     small: ({ children }: BlockProps) => (
       <p className="text-muted-foreground mb-4 text-sm leading-5 tracking-wide">{children}</p>

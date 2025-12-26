@@ -32,13 +32,13 @@ export default async function Home() {
         className={`${gridCols.wide} min-h-[calc(80dvh-56px)] md:min-h-[calc(80dvh-64px)] pt-4 md:pt-6 pb-12 md:pb-16 flex flex-col items-center justify-center text-center`}
       >
         {/* Tagline */}
-        <h1 className="font-normal tracking-tight whitespace-nowrap text-[8vw] md:text-[5vw] lg:text-[min(4.5vw,64px)] leading-none mb-6 md:mb-8">
+        <h1 className="font-normal tracking-tight whitespace-nowrap text-[7vw] md:text-[5vw] lg:text-[min(4.5vw,64px)] leading-none mb-6 md:mb-8">
           {tagline}
         </h1>
 
         {/* Subtitle */}
         {subtitle && (
-          <p className="text-xl leading-7 font-normal text-foreground mb-0 max-w-prose">
+          <p className="text-base md:text-xl leading-6 md:leading-7 font-normal text-foreground mb-0 max-w-prose">
             {subtitle}
           </p>
         )}
