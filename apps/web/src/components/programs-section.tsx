@@ -101,7 +101,7 @@ export function ProgramsSection({
                   ref={(el) => {
                     rowRefs.current[index] = el
                   }}
-                  className={`relative transition-all duration-300 ${
+                  className={`relative transition-all duration-300 ease-out ${
                     index > 0
                       ? hideBorder
                         ? 'border-t border-transparent'
@@ -117,14 +117,14 @@ export function ProgramsSection({
                     }`}
                   >
                     <h4
-                      className={`text-3xl font-normal tracking-tight md:w-[360px] md:shrink-0 mt-0 md:-mt-1 mb-0 leading-tight transition-all duration-300 ${
+                      className={`text-3xl font-normal tracking-tight md:w-[360px] md:shrink-0 mt-0 md:-mt-1 mb-0 leading-tight transition-all duration-300 ease-out ${
                         isHovered ? 'pl-4' : ''
                       } ${isDimmed ? 'text-muted-foreground' : ''}`}
                     >
                       {program.title}
                     </h4>
                     <p
-                      className={`text-base flex-1 mb-0 leading-tight transition-colors duration-300 ${
+                      className={`text-base flex-1 mb-0 leading-tight transition-colors duration-300 ease-out ${
                         isHovered
                           ? 'text-background'
                           : isDimmed
@@ -135,12 +135,12 @@ export function ProgramsSection({
                       {program.description}
                     </p>
                     <div
-                      className={`hidden md:flex justify-end shrink-0 w-8 transition-all duration-300 ${
+                      className={`hidden md:flex justify-end shrink-0 w-8 transition-all duration-300 ease-out ${
                         isHovered ? 'pr-4' : ''
                       }`}
                     >
                       <ArrowRight
-                        className={`w-5 h-5 transition-opacity duration-300 ${
+                        className={`w-5 h-5 transition-opacity duration-300 ease-out ${
                           isHovered ? 'opacity-100' : 'opacity-0'
                         }`}
                       />
