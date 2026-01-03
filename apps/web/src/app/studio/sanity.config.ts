@@ -24,6 +24,11 @@ export default defineConfig({
         S.list()
           .title('mikeiu.com CMS')
           .items([
+            // Home Page (singleton)
+            S.listItem()
+              .title('Home Page')
+              .icon(() => '🏠')
+              .child(S.document().schemaType('homePage').documentId('homePage').title('Home Page')),
             // Work section
             S.listItem()
               .title('Work')
@@ -48,7 +53,7 @@ export default defineConfig({
   schema: {
     types: schemaTypes,
     templates: (templates) =>
-      templates.filter(({ schemaType }) => ['caseStudy', 'page'].includes(schemaType)),
+      templates.filter(({ schemaType }) => ['homePage', 'caseStudy', 'page'].includes(schemaType)),
   },
 
   document: {
@@ -60,7 +65,7 @@ export default defineConfig({
       return prev
     },
     newDocumentOptions: (prev) =>
-      prev.filter(({ templateId }) => ['caseStudy', 'page'].includes(templateId)),
+      prev.filter(({ templateId }) => ['homePage', 'caseStudy', 'page'].includes(templateId)),
   },
 
   tools: (prev) => {
