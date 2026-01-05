@@ -1,4 +1,5 @@
 import { groq } from 'next-sanity'
+import type { SanityImage } from '../queries'
 
 // Tag for ISR revalidation
 export const homePageTag = 'homePage'
@@ -27,6 +28,30 @@ export const HOME_PAGE_QUERY = groq`
         description
       },
       footerLink
+    },
+    featuredWorkSection{
+      label,
+      heading,
+      button,
+      projects[]->{
+        _id,
+        title,
+        slug,
+        summary,
+        coverImage{
+          asset->{
+            _id,
+            url,
+            metadata { dimensions }
+          },
+          alt
+        },
+        projectInfo{
+          sector,
+          year
+        },
+        publishedAt
+      }
     },
     seoSettings
   }
@@ -70,6 +95,23 @@ export type HomePage = {
       description: string
     }>
     footerLink?: { text?: string; link?: string }
+  }
+  featuredWorkSection?: {
+    label?: string
+    heading?: string
+    button?: { text?: string; link?: string }
+    projects?: Array<{
+      _id: string
+      title: string
+      slug: { current: string }
+      summary: string
+      coverImage: SanityImage
+      projectInfo?: {
+        sector?: string
+        year?: string
+      }
+      publishedAt: string
+    }>
   }
   seoSettings?: {
     metaTitle?: string

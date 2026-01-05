@@ -7,6 +7,7 @@ import { HOME_PAGE_QUERY, homePageTag, type HomePage } from '@/sanity/queries/ho
 import { SanityImage } from '@/components/sanity-image'
 import { DecorativeVideoBlock } from '@/components/decorative-video-block'
 import { ProgramsSection } from '@/components/programs-section'
+import { FeaturedWorkSection } from '@/components/featured-work-section'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { ChevronRight } from 'lucide-react'
@@ -101,6 +102,16 @@ export default async function Home() {
           button={data.programsSection.button}
           programs={data.programsSection.programs}
           footerLink={data.programsSection.footerLink}
+        />
+      )}
+
+      {/* Featured Work Section */}
+      {data?.featuredWorkSection?.projects && data.featuredWorkSection.projects.length > 0 && (
+        <FeaturedWorkSection
+          label={data.featuredWorkSection.label}
+          heading={data.featuredWorkSection.heading}
+          button={data.featuredWorkSection.button}
+          projects={data.featuredWorkSection.projects}
         />
       )}
     </ContentGrid>

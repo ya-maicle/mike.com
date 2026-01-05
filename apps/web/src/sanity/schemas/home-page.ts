@@ -207,6 +207,54 @@ export const homePage = defineType({
       ],
     }),
     defineField({
+      name: 'featuredWorkSection',
+      title: 'Featured Work Section',
+      type: 'object',
+      description: 'Latest featured projects section',
+      fields: [
+        defineField({
+          name: 'label',
+          title: 'Section Label',
+          type: 'string',
+          initialValue: 'Latest work',
+        }),
+        defineField({
+          name: 'heading',
+          title: 'Heading',
+          type: 'text',
+          rows: 2,
+          initialValue: 'Explore my latest projects and case studies.',
+        }),
+        defineField({
+          name: 'button',
+          title: 'Header Button',
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'text',
+              title: 'Text',
+              type: 'string',
+              initialValue: 'View All Work',
+            }),
+            defineField({ name: 'link', title: 'Link', type: 'string', initialValue: '/work' }),
+          ],
+        }),
+        defineField({
+          name: 'projects',
+          title: 'Featured Projects',
+          type: 'array',
+          of: [
+            {
+              type: 'reference',
+              to: [{ type: 'caseStudy' }],
+            },
+          ],
+          validation: (Rule) => Rule.max(6),
+          description: 'Select which case studies to feature (max 6)',
+        }),
+      ],
+    }),
+    defineField({
       name: 'seoSettings',
       title: 'SEO Settings',
       type: 'object',
