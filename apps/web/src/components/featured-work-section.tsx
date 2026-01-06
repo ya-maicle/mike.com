@@ -14,8 +14,9 @@ type FeaturedProject = {
   summary: string
   coverImage: SanityImage
   projectInfo?: {
-    sector?: string
+    sector?: string[]
     year?: string
+    link?: { text?: string; url?: string }
   }
   publishedAt: string
 }

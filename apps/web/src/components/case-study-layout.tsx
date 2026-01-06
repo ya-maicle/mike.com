@@ -68,7 +68,14 @@ export function CaseStudyLayout({ data }: CaseStudyLayoutProps) {
       >
         <PageTemplate
           title={data.title}
-          metadata={[data.projectInfo?.year, data.projectInfo?.sector].filter(Boolean) as string[]}
+          metadata={
+            [
+              data.projectInfo?.year,
+              ...(Array.isArray(data.projectInfo?.sector)
+                ? data.projectInfo.sector
+                : [data.projectInfo?.sector]),
+            ].filter(Boolean) as string[]
+          }
           subtitle={data.summary}
           className="pb-0"
           coverMedia={
@@ -185,13 +192,21 @@ function PanelContent({ data }: { data: CaseStudy }) {
         {data.projectInfo?.sector && (
           <div>
             <h3 className="text-sm font-medium text-muted-foreground mb-1">Sector</h3>
-            <p className="text-lg">{data.projectInfo?.sector}</p>
+            <p className="text-lg">
+              {Array.isArray(data.projectInfo.sector)
+                ? data.projectInfo.sector.join(', ')
+                : data.projectInfo.sector}
+            </p>
           </div>
         )}
         {data.projectInfo?.discipline && (
           <div>
             <h3 className="text-sm font-medium text-muted-foreground mb-1">Discipline</h3>
-            <p className="text-lg">{data.projectInfo?.discipline}</p>
+            <p className="text-lg">
+              {Array.isArray(data.projectInfo.discipline)
+                ? data.projectInfo.discipline.join(', ')
+                : data.projectInfo.discipline}
+            </p>
           </div>
         )}
         {data.projectInfo?.year && (
@@ -204,11 +219,17 @@ function PanelContent({ data }: { data: CaseStudy }) {
           <div className="col-span-2">
             <h3 className="text-sm font-medium text-muted-foreground mb-1">Link</h3>
             <Link
-              href={data.projectInfo?.link}
+              href={
+                typeof data.projectInfo.link === 'string'
+                  ? data.projectInfo.link
+                  : data.projectInfo.link.url || '#'
+              }
               target="_blank"
               className="text-lg underline hover:text-muted-foreground transition-colors"
             >
-              Visit Project
+              {typeof data.projectInfo.link === 'string'
+                ? 'Visit Project'
+                : data.projectInfo.link.text || 'Visit Project'}
             </Link>
           </div>
         )}

@@ -109,12 +109,20 @@ export const caseStudy = defineType({
         defineField({
           name: 'sector',
           title: 'Sector',
-          type: 'string',
+          type: 'array',
+          of: [{ type: 'string' }],
+          options: {
+            layout: 'tags',
+          },
         }),
         defineField({
           name: 'discipline',
           title: 'Discipline',
-          type: 'string',
+          type: 'array',
+          of: [{ type: 'string' }],
+          options: {
+            layout: 'tags',
+          },
         }),
         defineField({
           name: 'year',
@@ -124,7 +132,21 @@ export const caseStudy = defineType({
         defineField({
           name: 'link',
           title: 'Project Link',
-          type: 'url',
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'url',
+              title: 'URL',
+              type: 'url',
+              validation: (Rule) => Rule.uri({ scheme: ['http', 'https'] }),
+            }),
+            defineField({
+              name: 'text',
+              title: 'Link Text',
+              type: 'string',
+              initialValue: 'Visit Project',
+            }),
+          ],
         }),
       ],
     }),

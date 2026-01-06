@@ -13,8 +13,9 @@ type ProjectCardProps = {
     summary: string
     coverImage: SanityImage
     projectInfo?: {
-      sector?: string
+      sector?: string[]
       year?: string
+      link?: { text?: string; url?: string }
     }
     publishedAt: string
   }
@@ -78,7 +79,13 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
           {/* Metadata */}
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
-            {project.projectInfo?.sector && <span>{project.projectInfo.sector}</span>}
+            {project.projectInfo?.sector && (
+              <span>
+                {Array.isArray(project.projectInfo.sector)
+                  ? project.projectInfo.sector.join(', ')
+                  : project.projectInfo.sector}
+              </span>
+            )}
             <time dateTime={project.publishedAt} className="text-muted-foreground/70">
               {project.projectInfo?.year || formattedDate}
             </time>
