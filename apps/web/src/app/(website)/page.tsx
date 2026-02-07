@@ -10,7 +10,6 @@ import { ProgramsSection } from '@/components/programs-section'
 import { FeaturedWorkSection } from '@/components/featured-work-section'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
-import { ChevronRight } from 'lucide-react'
 
 export const metadata: Metadata = {
   title: 'Home',
@@ -51,7 +50,6 @@ export default async function Home() {
               <Button asChild size="lg" className="rounded-full">
                 <Link href={data.heroButtons.primaryButton.link}>
                   {data.heroButtons.primaryButton.text}
-                  <ChevronRight className="w-4 h-4 ml-1" />
                 </Link>
               </Button>
             )}
@@ -59,7 +57,6 @@ export default async function Home() {
               <Button asChild variant="outline" size="lg" className="rounded-full">
                 <Link href={data.heroButtons.secondaryButton.link}>
                   {data.heroButtons.secondaryButton.text}
-                  <ChevronRight className="w-4 h-4 ml-1" />
                 </Link>
               </Button>
             )}
