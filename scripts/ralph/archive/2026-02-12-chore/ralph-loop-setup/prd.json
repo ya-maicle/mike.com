@@ -1,97 +1,105 @@
 {
   "project": "maicle.co.uk",
-  "branchName": "chore/project-cleanup",
-  "description": "Audit and clean up the monorepo: remove redundant files, unused dependencies, and dead code — in safe, incremental, verified commits.",
+  "branchName": "fix/playwright-tests",
+  "description": "Fix Playwright smoke tests: (1) update stale assertions to match redesigned pages, (2) integrate Playwright into CI by waiting for Vercel preview deployment and extracting its URL. Currently tests are skipped in CI because we couldn't access the Vercel preview URL.",
   "userStories": [
     {
-      "id": "CLEANUP-001",
-      "title": "Create branch and audit project structure",
-      "description": "As a developer, I need a comprehensive audit of the entire monorepo to identify redundant files, empty directories, generated artifacts, and potentially unused code before making any changes.",
+      "id": "PW-001",
+      "title": "Investigate test failures and Vercel CI integration gap",
+      "description": "As a developer, I need to understand exactly why tests fail and why they're skipped in CI, so I can plan targeted fixes.",
       "acceptanceCriteria": [
-        "Create and checkout branch 'chore/project-cleanup' from 'main'",
-        "Walk through EVERY top-level directory and file in the repo root",
-        "Walk through apps/web/, packages/ui/, packages/config/ subdirectories",
-        "Document findings in progress.txt under '## Audit Report' with categories: 'Redundant Files/Dirs', 'Generated Artifacts (should be gitignored)', 'Potentially Unused Code', 'Candidate Dependencies for Removal'",
-        "For EACH item, note: path, why it's a candidate, and risk level (safe/moderate/risky)",
-        "Do NOT delete or modify anything in this story — audit only"
+        "Create and checkout branch 'fix/playwright-tests' from 'preview'",
+        "Read playwright.config.ts, tests/smoke/preview.spec.ts, tests/smoke/production.spec.ts",
+        "Read .github/workflows/pr.yml to understand current CI setup",
+        "Read apps/web/src/app/(website)/page.tsx to understand current homepage content",
+        "Check if /api/health route exists: look for apps/web/src/app/api/health/route.ts",
+        "Document in progress.txt: (1) stale assertions, (2) actual page content, (3) CI gap (no Vercel preview URL available), (4) env vars needed (PLAYWRIGHT_BASE_URL, VERCEL_AUTOMATION_BYPASS_SECRET)",
+        "Research how to get the Vercel preview deployment URL in GitHub Actions: options include (a) 'await-vercel-deployment' action, (b) Vercel CLI 'vercel inspect', (c) GitHub Deployment Status API",
+        "Do NOT modify any files — investigation only"
       ],
       "priority": 1,
       "passes": false,
-      "notes": "Be thorough. Check: root-level dirs (dist/, PRPs/, claude-code-full-guide/, default-profile-pics/, playwright-report/, test-results/), orphaned config files, .env examples, empty dirs. For deps: run 'pnpm why <pkg>' on any suspected unused packages. Check if imports actually reference them. Write the full audit to progress.txt so the user can review before proceeding. This story is AUDIT ONLY — do not delete anything."
+      "notes": "The core CI problem: when a PR is opened against 'preview', Vercel creates a unique preview deployment (e.g., mike-com-abc123.vercel.app). But the GitHub Actions workflow doesn't know this URL, so it can't pass it to Playwright. The 'preview' branch URL (preview.mikeiu.com) is useless because it hasn't been updated with the PR changes yet. Research GitHub Actions that solve this: 'amondnet/vercel-action', 'patrickedqvist/wait-for-vercel-preview', or the Vercel GitHub API."
     },
     {
-      "id": "CLEANUP-002",
-      "title": "Remove redundant root-level files and directories",
-      "description": "As a developer, I need to remove files and directories from the repo root that are not part of the application, build system, or deployment pipeline.",
+      "id": "PW-002",
+      "title": "Update smoke tests to match current site content",
+      "description": "As a developer, I need to rewrite the smoke test assertions so they verify elements that actually exist on the deployed pages.",
       "acceptanceCriteria": [
-        "Review the audit from CLEANUP-001 before proceeding",
-        "Remove only items categorised as 'safe' risk in the audit",
-        "Update .gitignore if any removed items were generated artifacts that should be ignored instead of tracked",
-        "Run 'pnpm build' to confirm the build still passes",
-        "Run 'pnpm lint' to confirm no lint errors",
-        "Commit with message: 'chore: remove redundant root-level files and directories'",
-        "Push to origin and verify GitHub checks pass with 'gh pr checks --watch' (create a draft PR first if not already created)"
+        "Update preview.spec.ts: replace stale Next.js starter assertions with checks for actual page elements (navigation, main content, heading sections)",
+        "Keep tests minimal and resilient — check structural elements, not specific marketing copy",
+        "Verify /api/health route exists. If not, create a simple one at apps/web/src/app/api/health/route.ts returning { status: 'ok', service: 'web' }",
+        "Update production.spec.ts if needed to match current production site",
+        "Run 'pnpm typecheck' and 'pnpm lint' to verify no errors",
+        "Commit: 'fix: update Playwright smoke tests to match redesigned pages'"
       ],
       "priority": 2,
       "passes": false,
-      "notes": "IMPORTANT: Follow the 'Safe Removal Protocol' in PROMPT.md for EVERY item. Remove ONE item at a time: checkpoint (git stash) → delete → pnpm build && pnpm lint → if passes: commit, if fails: rollback and skip. Likely candidates: dist/ (old static build), default-profile-pics/ (empty), playwright-report/ and test-results/ (generated, should be gitignored not tracked). Do NOT remove config files (sanity.cli.ts, playwright.config.ts etc). claude-code-full-guide/ and PRPs/ may be reference docs — flag them in progress.txt but do NOT delete. If unsure, KEEP and note it."
+      "notes": "Good resilient test targets: (1) page.getByRole('navigation').first() exists, (2) page.locator('main') exists, (3) page title is not empty, (4) no 404 or error page. Avoid fragile selectors like specific text content. The health API test is valuable — keep it if the route exists."
     },
     {
-      "id": "CLEANUP-003",
-      "title": "Audit and remove unused npm dependencies",
-      "description": "As a developer, I need to identify and remove npm packages that are installed but never imported or used in the codebase, to reduce install time and bundle size.",
+      "id": "PW-003",
+      "title": "Add Playwright to CI workflow with Vercel preview URL",
+      "description": "As a developer, I need to update the GitHub Actions workflow so that Playwright smoke tests automatically run against the Vercel preview deployment after each PR.",
       "acceptanceCriteria": [
-        "For each package in apps/web/package.json dependencies and devDependencies, search the codebase for actual imports/usage",
-        "For each package in packages/ui/package.json, do the same",
-        "For each package in the root package.json, do the same",
-        "List unused packages in progress.txt under '## Unused Dependencies'",
-        "Remove unused packages using 'pnpm remove <pkg> --filter <workspace>'",
-        "Run 'pnpm install' to regenerate lockfile",
-        "Run 'pnpm build' to confirm build passes",
-        "Run 'pnpm lint' to confirm no errors",
-        "Commit with message: 'chore: remove unused npm dependencies'",
-        "Push and verify GitHub checks pass"
+        "Add a new job to .github/workflows/pr.yml that: (a) waits for the Vercel preview deployment to complete, (b) extracts the deployment URL, (c) installs Playwright browsers, (d) runs 'pnpm test' with PLAYWRIGHT_BASE_URL set to the Vercel preview URL",
+        "Use a GitHub Action like 'patrickedqvist/wait-for-vercel-preview' or equivalent to wait for and retrieve the deployment URL",
+        "Pass VERCEL_AUTOMATION_BYPASS_SECRET from GitHub Secrets to the test step",
+        "Ensure the smoke test job depends on the 'build' job (runs after build passes)",
+        "Run 'pnpm typecheck' and 'pnpm lint' to verify the workflow YAML syntax",
+        "Commit: 'ci: add Playwright smoke tests to PR workflow with Vercel preview URL'"
       ],
       "priority": 3,
       "passes": false,
-      "notes": "IMPORTANT: Follow the 'Safe Removal Protocol' in PROMPT.md for EVERY package. Remove ONE package at a time: checkpoint → pnpm remove <pkg> → pnpm install → pnpm build && pnpm lint → if passes: commit, if fails: rollback and skip. Use 'grep -r \"from.*<package>\" apps/ packages/' to check usage. Be careful with: (1) packages in config files (tailwind/postcss plugins), (2) CLI tools in scripts, (3) @types/* packages. If referenced ANYWHERE — it is NOT unused. Never remove framework packages (next, react, etc). When unsure, KEEP it."
+      "notes": "IMPORTANT: The VERCEL_AUTOMATION_BYPASS_SECRET must be added as a GitHub repository secret manually by the user. The agent should note this in progress.txt. The Vercel Token (VERCEL_TOKEN) may also be needed. If the 'wait-for-vercel-preview' approach doesn't work, an alternative is to use the GitHub Deployments API: after Vercel deploys, it creates a GitHub deployment with the URL, which can be queried. Make sure the new job uses 'needs: build' so it only runs after the build passes. Use 'npx playwright install --with-deps chromium' to install only Chromium (not all browsers) to keep CI fast."
     },
     {
-      "id": "CLEANUP-004",
-      "title": "Clean up dead code and orphaned components",
-      "description": "As a developer, I need to find and remove React components, utility functions, or pages that exist in the codebase but are never imported or rendered anywhere.",
+      "id": "PW-004",
+      "title": "Ensure preview-to-main pipeline also has CI checks and smoke tests",
+      "description": "As a developer, I need the CI workflow to also trigger on PRs from preview to main, running the same checks (typecheck, lint, build) and production smoke tests.",
       "acceptanceCriteria": [
-        "Scan apps/web/src/components/ for components not imported anywhere else in apps/web/",
-        "Scan packages/ui/src/ for components not imported by apps/web/ or any other consumer",
-        "Scan apps/web/src/app/ for route segments that are commented out or contain only placeholder content",
-        "Check for unused utility files in apps/web/src/lib/ or packages/*/src/",
-        "For each orphan found, verify it truly has zero references (grep the entire repo)",
-        "Remove confirmed dead code",
-        "Run 'pnpm build' and 'pnpm lint' to verify nothing breaks",
-        "Commit with message: 'chore: remove dead code and orphaned components'",
-        "Push and verify GitHub checks pass"
+        "Update .github/workflows/pr.yml: add 'main' to the 'branches' list under 'pull_request' trigger so the workflow runs on PRs to both 'preview' AND 'main'",
+        "Ensure the Playwright smoke test job works for both targets: use preview.spec.ts when PR targets 'preview', use production.spec.ts when PR targets 'main'",
+        "If it's simpler, create a separate workflow file (.github/workflows/pr-main.yml) for PRs to main — but only if the logic diverges significantly",
+        "Run 'pnpm typecheck' and 'pnpm lint' to verify no errors",
+        "Commit: 'ci: extend PR checks to cover preview-to-main pipeline'"
       ],
       "priority": 4,
       "passes": false,
-      "notes": "IMPORTANT: Follow the 'Safe Removal Protocol' in PROMPT.md for EVERY file. Remove ONE file at a time: checkpoint → delete → pnpm build && pnpm lint → if passes: commit, if fails: rollback and skip. A component is only dead if ZERO files import it. Check both direct and dynamic/lazy imports. Storybook stories (.stories.tsx) count as usage. If a component is exported from a barrel file (index.ts) but never consumed, just remove the export — don't delete the file unless truly orphaned."
+      "notes": "The simplest approach: just add 'main' to the branches list in pr.yml. The Playwright job can optionally run different test suites based on the target branch using a GitHub Actions conditional: if github.event.pull_request.base.ref == 'main', run production.spec.ts; if 'preview', run preview.spec.ts. Or just run both — production tests should always pass."
     },
     {
-      "id": "CLEANUP-005",
-      "title": "Final verification and PR",
-      "description": "As a developer, I need to verify that all cleanup changes are safe, the app builds and runs correctly, and create a PR for review.",
+      "id": "PW-005",
+      "title": "Push, create PR, and verify all GitHub checks pass",
+      "description": "As a developer, I need to push the fix, create a PR, and confirm all checks pass — including the new Playwright smoke test job.",
       "acceptanceCriteria": [
-        "Run full verification: 'pnpm build', 'pnpm lint'",
-        "If Playwright tests exist, run 'pnpm test' to verify e2e tests pass",
-        "Check 'git diff main --stat' to summarise all changes",
-        "Create or update the draft PR: 'gh pr create --draft --base preview --title \"chore: project cleanup — remove redundant files and unused dependencies\" --body \"...\"'",
-        "PR body must include: summary of what was removed (files, dirs, packages), summary of what was kept and why, confirmation that build/lint/tests pass",
-        "Verify all GitHub checks pass on the PR",
-        "Log final summary in progress.txt",
-        "If merge is blocked by branch protection, use '--admin' flag or log it and exit gracefully"
+        "Push branch: 'git push -u origin fix/playwright-tests'",
+        "Create draft PR: 'gh pr create --draft --base preview --title \"fix: update Playwright smoke tests and add to CI\" --body \"...\"'",
+        "Wait for all checks: 'gh pr checks <PR_NUMBER> --watch'",
+        "All checks must pass: typecheck, lint, build, and (if the Playwright job was added) smoke tests",
+        "If the new Playwright CI job fails, read the error logs and fix. Common issues: missing secrets, deployment not ready, timeout too short",
+        "If a GitHub secret (VERCEL_AUTOMATION_BYPASS_SECRET) needs to be added manually, note this in progress.txt and mark this story as passed anyway — the user will add it",
+        "Log PR URL and results in progress.txt"
       ],
       "priority": 5,
       "passes": false,
-      "notes": "Target branch is 'preview'. Use squash merge if merging. The PR body is important — it should be a clear changelog so the user can review exactly what was removed. Do not force merge if checks fail — fix the issue first."
+      "notes": "The Playwright CI job might fail if VERCEL_AUTOMATION_BYPASS_SECRET is not set as a GitHub secret yet. That's expected — log it clearly so the user knows what to add. The other checks (typecheck, lint, build) should pass."
+    },
+    {
+      "id": "PW-006",
+      "title": "Merge PR, verify deployment, clean up branch",
+      "description": "As a developer, once checks pass (or expected failures are documented), merge to preview and clean up.",
+      "acceptanceCriteria": [
+        "Merge PR: 'gh pr merge <PR_NUMBER> --squash --delete-branch' (use --admin if blocked)",
+        "If merge is blocked, log it and exit gracefully",
+        "Switch to preview: 'git checkout preview && git pull'",
+        "Delete local branch: 'git branch -d fix/playwright-tests' (if it still exists)",
+        "Verify merge: 'git log -1' shows the squash commit",
+        "Log final summary in progress.txt including any manual steps the user needs to take (e.g., adding GitHub secrets)"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": "After merge, document clearly in progress.txt if the user needs to: (1) add VERCEL_AUTOMATION_BYPASS_SECRET as a GitHub repo secret, (2) add VERCEL_TOKEN as a GitHub repo secret, (3) any other manual configuration."
     }
   ]
 }

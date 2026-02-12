@@ -8,6 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "typecheck": "tsc --noEmit",
     "test:sanity": "tsx src/sanity/test-connection.ts",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",

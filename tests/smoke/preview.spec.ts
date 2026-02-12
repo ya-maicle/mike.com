@@ -28,10 +28,7 @@ test.beforeEach(async ({ page }) => {
 
 test.describe('Preview Smoke', () => {
   test('Health API returns 200 and expected body', async ({ request }) => {
-    const bypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET
-    const headers = { 'x-vercel-bypass-secret': bypassSecret! }
-
-    const res = await request.get('/api/health', { headers })
+    const res = await request.get('/api/health')
     expect(res.status()).toBe(200)
 
     const body = await res.json()
@@ -43,17 +40,11 @@ test.describe('Preview Smoke', () => {
     await page.goto('/')
     await page.waitForLoadState('networkidle')
 
-    // Check for the Next.js logo (reliable indicator the page loaded)
-    await expect(page.getByAltText('Next.js logo')).toBeVisible()
+    // Check that main content area exists
+    await expect(page.locator('main')).toBeVisible()
 
-    // Check for the "Get started by editing" text
-    await expect(page.getByText('Get started by editing')).toBeVisible()
-
-    // Check for the E2E pipeline test indicator
-    await expect(page.getByText('✅ E2E Branching Pipeline Test')).toBeVisible()
-
-    // Check for main action buttons
-    await expect(page.getByRole('link', { name: /deploy now/i })).toBeVisible()
-    await expect(page.getByRole('link', { name: /read our docs/i })).toBeVisible()
+    // Check that the H1 heading exists and is not empty
+    await expect(page.locator('h1')).toBeVisible()
+    await expect(page.locator('h1')).not.toBeEmpty()
   })
 })
