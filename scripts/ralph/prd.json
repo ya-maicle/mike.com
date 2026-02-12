@@ -1,0 +1,97 @@
+{
+  "project": "maicle.co.uk",
+  "branchName": "chore/project-cleanup",
+  "description": "Audit and clean up the monorepo: remove redundant files, unused dependencies, and dead code — in safe, incremental, verified commits.",
+  "userStories": [
+    {
+      "id": "CLEANUP-001",
+      "title": "Create branch and audit project structure",
+      "description": "As a developer, I need a comprehensive audit of the entire monorepo to identify redundant files, empty directories, generated artifacts, and potentially unused code before making any changes.",
+      "acceptanceCriteria": [
+        "Create and checkout branch 'chore/project-cleanup' from 'main'",
+        "Walk through EVERY top-level directory and file in the repo root",
+        "Walk through apps/web/, packages/ui/, packages/config/ subdirectories",
+        "Document findings in progress.txt under '## Audit Report' with categories: 'Redundant Files/Dirs', 'Generated Artifacts (should be gitignored)', 'Potentially Unused Code', 'Candidate Dependencies for Removal'",
+        "For EACH item, note: path, why it's a candidate, and risk level (safe/moderate/risky)",
+        "Do NOT delete or modify anything in this story — audit only"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "Be thorough. Check: root-level dirs (dist/, PRPs/, claude-code-full-guide/, default-profile-pics/, playwright-report/, test-results/), orphaned config files, .env examples, empty dirs. For deps: run 'pnpm why <pkg>' on any suspected unused packages. Check if imports actually reference them. Write the full audit to progress.txt so the user can review before proceeding. This story is AUDIT ONLY — do not delete anything."
+    },
+    {
+      "id": "CLEANUP-002",
+      "title": "Remove redundant root-level files and directories",
+      "description": "As a developer, I need to remove files and directories from the repo root that are not part of the application, build system, or deployment pipeline.",
+      "acceptanceCriteria": [
+        "Review the audit from CLEANUP-001 before proceeding",
+        "Remove only items categorised as 'safe' risk in the audit",
+        "Update .gitignore if any removed items were generated artifacts that should be ignored instead of tracked",
+        "Run 'pnpm build' to confirm the build still passes",
+        "Run 'pnpm lint' to confirm no lint errors",
+        "Commit with message: 'chore: remove redundant root-level files and directories'",
+        "Push to origin and verify GitHub checks pass with 'gh pr checks --watch' (create a draft PR first if not already created)"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": "IMPORTANT: Follow the 'Safe Removal Protocol' in PROMPT.md for EVERY item. Remove ONE item at a time: checkpoint (git stash) → delete → pnpm build && pnpm lint → if passes: commit, if fails: rollback and skip. Likely candidates: dist/ (old static build), default-profile-pics/ (empty), playwright-report/ and test-results/ (generated, should be gitignored not tracked). Do NOT remove config files (sanity.cli.ts, playwright.config.ts etc). claude-code-full-guide/ and PRPs/ may be reference docs — flag them in progress.txt but do NOT delete. If unsure, KEEP and note it."
+    },
+    {
+      "id": "CLEANUP-003",
+      "title": "Audit and remove unused npm dependencies",
+      "description": "As a developer, I need to identify and remove npm packages that are installed but never imported or used in the codebase, to reduce install time and bundle size.",
+      "acceptanceCriteria": [
+        "For each package in apps/web/package.json dependencies and devDependencies, search the codebase for actual imports/usage",
+        "For each package in packages/ui/package.json, do the same",
+        "For each package in the root package.json, do the same",
+        "List unused packages in progress.txt under '## Unused Dependencies'",
+        "Remove unused packages using 'pnpm remove <pkg> --filter <workspace>'",
+        "Run 'pnpm install' to regenerate lockfile",
+        "Run 'pnpm build' to confirm build passes",
+        "Run 'pnpm lint' to confirm no errors",
+        "Commit with message: 'chore: remove unused npm dependencies'",
+        "Push and verify GitHub checks pass"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": "IMPORTANT: Follow the 'Safe Removal Protocol' in PROMPT.md for EVERY package. Remove ONE package at a time: checkpoint → pnpm remove <pkg> → pnpm install → pnpm build && pnpm lint → if passes: commit, if fails: rollback and skip. Use 'grep -r \"from.*<package>\" apps/ packages/' to check usage. Be careful with: (1) packages in config files (tailwind/postcss plugins), (2) CLI tools in scripts, (3) @types/* packages. If referenced ANYWHERE — it is NOT unused. Never remove framework packages (next, react, etc). When unsure, KEEP it."
+    },
+    {
+      "id": "CLEANUP-004",
+      "title": "Clean up dead code and orphaned components",
+      "description": "As a developer, I need to find and remove React components, utility functions, or pages that exist in the codebase but are never imported or rendered anywhere.",
+      "acceptanceCriteria": [
+        "Scan apps/web/src/components/ for components not imported anywhere else in apps/web/",
+        "Scan packages/ui/src/ for components not imported by apps/web/ or any other consumer",
+        "Scan apps/web/src/app/ for route segments that are commented out or contain only placeholder content",
+        "Check for unused utility files in apps/web/src/lib/ or packages/*/src/",
+        "For each orphan found, verify it truly has zero references (grep the entire repo)",
+        "Remove confirmed dead code",
+        "Run 'pnpm build' and 'pnpm lint' to verify nothing breaks",
+        "Commit with message: 'chore: remove dead code and orphaned components'",
+        "Push and verify GitHub checks pass"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": "IMPORTANT: Follow the 'Safe Removal Protocol' in PROMPT.md for EVERY file. Remove ONE file at a time: checkpoint → delete → pnpm build && pnpm lint → if passes: commit, if fails: rollback and skip. A component is only dead if ZERO files import it. Check both direct and dynamic/lazy imports. Storybook stories (.stories.tsx) count as usage. If a component is exported from a barrel file (index.ts) but never consumed, just remove the export — don't delete the file unless truly orphaned."
+    },
+    {
+      "id": "CLEANUP-005",
+      "title": "Final verification and PR",
+      "description": "As a developer, I need to verify that all cleanup changes are safe, the app builds and runs correctly, and create a PR for review.",
+      "acceptanceCriteria": [
+        "Run full verification: 'pnpm build', 'pnpm lint'",
+        "If Playwright tests exist, run 'pnpm test' to verify e2e tests pass",
+        "Check 'git diff main --stat' to summarise all changes",
+        "Create or update the draft PR: 'gh pr create --draft --base preview --title \"chore: project cleanup — remove redundant files and unused dependencies\" --body \"...\"'",
+        "PR body must include: summary of what was removed (files, dirs, packages), summary of what was kept and why, confirmation that build/lint/tests pass",
+        "Verify all GitHub checks pass on the PR",
+        "Log final summary in progress.txt",
+        "If merge is blocked by branch protection, use '--admin' flag or log it and exit gracefully"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": "Target branch is 'preview'. Use squash merge if merging. The PR body is important — it should be a clear changelog so the user can review exactly what was removed. Do not force merge if checks fail — fix the issue first."
+    }
+  ]
+}
