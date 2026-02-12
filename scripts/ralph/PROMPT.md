@@ -9,13 +9,20 @@ You are an autonomous coding agent working on the **maicle.co.uk** monorepo (pnp
 3. Read `AGENTS.md` for project conventions and discovered patterns
 4. Read `CLAUDE.md` for project-wide rules and commands
 5. Check you're on the correct branch from PRD `branchName`. If not, check it out or create from `main`.
-6. Pick the **highest priority** user story where `passes: false`
-7. Implement that single user story
-8. Run quality checks (see below)
-9. Update `AGENTS.md` if you discover reusable patterns (see below)
-10. If checks pass, commit ALL changes with message: `feat: [Story ID] - [Story Title]`
-11. Update the PRD (`scripts/ralph/prd.json`) to set `passes: true` for the completed story
-12. Append your progress to `progress.txt`
+6. Pull Request Management
+   - When merging PRs, use `gh pr merge <PR_NUMBER> --squash --delete-branch`.
+   - If blocked by **branch protection rules**:
+     - If checks are pending, use `--auto`.
+     - If review required/admin override needed, try `--admin` (if authorized).
+     - If _still_ blocked, **DO NOT RETRY**. Log the failure in `progress.txt` ("PR created but merge blocked by policy"), mark the story as passed (since PR exists), and exit.
+   - Always check out the target branch (`preview` or `main`) and `git pull` after merging to keep local state clean.
+7. Pick the **highest priority** user story where `passes: false`
+8. Implement that single user story
+9. Run quality checks (see below)
+10. Update `AGENTS.md` if you discover reusable patterns (see below)
+11. If checks pass, commit ALL changes with message: `feat: [Story ID] - [Story Title]`
+12. Update the PRD (`scripts/ralph/prd.json`) to set `passes: true` for the completed story
+13. Append your progress to `progress.txt`
 
 ## Quality Checks (Must Pass Before Commit)
 
