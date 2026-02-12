@@ -1,3 +1,12 @@
+## 2026-02-12T23:16:00Z - PW-003
+- **Task**: Add Playwright to CI workflow with Vercel preview URL.
+- **Outcome**: Added a new `smoke-test` job to the `.github/workflows/pr.yml` file. This job uses the `patrickedqvist/wait-for-vercel-preview` action to get the Vercel preview URL and then runs the Playwright smoke tests.
+- **Files Changed**:
+  - `.github/workflows/pr.yml`
+- **Learnings for future iterations:**
+  - The `patrickedqvist/wait-for-vercel-preview` action is a simple way to get the Vercel preview URL in a GitHub Actions workflow.
+  - It's important to pass the `VERCEL_TOKEN` and `VERCEL_AUTOMATION_BYPASS_SECRET` secrets to the workflow for it to work correctly.
+---
 ## 2026-02-12T23:14:00Z - PW-002
 - **Task**: Update smoke tests to match current site content.
 - **Outcome**: Updated `tests/smoke/preview.spec.ts` to check for actual page content, and created the `/api/health` endpoint.

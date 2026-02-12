@@ -50,7 +50,7 @@
         "Commit: 'ci: add Playwright smoke tests to PR workflow with Vercel preview URL'"
       ],
       "priority": 3,
-      "passes": false,
+      "passes": true,
       "notes": "IMPORTANT: The VERCEL_AUTOMATION_BYPASS_SECRET must be added as a GitHub repository secret manually by the user. The agent should note this in progress.txt. The Vercel Token (VERCEL_TOKEN) may also be needed. If the 'wait-for-vercel-preview' approach doesn't work, an alternative is to use the GitHub Deployments API: after Vercel deploys, it creates a GitHub deployment with the URL, which can be queried. Make sure the new job uses 'needs: build' so it only runs after the build passes. Use 'npx playwright install --with-deps chromium' to install only Chromium (not all browsers) to keep CI fast."
     },
     {
