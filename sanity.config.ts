@@ -24,6 +24,12 @@ export default defineConfig({
         S.list()
           .title('mikeiu.com CMS')
           .items([
+            // Home Page (singleton)
+            S.listItem()
+              .title('Home Page')
+              .icon(() => '🏠')
+              .child(S.document().schemaType('homePage').documentId('homePage').title('Home Page')),
+
             S.listItem()
               .title('Work')
               .icon(() => '💼')

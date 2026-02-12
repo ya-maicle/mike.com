@@ -108,10 +108,10 @@ export type CaseStudy = {
   }
   projectInfo?: {
     client?: string
-    sector?: string
-    discipline?: string
+    sector?: string[]
+    discipline?: string[]
     year?: string
-    link?: string
+    link?: { text?: string; url?: string }
   }
   content?: (
     | { _type: 'block'; [key: string]: any } // eslint-disable-line @typescript-eslint/no-explicit-any

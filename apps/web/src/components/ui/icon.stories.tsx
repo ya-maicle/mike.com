@@ -188,11 +188,11 @@ export const IconButtons: Story = {
         <Icon icon={Icons.Plus} size="sm" />
       </Button>
       <Button variant="outline">
-        <Icon icon={Icons.Download} size="sm" className="mr-2" />
+        <Icon icon={Icons.Download} size="sm" />
         Download
       </Button>
       <Button variant="destructive">
-        <Icon icon={Icons.Trash} size="sm" className="mr-2" />
+        <Icon icon={Icons.Trash} size="sm" />
         Delete
       </Button>
       <Button variant="ghost" size="icon">
@@ -200,7 +200,7 @@ export const IconButtons: Story = {
       </Button>
       <Button variant="secondary">
         Save
-        <Icon icon={Icons.Save} size="sm" className="ml-2" />
+        <Icon icon={Icons.Save} size="sm" />
       </Button>
     </div>
   ),

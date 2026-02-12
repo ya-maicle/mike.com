@@ -4,6 +4,8 @@ import { plain } from '@/lib/fonts'
 import './globals.css'
 
 import { SITE_CONFIG } from '@/lib/constants'
+import { Analytics } from '@vercel/analytics/next'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
@@ -36,6 +38,8 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         {children}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )

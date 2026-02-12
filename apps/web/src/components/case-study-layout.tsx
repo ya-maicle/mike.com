@@ -68,7 +68,14 @@ export function CaseStudyLayout({ data }: CaseStudyLayoutProps) {
       >
         <PageTemplate
           title={data.title}
-          metadata={[data.projectInfo?.year, data.projectInfo?.sector].filter(Boolean) as string[]}
+          metadata={
+            [
+              data.projectInfo?.year,
+              ...(Array.isArray(data.projectInfo?.sector)
+                ? data.projectInfo.sector
+                : [data.projectInfo?.sector]),
+            ].filter(Boolean) as string[]
+          }
           subtitle={data.summary}
           className="pb-0"
           coverMedia={
@@ -89,13 +96,15 @@ export function CaseStudyLayout({ data }: CaseStudyLayoutProps) {
       <div
         className={cn(
           'hidden md:block transition-all duration-500 ease-in-out bg-background z-50',
-          'relative min-h-screen',
-          isPanelOpen ? 'w-1/2 opacity-100' : 'w-0 opacity-0 overflow-hidden',
+          'relative',
+          isPanelOpen ? 'min-h-screen w-1/2 opacity-100' : 'w-0 opacity-0 overflow-hidden',
         )}
       >
-        <div className="sticky top-16 p-8 flex flex-col">
-          <PanelContent data={data} />
-        </div>
+        {isPanelOpen && (
+          <div className="sticky top-16 p-8 flex flex-col">
+            <PanelContent data={data} />
+          </div>
+        )}
       </div>
 
       {/* Side Panel (Mobile - Portal) */}
@@ -121,7 +130,7 @@ export function CaseStudyLayout({ data }: CaseStudyLayoutProps) {
                     variant="secondary"
                     size="lg"
                     onClick={togglePanel}
-                    className="shadow-none bg-secondary/40 backdrop-blur-md hover:bg-secondary/60 hover:scale-105 transition-all duration-300 cursor-pointer"
+                    className="shadow-none bg-border/90 backdrop-blur-md hover:bg-border/95 hover:scale-105 transition-all duration-300 cursor-pointer"
                   >
                     <Plus className="size-4 transition-transform duration-300 ease-in-out rotate-45" />
                     About the project
@@ -145,7 +154,7 @@ export function CaseStudyLayout({ data }: CaseStudyLayoutProps) {
               variant="secondary"
               size="lg"
               onClick={togglePanel}
-              className="shadow-none bg-secondary/40 backdrop-blur-md hover:bg-secondary/60 hover:scale-105 transition-all duration-300 cursor-pointer"
+              className="shadow-none bg-border/90 backdrop-blur-md hover:bg-border/95 hover:scale-105 transition-all duration-300 cursor-pointer"
             >
               <Plus
                 className={cn(
@@ -185,13 +194,21 @@ function PanelContent({ data }: { data: CaseStudy }) {
         {data.projectInfo?.sector && (
           <div>
             <h3 className="text-sm font-medium text-muted-foreground mb-1">Sector</h3>
-            <p className="text-lg">{data.projectInfo?.sector}</p>
+            <p className="text-lg">
+              {Array.isArray(data.projectInfo.sector)
+                ? data.projectInfo.sector.join(', ')
+                : data.projectInfo.sector}
+            </p>
           </div>
         )}
         {data.projectInfo?.discipline && (
           <div>
             <h3 className="text-sm font-medium text-muted-foreground mb-1">Discipline</h3>
-            <p className="text-lg">{data.projectInfo?.discipline}</p>
+            <p className="text-lg">
+              {Array.isArray(data.projectInfo.discipline)
+                ? data.projectInfo.discipline.join(', ')
+                : data.projectInfo.discipline}
+            </p>
           </div>
         )}
         {data.projectInfo?.year && (
@@ -204,11 +221,17 @@ function PanelContent({ data }: { data: CaseStudy }) {
           <div className="col-span-2">
             <h3 className="text-sm font-medium text-muted-foreground mb-1">Link</h3>
             <Link
-              href={data.projectInfo?.link}
+              href={
+                typeof data.projectInfo.link === 'string'
+                  ? data.projectInfo.link
+                  : data.projectInfo.link.url || '#'
+              }
               target="_blank"
               className="text-lg underline hover:text-muted-foreground transition-colors"
             >
-              Visit Project
+              {typeof data.projectInfo.link === 'string'
+                ? 'Visit Project'
+                : data.projectInfo.link.text || 'Visit Project'}
             </Link>
           </div>
         )}
