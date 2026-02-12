@@ -18,7 +18,7 @@
         "Do NOT modify any files — investigation only"
       ],
       "priority": 1,
-      "passes": true,
+      "passes": false,
       "notes": "The core CI problem: when a PR is opened against 'preview', Vercel creates a unique preview deployment (e.g., mike-com-abc123.vercel.app). But the GitHub Actions workflow doesn't know this URL, so it can't pass it to Playwright. The 'preview' branch URL (preview.mikeiu.com) is useless because it hasn't been updated with the PR changes yet. Research GitHub Actions that solve this: 'amondnet/vercel-action', 'patrickedqvist/wait-for-vercel-preview', or the Vercel GitHub API."
     },
     {
@@ -34,7 +34,7 @@
         "Commit: 'fix: update Playwright smoke tests to match redesigned pages'"
       ],
       "priority": 2,
-      "passes": true,
+      "passes": false,
       "notes": "Good resilient test targets: (1) page.getByRole('navigation').first() exists, (2) page.locator('main') exists, (3) page title is not empty, (4) no 404 or error page. Avoid fragile selectors like specific text content. The health API test is valuable — keep it if the route exists."
     },
     {

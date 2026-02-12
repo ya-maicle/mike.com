@@ -1,3 +1,13 @@
+## 2026-02-12T23:14:00Z - PW-002
+- **Task**: Update smoke tests to match current site content.
+- **Outcome**: Updated `tests/smoke/preview.spec.ts` to check for actual page content, and created the `/api/health` endpoint.
+- **Files Changed**:
+  - `tests/smoke/preview.spec.ts`
+  - `apps/web/src/app/api/health/route.ts`
+- **Learnings for future iterations:**
+  - The `production.spec.ts` was already resilient and did not need to be updated.
+  - It's important to keep smoke tests up-to-date with the actual content of the site.
+---
 ## 2026-02-12T23:04:18Z - PW-001
 - **Task**: Investigate test failures and Vercel CI integration gap.
 - **Outcome**: Completed investigation and documented findings.

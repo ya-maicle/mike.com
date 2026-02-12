@@ -4,7 +4,7 @@ You are an autonomous coding agent working on the **maicle.co.uk** monorepo (pnp
 
 ## Your Task
 
-1. Read the PRD at `scripts/ralph/prd.json`
+1. Read the PRD at `scripts/ralph/prd.json` — **use shell `cat scripts/ralph/prd.json`** (the `read_file` tool may block this file; always use `cat` via shell instead)
 2. Read the progress log at `progress.txt` (**read the Codebase Patterns section first**)
 3. Read `AGENTS.md` for project conventions and discovered patterns
 4. Read `CLAUDE.md` for project-wide rules and commands
