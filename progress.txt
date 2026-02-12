@@ -1,3 +1,11 @@
+## 2026-02-12T23:18:00Z - PW-004
+- **Task**: Ensure preview-to-main pipeline also has CI checks and smoke tests.
+- **Outcome**: Updated the `.github/workflows/pr.yml` file to run on PRs to both `preview` and `main`. Added a condition to the `smoke-test` job to run the appropriate test file based on the target branch.
+- **Files Changed**:
+  - `.github/workflows/pr.yml`
+- **Learnings for future iterations:**
+  - Using a conditional in the workflow file is a simple way to run different tests for different branches.
+---
 ## 2026-02-12T23:16:00Z - PW-003
 - **Task**: Add Playwright to CI workflow with Vercel preview URL.
 - **Outcome**: Added a new `smoke-test` job to the `.github/workflows/pr.yml` file. This job uses the `patrickedqvist/wait-for-vercel-preview` action to get the Vercel preview URL and then runs the Playwright smoke tests.

@@ -65,7 +65,7 @@
         "Commit: 'ci: extend PR checks to cover preview-to-main pipeline'"
       ],
       "priority": 4,
-      "passes": false,
+      "passes": true,
       "notes": "The simplest approach: just add 'main' to the branches list in pr.yml. The Playwright job can optionally run different test suites based on the target branch using a GitHub Actions conditional: if github.event.pull_request.base.ref == 'main', run production.spec.ts; if 'preview', run preview.spec.ts. Or just run both — production tests should always pass."
     },
     {
