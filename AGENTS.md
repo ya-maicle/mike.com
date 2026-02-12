@@ -46,4 +46,6 @@ pnpm --filter @maicle/ui storybook  # Visual checks
 
 <!-- AI agents: Add patterns here as you discover them -->
 <!-- Format: "- [area]: [pattern description]" -->
+
+- [CI/CD]: Use `gh pr checks <PR_NUMBER>` to monitor the status of checks for a pull request.
 <!-- Only add genuinely reusable knowledge, not story-specific details -->
