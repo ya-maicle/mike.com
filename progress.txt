@@ -69,3 +69,13 @@ Started: Thu Feb 12 22:29:05 GMT 2026
   - Removing a component might orphan its specific UI primitives (e.g., `command` UI used only by `command-menu`).
   - Always check for text-based usage (e.g., in comments or text) before assuming a component is unused based on simple grep.
 ---
+
+## Thu Feb 12 2026 - CLEANUP-005
+- Final verification and PR creation.
+- Verified build and lint pass.
+- Created draft PR #61 targeting 'preview' branch.
+- Files changed: Summary included in PR body.
+- **Learnings for future iterations:**
+  - Always check the intended base branch in the PRD (it was 'preview' not 'main').
+  - Playwright smoke tests require a BASE_URL; they are best run against a deployed preview/staging environment.
+---

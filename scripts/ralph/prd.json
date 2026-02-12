@@ -90,7 +90,7 @@
         "If merge is blocked by branch protection, use '--admin' flag or log it and exit gracefully"
       ],
       "priority": 5,
-      "passes": false,
+      "passes": true,
       "notes": "Target branch is 'preview'. Use squash merge if merging. The PR body is important — it should be a clear changelog so the user can review exactly what was removed. Do not force merge if checks fail — fix the issue first."
     }
   ]
