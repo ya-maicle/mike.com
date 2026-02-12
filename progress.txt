@@ -1,5 +1,5 @@
 # Ralph Progress Log
-Started: Thu Feb 12 21:55:50 GMT 2026
+Started: Thu Feb 12 22:29:05 GMT 2026
 ---
 
 ## Audit Report (CLEANUP-001)
@@ -50,4 +50,22 @@ Started: Thu Feb 12 21:55:50 GMT 2026
 - **Learnings for future iterations:**
   - `sanity.config.ts` in the root acts as the Studio entry point, so root dependencies like `sanity`, `sanity-plugin-*` are NOT unused.
   - `pnpm remove --filter <name>` requires the package name (e.g., `web`), not the directory path.
+
+## Thu Feb 12 2026 - CLEANUP-004
+- Audited components and libraries for dead code.
+- Removed `apps/web/src/components/command-menu.tsx` (Unused).
+- Removed `apps/web/src/components/ui/command.tsx` (Only used by command-menu).
+- Removed `apps/web/src/components/portable-text-lite.tsx` (Redundant with `portable-text-grid.tsx`).
+- Removed `apps/web/src/lib/feature-flags.ts` (Unused).
+- Verified that other UI components are used in stories (as per project rules).
+- Verified that `stories/page.tsx` is a WIP placeholder but should be kept as it's a guarded route.
+- Files changed:
+  - `apps/web/src/components/command-menu.tsx`
+  - `apps/web/src/components/ui/command.tsx`
+  - `apps/web/src/components/portable-text-lite.tsx`
+  - `apps/web/src/lib/feature-flags.ts`
+- **Learnings for future iterations:**
+  - UI components only used in Storybook are NOT considered dead code.
+  - Removing a component might orphan its specific UI primitives (e.g., `command` UI used only by `command-menu`).
+  - Always check for text-based usage (e.g., in comments or text) before assuming a component is unused based on simple grep.
 ---

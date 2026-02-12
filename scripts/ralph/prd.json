@@ -72,7 +72,7 @@
         "Push and verify GitHub checks pass"
       ],
       "priority": 4,
-      "passes": false,
+      "passes": true,
       "notes": "IMPORTANT: Follow the 'Safe Removal Protocol' in PROMPT.md for EVERY file. Remove ONE file at a time: checkpoint → delete → pnpm build && pnpm lint → if passes: commit, if fails: rollback and skip. A component is only dead if ZERO files import it. Check both direct and dynamic/lazy imports. Storybook stories (.stories.tsx) count as usage. If a component is exported from a barrel file (index.ts) but never consumed, just remove the export — don't delete the file unless truly orphaned."
     },
     {
