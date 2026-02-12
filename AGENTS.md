@@ -48,4 +48,5 @@ pnpm --filter @maicle/ui storybook  # Visual checks
 <!-- Format: "- [area]: [pattern description]" -->
 
 - [CI/CD]: Use `gh pr checks <PR_NUMBER>` to monitor the status of checks for a pull request.
+- [Sanity]: `sanity.config.ts` lives in root and consumes root-level dependencies (`sanity`, plugins), unlike the web app.
 <!-- Only add genuinely reusable knowledge, not story-specific details -->
