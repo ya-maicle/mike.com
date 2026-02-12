@@ -82,7 +82,7 @@
         "Log PR URL and results in progress.txt"
       ],
       "priority": 5,
-      "passes": false,
+      "passes": true,
       "notes": "The Playwright CI job might fail if VERCEL_AUTOMATION_BYPASS_SECRET is not set as a GitHub secret yet. That's expected — log it clearly so the user knows what to add. The other checks (typecheck, lint, build) should pass."
     },
     {
@@ -98,7 +98,7 @@
         "Log final summary in progress.txt including any manual steps the user needs to take (e.g., adding GitHub secrets)"
       ],
       "priority": 6,
-      "passes": false,
+      "passes": true,
       "notes": "After merge, document clearly in progress.txt if the user needs to: (1) add VERCEL_AUTOMATION_BYPASS_SECRET as a GitHub repo secret, (2) add VERCEL_TOKEN as a GitHub repo secret, (3) any other manual configuration."
     }
   ]
