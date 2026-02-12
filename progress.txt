@@ -1,18 +1,27 @@
-## 2026-02-12 00:16:56 UTC - PR-003
-- Pushed branch `chore/ralph-loop-setup` to origin.
-- Created draft pull request: https://github.com/ya-maicle/mike.com/pull/60
-- Updated `scripts/ralph/prd.json` to mark `PR-003` as complete.
-- Files changed: `scripts/ralph/prd.json`
-- **Learnings for future iterations:**
-  - `gh pr create` can fail if the specified label doesn't exist. It's safer to query for available labels first or omit the label flag if unsure.
----
+## 2026-02-12T23:04:18Z - PW-001
+- **Task**: Investigate test failures and Vercel CI integration gap.
+- **Outcome**: Completed investigation and documented findings.
+- **Files Analyzed**:
+  - `playwright.config.ts`
+  - `tests/smoke/preview.spec.ts`
+  - `tests/smoke/production.spec.ts`
+  - `.github/workflows/pr.yml`
+  - `apps/web/src/app/(website)/page.tsx`
+  - `apps/web/src/app/api/health/route.ts`
 
-## 2026-02-12 00:18:25 UTC - PR-004
-- Verified that all GitHub checks for PR #60 passed using `gh pr checks 60`.
-- This included Vercel preview deployment and other CI checks.
-- Files changed:
-  - `AGENTS.md`
-  - `scripts/ralph/prd.json`
 - **Learnings for future iterations:**
-  - Use `gh pr checks <PR_NUMBER>` to monitor the status of checks for a pull request. This is a quick way to verify if a PR is ready for the next step.
+  - **Stale Assertions**: `tests/smoke/preview.spec.ts` contains assertions based on the default Next.js starter page (e.g., "Get started by editing"). These are completely outdated. The current homepage (`apps/web/src/app/(website)/page.tsx`) is built with Sanity and has a different structure (e.g., `<h1>` with a tagline).
+  - **Actual Page Content**: The homepage renders a `main` element, a `h1` tagline, a `p` subtitle, and potentially hero buttons. Tests should be updated to check for these resilient elements instead of specific text.
+  - **CI Gap**: The `.github/workflows/pr.yml` file has jobs for type checking, linting, and building, but it does **not** have a job to run the Playwright smoke tests. This is a major gap.
+  - **Missing Health API**: The file `apps/web/src/app/api/health/route.ts` was not found, meaning the `/api/health` check in `preview.spec.ts` will fail. This route needs to be created.
+  - **Required Environment Variables**: For Playwright tests to run (especially in CI), two environment variables are essential:
+    - `PLAYWRIGHT_BASE_URL`: The URL of the environment to test (e.g., the Vercel preview deployment URL).
+    - `VERCEL_AUTOMATION_BYPASS_SECRET`: The secret to bypass Vercel's deployment protection.
+  - **Getting the Vercel Preview URL**: Research indicates several methods to retrieve the Vercel preview URL in a GitHub Actions workflow:
+    - **Vercel CLI**: Use `vercel deploy` and parse the output to get the URL. This requires storing `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID` as GitHub secrets.
+    - **GitHub Actions**: Actions like `patrickedqvist/wait-for-vercel-preview` or `amondnet/vercel-action` are designed to wait for the Vercel deployment to finish and return its URL. This seems like a simpler and more robust approach.
+    - **GitHub Deployment API**: Vercel creates a GitHub "deployment" event. The workflow could listen for this event or query the API to get the deployment URL.
+---
+# Ralph Progress Log
+Started: Thu Feb 12 23:04:18 GMT 2026
 ---

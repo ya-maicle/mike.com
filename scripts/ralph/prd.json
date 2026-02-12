@@ -1,0 +1,105 @@
+{
+  "project": "maicle.co.uk",
+  "branchName": "fix/playwright-tests",
+  "description": "Fix Playwright smoke tests: (1) update stale assertions to match redesigned pages, (2) integrate Playwright into CI by waiting for Vercel preview deployment and extracting its URL. Currently tests are skipped in CI because we couldn't access the Vercel preview URL.",
+  "userStories": [
+    {
+      "id": "PW-001",
+      "title": "Investigate test failures and Vercel CI integration gap",
+      "description": "As a developer, I need to understand exactly why tests fail and why they're skipped in CI, so I can plan targeted fixes.",
+      "acceptanceCriteria": [
+        "Create and checkout branch 'fix/playwright-tests' from 'preview'",
+        "Read playwright.config.ts, tests/smoke/preview.spec.ts, tests/smoke/production.spec.ts",
+        "Read .github/workflows/pr.yml to understand current CI setup",
+        "Read apps/web/src/app/(website)/page.tsx to understand current homepage content",
+        "Check if /api/health route exists: look for apps/web/src/app/api/health/route.ts",
+        "Document in progress.txt: (1) stale assertions, (2) actual page content, (3) CI gap (no Vercel preview URL available), (4) env vars needed (PLAYWRIGHT_BASE_URL, VERCEL_AUTOMATION_BYPASS_SECRET)",
+        "Research how to get the Vercel preview deployment URL in GitHub Actions: options include (a) 'await-vercel-deployment' action, (b) Vercel CLI 'vercel inspect', (c) GitHub Deployment Status API",
+        "Do NOT modify any files — investigation only"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "The core CI problem: when a PR is opened against 'preview', Vercel creates a unique preview deployment (e.g., mike-com-abc123.vercel.app). But the GitHub Actions workflow doesn't know this URL, so it can't pass it to Playwright. The 'preview' branch URL (preview.mikeiu.com) is useless because it hasn't been updated with the PR changes yet. Research GitHub Actions that solve this: 'amondnet/vercel-action', 'patrickedqvist/wait-for-vercel-preview', or the Vercel GitHub API."
+    },
+    {
+      "id": "PW-002",
+      "title": "Update smoke tests to match current site content",
+      "description": "As a developer, I need to rewrite the smoke test assertions so they verify elements that actually exist on the deployed pages.",
+      "acceptanceCriteria": [
+        "Update preview.spec.ts: replace stale Next.js starter assertions with checks for actual page elements (navigation, main content, heading sections)",
+        "Keep tests minimal and resilient — check structural elements, not specific marketing copy",
+        "Verify /api/health route exists. If not, create a simple one at apps/web/src/app/api/health/route.ts returning { status: 'ok', service: 'web' }",
+        "Update production.spec.ts if needed to match current production site",
+        "Run 'pnpm typecheck' and 'pnpm lint' to verify no errors",
+        "Commit: 'fix: update Playwright smoke tests to match redesigned pages'"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": "Good resilient test targets: (1) page.getByRole('navigation').first() exists, (2) page.locator('main') exists, (3) page title is not empty, (4) no 404 or error page. Avoid fragile selectors like specific text content. The health API test is valuable — keep it if the route exists."
+    },
+    {
+      "id": "PW-003",
+      "title": "Add Playwright to CI workflow with Vercel preview URL",
+      "description": "As a developer, I need to update the GitHub Actions workflow so that Playwright smoke tests automatically run against the Vercel preview deployment after each PR.",
+      "acceptanceCriteria": [
+        "Add a new job to .github/workflows/pr.yml that: (a) waits for the Vercel preview deployment to complete, (b) extracts the deployment URL, (c) installs Playwright browsers, (d) runs 'pnpm test' with PLAYWRIGHT_BASE_URL set to the Vercel preview URL",
+        "Use a GitHub Action like 'patrickedqvist/wait-for-vercel-preview' or equivalent to wait for and retrieve the deployment URL",
+        "Pass VERCEL_AUTOMATION_BYPASS_SECRET from GitHub Secrets to the test step",
+        "Ensure the smoke test job depends on the 'build' job (runs after build passes)",
+        "Run 'pnpm typecheck' and 'pnpm lint' to verify the workflow YAML syntax",
+        "Commit: 'ci: add Playwright smoke tests to PR workflow with Vercel preview URL'"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": "IMPORTANT: The VERCEL_AUTOMATION_BYPASS_SECRET must be added as a GitHub repository secret manually by the user. The agent should note this in progress.txt. The Vercel Token (VERCEL_TOKEN) may also be needed. If the 'wait-for-vercel-preview' approach doesn't work, an alternative is to use the GitHub Deployments API: after Vercel deploys, it creates a GitHub deployment with the URL, which can be queried. Make sure the new job uses 'needs: build' so it only runs after the build passes. Use 'npx playwright install --with-deps chromium' to install only Chromium (not all browsers) to keep CI fast."
+    },
+    {
+      "id": "PW-004",
+      "title": "Ensure preview-to-main pipeline also has CI checks and smoke tests",
+      "description": "As a developer, I need the CI workflow to also trigger on PRs from preview to main, running the same checks (typecheck, lint, build) and production smoke tests.",
+      "acceptanceCriteria": [
+        "Update .github/workflows/pr.yml: add 'main' to the 'branches' list under 'pull_request' trigger so the workflow runs on PRs to both 'preview' AND 'main'",
+        "Ensure the Playwright smoke test job works for both targets: use preview.spec.ts when PR targets 'preview', use production.spec.ts when PR targets 'main'",
+        "If it's simpler, create a separate workflow file (.github/workflows/pr-main.yml) for PRs to main — but only if the logic diverges significantly",
+        "Run 'pnpm typecheck' and 'pnpm lint' to verify no errors",
+        "Commit: 'ci: extend PR checks to cover preview-to-main pipeline'"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": "The simplest approach: just add 'main' to the branches list in pr.yml. The Playwright job can optionally run different test suites based on the target branch using a GitHub Actions conditional: if github.event.pull_request.base.ref == 'main', run production.spec.ts; if 'preview', run preview.spec.ts. Or just run both — production tests should always pass."
+    },
+    {
+      "id": "PW-005",
+      "title": "Push, create PR, and verify all GitHub checks pass",
+      "description": "As a developer, I need to push the fix, create a PR, and confirm all checks pass — including the new Playwright smoke test job.",
+      "acceptanceCriteria": [
+        "Push branch: 'git push -u origin fix/playwright-tests'",
+        "Create draft PR: 'gh pr create --draft --base preview --title \"fix: update Playwright smoke tests and add to CI\" --body \"...\"'",
+        "Wait for all checks: 'gh pr checks <PR_NUMBER> --watch'",
+        "All checks must pass: typecheck, lint, build, and (if the Playwright job was added) smoke tests",
+        "If the new Playwright CI job fails, read the error logs and fix. Common issues: missing secrets, deployment not ready, timeout too short",
+        "If a GitHub secret (VERCEL_AUTOMATION_BYPASS_SECRET) needs to be added manually, note this in progress.txt and mark this story as passed anyway — the user will add it",
+        "Log PR URL and results in progress.txt"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": "The Playwright CI job might fail if VERCEL_AUTOMATION_BYPASS_SECRET is not set as a GitHub secret yet. That's expected — log it clearly so the user knows what to add. The other checks (typecheck, lint, build) should pass."
+    },
+    {
+      "id": "PW-006",
+      "title": "Merge PR, verify deployment, clean up branch",
+      "description": "As a developer, once checks pass (or expected failures are documented), merge to preview and clean up.",
+      "acceptanceCriteria": [
+        "Merge PR: 'gh pr merge <PR_NUMBER> --squash --delete-branch' (use --admin if blocked)",
+        "If merge is blocked, log it and exit gracefully",
+        "Switch to preview: 'git checkout preview && git pull'",
+        "Delete local branch: 'git branch -d fix/playwright-tests' (if it still exists)",
+        "Verify merge: 'git log -1' shows the squash commit",
+        "Log final summary in progress.txt including any manual steps the user needs to take (e.g., adding GitHub secrets)"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": "After merge, document clearly in progress.txt if the user needs to: (1) add VERCEL_AUTOMATION_BYPASS_SECRET as a GitHub repo secret, (2) add VERCEL_TOKEN as a GitHub repo secret, (3) any other manual configuration."
+    }
+  ]
+}
