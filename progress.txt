@@ -25,3 +25,29 @@ Started: Thu Feb 12 21:55:50 GMT 2026
 - `styled-components` (Root): Not imported in `apps/web/src` or `packages/ui/src`. It is a dependency of `@sanity/ui` and `sanity`, so it might be a required peer dependency, but explicit root dependency might be removable if pnpm handles it. **Risk: Moderate**.
 - `lucide-react` (Root): Likely unused in root (scripts don't typically use UI icons). **Risk: Safe**.
 - `@sanity/vision` (Root): If only used in Studio (in `apps/web`), should move to `apps/web` or devDeps. **Risk: Low**.
+
+## Cleanup Report (CLEANUP-002)
+- **dist/**: Removed (Generated artifact).
+- **default-profile-pics/**: Removed (Empty directory).
+- **playwright-report/**: Removed (Generated artifact).
+- **test-results/**: Removed (Generated artifact).
+- **.gitignore**: Verified correct.
+- **Verification**: pnpm build and pnpm lint passed.
+
+## Unused Dependencies Report (CLEANUP-003)
+- `lucide-react` (root): REMOVED.
+- `openai` (apps/web): REMOVED.
+- `styled-components`, `sanity`, `sanity-plugin-media`, `sanity-plugin-mux-input` (root): KEPT (Used by `sanity.config.ts`).
+- `server-only` (apps/web): KEPT (Used in API routes/client).
+- `media-chrome`, `tw-animate-css` (apps/web): KEPT (Used in components/CSS).
+
+## Thu Feb 12 2026 - CLEANUP-003
+- Audited all dependencies in root and apps/web.
+- Removed unused `lucide-react` from root package.json.
+- Removed unused `openai` from apps/web package.json.
+- Verified that root-level Sanity dependencies are used by `sanity.config.ts`.
+- Files changed: `package.json`, `pnpm-lock.yaml`, `apps/web/package.json`.
+- **Learnings for future iterations:**
+  - `sanity.config.ts` in the root acts as the Studio entry point, so root dependencies like `sanity`, `sanity-plugin-*` are NOT unused.
+  - `pnpm remove --filter <name>` requires the package name (e.g., `web`), not the directory path.
+---

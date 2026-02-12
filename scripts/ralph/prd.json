@@ -33,7 +33,7 @@
         "Push to origin and verify GitHub checks pass with 'gh pr checks --watch' (create a draft PR first if not already created)"
       ],
       "priority": 2,
-      "passes": false,
+      "passes": true,
       "notes": "IMPORTANT: Follow the 'Safe Removal Protocol' in PROMPT.md for EVERY item. Remove ONE item at a time: checkpoint (git stash) → delete → pnpm build && pnpm lint → if passes: commit, if fails: rollback and skip. Likely candidates: dist/ (old static build), default-profile-pics/ (empty), playwright-report/ and test-results/ (generated, should be gitignored not tracked). Do NOT remove config files (sanity.cli.ts, playwright.config.ts etc). claude-code-full-guide/ and PRPs/ may be reference docs — flag them in progress.txt but do NOT delete. If unsure, KEEP and note it."
     },
     {
@@ -53,7 +53,7 @@
         "Push and verify GitHub checks pass"
       ],
       "priority": 3,
-      "passes": false,
+      "passes": true,
       "notes": "IMPORTANT: Follow the 'Safe Removal Protocol' in PROMPT.md for EVERY package. Remove ONE package at a time: checkpoint → pnpm remove <pkg> → pnpm install → pnpm build && pnpm lint → if passes: commit, if fails: rollback and skip. Use 'grep -r \"from.*<package>\" apps/ packages/' to check usage. Be careful with: (1) packages in config files (tailwind/postcss plugins), (2) CLI tools in scripts, (3) @types/* packages. If referenced ANYWHERE — it is NOT unused. Never remove framework packages (next, react, etc). When unsure, KEEP it."
     },
     {
