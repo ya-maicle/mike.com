@@ -1,35 +1,18 @@
-# Ralph Progress Log
-
-## Codebase Patterns
-<!-- Consolidated reusable patterns discovered during iterations -->
-<!-- AI agents: Read this section FIRST before starting work -->
-
+## 2026-02-12 00:16:56 UTC - PR-003
+- Pushed branch `chore/ralph-loop-setup` to origin.
+- Created draft pull request: https://github.com/ya-maicle/mike.com/pull/60
+- Updated `scripts/ralph/prd.json` to mark `PR-003` as complete.
+- Files changed: `scripts/ralph/prd.json`
+- **Learnings for future iterations:**
+  - `gh pr create` can fail if the specified label doesn't exist. It's safer to query for available labels first or omit the label flag if unsure.
 ---
 
-## 2026-02-11 - TEST-002
-- Created RALPH_AUTOMATION_TEST.md
-- Verified `./ralph-loop` script auto-detects environment and runs `npx @anthropic-ai/claude-code`
-- Note: Script halted at authentication step (requires `claude login`)
+## 2026-02-12 00:18:25 UTC - PR-004
+- Verified that all GitHub checks for PR #60 passed using `gh pr checks 60`.
+- This included Vercel preview deployment and other CI checks.
+- Files changed:
+  - `AGENTS.md`
+  - `scripts/ralph/prd.json`
 - **Learnings for future iterations:**
-  - Automation script logic is sound
-  - Users must authenticate Claude Code before running the loop autonomously
----
-
-## 2026-02-11 - VISUAL-001
-- Added "Ralph Visual Verification" banner to homepage
-- Verified visibility using browser subagent
-- **Learnings for future iterations:**
-  - Browser checking works perfectly for visual validation
-  - Dev server needs a few seconds to HMR before screenshotting
----
-
-## 2026-02-12 - PR-001
-- Implemented user story to remove test artifacts from the branch.
-- Performed a soft reset to `origin/main` (7c72abb).
-- Deleted `RALPH_AUTOMATION_TEST.md` and `RALPH_VERIFIED.md`.
-- Reverted changes to `apps/web/src/app/(website)/page.tsx`.
-- Ran quality checks (`typecheck`, `lint`, `build`), which all passed.
-- **Learnings for future iterations:**
-  - `git checkout` with paths containing parentheses requires quoting the path.
-  - The `apps/web` package is missing a `typecheck` script in its `package.json`, so `pnpm typecheck` does not check it. The build process, however, seems to perform the necessary checks.
+  - Use `gh pr checks <PR_NUMBER>` to monitor the status of checks for a pull request. This is a quick way to verify if a PR is ready for the next step.
 ---
