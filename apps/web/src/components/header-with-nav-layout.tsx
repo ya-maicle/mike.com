@@ -37,17 +37,10 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
         setIsMobile(!e.matches)
       }
       mqMobile.addEventListener('change', onMobileChange)
-      const mqNav = window.matchMedia('(min-width: 1000px)')
-      setNavOpen(mqNav.matches)
-
-      const onNavChange = (e: MediaQueryListEvent) => {
-        setNavOpen(e.matches)
-      }
-      mqNav.addEventListener('change', onNavChange)
+      setNavOpen(false)
 
       return () => {
         mqMobile.removeEventListener('change', onMobileChange)
-        mqNav.removeEventListener('change', onNavChange)
       }
     }
   }, [])
