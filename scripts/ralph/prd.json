@@ -1,23 +1,23 @@
 {
   "project": "maicle.co.uk",
-  "branchName": "fix/desktop-nav-default-closed",
-  "description": "Close the left desktop navigation by default while preserving toggle behavior across breakpoints.",
+  "branchName": "feat/add-vercel-speed-insights",
+  "description": "Connect Vercel Speed Insights to the project to monitor real-time performance metrics.",
   "userStories": [
     {
-      "id": "NAV-001",
-      "title": "Set desktop left navigation default state to closed",
-      "description": "As a desktop user, I want the left navigation to be closed by default so the page content is not shifted when I first land on a page.",
+      "id": "PERF-001",
+      "title": "Enable Vercel Speed Insights",
+      "description": "As a site owner, I want to integrate Vercel Speed Insights so that I can track and improve the performance of my website.",
       "acceptanceCriteria": [
-        "Desktop left navigation is closed by default on initial load",
-        "Desktop toggle button can open and close the navigation",
-        "Mobile navigation toggle behavior remains unchanged",
-        "Layout/content margin does not shift right until navigation is explicitly opened",
+        "The `@vercel/speed-insights` package is installed in the web app",
+        "The `<SpeedInsights />` component is added to the root layout",
+        "The application builds successfully without errors",
+        "Vercel deployment succeeds",
         "Typecheck passes (pnpm typecheck)",
         "Lint passes (pnpm lint)"
       ],
       "priority": 1,
       "passes": false,
-      "notes": "Created from prd.json.example as requested for Ralph loop execution."
+      "notes": "Follows the quickstart guide: https://vercel.com/docs/speed-insights/quickstart"
     }
   ]
 }
