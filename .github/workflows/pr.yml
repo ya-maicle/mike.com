@@ -157,10 +157,11 @@ jobs:
 
       - name: Wait for Vercel Preview URL
         id: vercel
-        uses: patrickedqvist/wait-for-vercel-preview@v2
+        uses: patrickedqvist/wait-for-vercel-preview@v1.3.3
         with:
-          token: ${{ secrets.VERCEL_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           max_timeout: 600
+          vercel_protection_bypass_header: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
 
       - name: Run Playwright tests
         if: github.base_ref == 'main'
