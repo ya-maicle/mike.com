@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Geist_Mono } from 'next/font/google'
-import { plain } from '@/lib/fonts'
+import { plain, optimistic } from '@/lib/fonts'
 import './globals.css'
 
 import { SITE_CONFIG } from '@/lib/constants'
@@ -34,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${plain.variable} ${geistMono.variable} antialiased`}
+        className={`${plain.variable} ${optimistic.variable} ${geistMono.variable} antialiased`}
         suppressHydrationWarning
       >
         {children}
