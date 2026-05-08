@@ -68,9 +68,7 @@ export function ProgramsSection({
         <div className="grid grid-cols-12">
           <div className="col-span-12 md:col-span-8 lg:col-span-6 flex flex-col gap-6">
             {label && <p className="text-sm text-muted-foreground mb-0">{label}</p>}
-            {heading && (
-              <h2 className="text-4xl font-normal tracking-tight mt-0 mb-0">{heading}</h2>
-            )}
+            {heading && <h2 className="text-4xl font-normal mt-0 mb-0">{heading}</h2>}
             {button?.text && button?.link && (
               <Button asChild size="lg" className="shrink-0 rounded-full w-fit">
                 <Link href={button.link}>{button.text}</Link>
@@ -117,7 +115,7 @@ export function ProgramsSection({
                     }`}
                   >
                     <h4
-                      className={`text-3xl font-normal tracking-tight md:w-[360px] md:shrink-0 mt-0 md:-mt-1 mb-0 leading-tight transition-all duration-300 ease-out ${
+                      className={`text-3xl font-normal md:w-[360px] md:shrink-0 mt-0 md:-mt-1 mb-0 leading-tight transition-all duration-300 ease-out ${
                         isHovered ? 'pl-4' : ''
                       } ${isDimmed ? 'text-muted-foreground' : ''}`}
                     >

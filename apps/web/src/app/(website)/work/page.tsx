@@ -24,7 +24,7 @@ export default async function WorkPage() {
         <section key={study._id} className="group grid gap-8 lg:gap-12 items-end lg:grid-cols-2">
           <div className="flex flex-col items-start space-y-4 lg:space-y-6 lg:order-1">
             <div className="space-y-2 lg:space-y-3">
-              <h2 className="text-5xl font-normal tracking-tight text-foreground">{study.title}</h2>
+              <h2 className="text-5xl font-normal text-foreground">{study.title}</h2>
               {study.summary ? (
                 <p className="max-w-[600px] text-xl text-foreground leading-relaxed">
                   {study.summary}

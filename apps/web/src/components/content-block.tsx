@@ -69,7 +69,7 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
         )}
         {block.title && (
           <div className={narrowClass}>
-            <h3 className="text-xl font-semibold tracking-tight">{block.title}</h3>
+            <h3 className="text-xl font-semibold">{block.title}</h3>
           </div>
         )}
         {block.description && (
@@ -110,7 +110,7 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
         />
         {block.title && (
           <div className={narrowClass}>
-            <h3 className="text-xl font-semibold tracking-tight">{block.title}</h3>
+            <h3 className="text-xl font-semibold">{block.title}</h3>
           </div>
         )}
         {block.description && (
