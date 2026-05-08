@@ -1,5 +1,23 @@
 import localFont from 'next/font/local'
 
+// VF handles all normal styles; TextRegularIt is used only for italic rendering
+export const optimistic = localFont({
+  src: [
+    {
+      path: '../fonts/OptimisticAI/OptimisticAI-Display.woff2',
+      weight: '100 900',
+      style: 'normal',
+    },
+    {
+      path: '../fonts/OptimisticAI/OptimisticAI-Text.woff2',
+      weight: '400',
+      style: 'italic',
+    },
+  ],
+  variable: '--font-optimistic',
+  display: 'swap',
+})
+
 export const plain = localFont({
   src: [
     {

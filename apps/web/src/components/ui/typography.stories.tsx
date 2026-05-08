@@ -20,7 +20,7 @@ export const Overview: Story = {
   render: () => (
     <div className="space-y-8 max-w-5xl">
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold tracking-tight">Typography System</h2>
+        <h2 className="text-2xl font-semibold">Typography System</h2>
         <p className="text-muted-foreground max-w-prose">
           Our typography system uses fluid scaling and specific font weights to ensure optimal
           readability across all devices. Use these utility classes to apply the design
@@ -42,43 +42,43 @@ export const Overview: Story = {
                 {
                   token: 'Hero (H1)',
                   class: 'text-5xl',
-                  specs: 'Medium (500), -0.02em',
-                  styles: 'font-medium tracking-tight',
+                  specs: 'Medium (500)',
+                  styles: 'font-medium',
                   example: 'The quick brown fox',
                 },
                 {
                   token: 'H2',
                   class: 'text-5xl',
-                  specs: 'Medium (500), -0.02em',
-                  styles: 'font-medium tracking-tight',
+                  specs: 'Medium (500)',
+                  styles: 'font-medium',
                   example: 'The quick brown fox',
                 },
                 {
                   token: 'H3',
                   class: 'text-4xl',
-                  specs: 'Medium (500), -0.02em',
-                  styles: 'font-medium tracking-tight',
+                  specs: 'Medium (500)',
+                  styles: 'font-medium',
                   example: 'The quick brown fox',
                 },
                 {
                   token: 'H4',
                   class: 'text-3xl',
-                  specs: 'Regular (400), -0.02em',
-                  styles: 'font-normal tracking-tight',
+                  specs: 'Regular (400)',
+                  styles: 'font-normal',
                   example: 'The quick brown fox',
                 },
                 {
                   token: 'H5',
                   class: 'text-2xl',
-                  specs: 'Medium (500), -0.02em',
-                  styles: 'font-medium tracking-tight',
+                  specs: 'Medium (500)',
+                  styles: 'font-medium',
                   example: 'The quick brown fox',
                 },
                 {
                   token: 'H6',
                   class: 'text-lg',
-                  specs: 'Medium (500), -0.02em',
-                  styles: 'font-medium tracking-tight',
+                  specs: 'Medium (500)',
+                  styles: 'font-medium',
                   example: 'The quick brown fox',
                 },
                 {
@@ -137,7 +137,7 @@ export const DefaultStyles: Story = {
   render: () => (
     <div className="space-y-8 max-w-3xl">
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold tracking-tight">Default HTML Elements</h2>
+        <h2 className="text-2xl font-semibold">Default HTML Elements</h2>
         <p className="text-muted-foreground">
           These elements rely purely on global CSS styles from <code>globals.css</code> without any
           utility classes. This ensures that markdown content or unstyled HTML renders correctly.
@@ -194,7 +194,7 @@ export const FontWeights: Story = {
   render: () => (
     <div className="space-y-8 max-w-3xl">
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold tracking-tight">Font Weights</h2>
+        <h2 className="text-2xl font-semibold">Font Weights</h2>
         <p className="text-muted-foreground">
           The Plain font family includes weights from 100 to 900.
         </p>
@@ -235,7 +235,7 @@ export const Paragraphs: Story = {
   render: () => (
     <div className="space-y-12 max-w-2xl">
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold tracking-tight">Paragraph Typography</h2>
+        <h2 className="text-2xl font-semibold">Paragraph Typography</h2>
         <p className="text-muted-foreground">
           Multiple paragraphs demonstrating body text styling, line height, and spacing. Use this to
           evaluate readability and visual rhythm.

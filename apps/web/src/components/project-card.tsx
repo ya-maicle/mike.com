@@ -73,9 +73,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
         {/* Content */}
         <div className="space-y-2">
-          <h3 className="text-xl font-normal tracking-tight leading-tight line-clamp-2">
-            {project.title}
-          </h3>
+          <h3 className="text-xl font-normal leading-tight line-clamp-2">{project.title}</h3>
 
           {/* Metadata */}
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
