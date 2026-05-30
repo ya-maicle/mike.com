@@ -74,6 +74,9 @@ export default async function Home() {
               image={data.coverMedia.image}
               className="w-full h-full object-cover"
               sizes="100vw"
+              aspectRatio="16/9"
+              priority
+              quality={90}
             />
           ) : data.coverMedia.type === 'video' && data.coverMedia.video?.asset?.playbackId ? (
             <DecorativeVideoBlock playbackId={data.coverMedia.video.asset.playbackId} />

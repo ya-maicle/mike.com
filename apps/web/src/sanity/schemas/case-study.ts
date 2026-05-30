@@ -17,6 +17,15 @@ export const caseStudy = defineType({
     }),
 
     defineField({
+      name: 'featuredOrder',
+      title: 'Display Order',
+      description:
+        'Position on the /work page. Lower numbers appear first (e.g. 1, 2, 3). Leave blank to sort by publish date.',
+      type: 'number',
+      validation: (Rule) => Rule.integer().min(0),
+    }),
+
+    defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
@@ -52,6 +61,29 @@ export const caseStudy = defineType({
         },
       ],
       validation: (Rule) => Rule.required(),
+    }),
+
+    defineField({
+      name: 'listingImages',
+      title: 'Listing Images',
+      description:
+        'Images shown in the row on the /work index page. Provide 4 for the full desktop row; mobile shows 1, small tablets show 2.',
+      type: 'array',
+      of: [
+        {
+          type: 'image',
+          options: { hotspot: true },
+          fields: [
+            {
+              name: 'alt',
+              type: 'string',
+              title: 'Alt text',
+              validation: (Rule) => Rule.required(),
+            },
+          ],
+        },
+      ],
+      validation: (Rule) => Rule.min(1).max(4),
     }),
 
     defineField({

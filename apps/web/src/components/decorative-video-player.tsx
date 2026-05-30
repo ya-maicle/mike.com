@@ -1,7 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { MuxPlayer } from '@/components/mux-player'
+import { DecorativeVideo } from '@/components/decorative-video'
 import { Play, Pause } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -13,30 +13,26 @@ interface DecorativeVideoPlayerProps {
 
 export function DecorativeVideoPlayer({ playbackId, className }: DecorativeVideoPlayerProps) {
   const [isPlaying, setIsPlaying] = React.useState(true)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const playerRef = React.useRef<any>(null)
+  const videoRef = React.useRef<HTMLVideoElement>(null)
 
   const togglePlay = () => {
-    if (playerRef.current) {
-      if (isPlaying) {
-        playerRef.current.pause()
-      } else {
-        playerRef.current.play()
-      }
-      setIsPlaying(!isPlaying)
+    const video = videoRef.current
+    if (!video) return
+    if (isPlaying) {
+      video.pause()
+    } else {
+      const result = video.play()
+      if (result) result.catch(() => {})
     }
+    setIsPlaying(!isPlaying)
   }
 
   return (
     <div className="relative group overflow-hidden rounded-[8px]">
-      <MuxPlayer
-        ref={playerRef}
+      <DecorativeVideo
+        ref={videoRef}
         playbackId={playbackId}
         className={cn('w-full h-auto', className)}
-        autoPlay={true}
-        muted={true}
-        loop={true}
-        showControls={false}
       />
 
       <div className="absolute bottom-4 right-4 z-10">

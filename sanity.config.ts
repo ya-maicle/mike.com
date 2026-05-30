@@ -42,7 +42,7 @@ export default defineConfig({
           ]),
     }),
 
-    muxInput(),
+    muxInput({ mp4_support: 'standard', max_resolution_tier: '2160p' }),
     media(),
     visionTool({
       defaultApiVersion: '2025-01-01',

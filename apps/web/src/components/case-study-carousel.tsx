@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/ui/carousel'
 import { SanityImage } from '@/components/sanity-image'
-import { MuxPlayer } from '@/components/mux-player'
+import { DecorativeVideo } from '@/components/decorative-video'
 import { ArrowLeft, ArrowRight, Play, Pause } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
@@ -49,15 +49,14 @@ export function CaseStudyCarousel({ items, title, description }: CaseStudyCarous
                     <SanityImage
                       image={item.image}
                       className="w-full h-full object-cover"
-                      sizes="100vw"
+                      sizes="(min-width: 1376px) 1376px, 100vw"
+                      aspectRatio="16/9"
                     />
                   ) : (
-                    <MuxPlayer
+                    <DecorativeVideo
                       playbackId={item.video?.asset?.playbackId}
-                      className="w-full h-full object-cover"
-                      autoPlay
-                      muted
-                      loop
+                      className="w-full h-full"
+                      videoClassName="object-cover"
                     />
                   )}
                 </div>

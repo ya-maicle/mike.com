@@ -4,7 +4,7 @@ import { sanityFetch } from '@/sanity/client'
 import { PageTemplate } from '@/components/page-template'
 import { LegalPageContent } from '@/components/legal-page-content'
 import type { PortableTextBlock } from '@portabletext/types'
-import type { SanityImage } from '@/sanity/queries'
+import { IMAGE_PROJECTION, type SanityImage } from '@/sanity/queries'
 
 type CoverMedia =
   | { type: 'image'; image: SanityImage }
@@ -69,29 +69,20 @@ export default async function DynamicPage(props: PageProps) {
   }
 
   const page = await sanityFetch<PageData | null>(
-    `*[_type == "page" && slug.current == $slug][0]{ 
+    `*[_type == "page" && slug.current == $slug][0]{
       _id,
-      title, 
+      title,
       subtitle,
       coverMedia {
         type,
-        image {
-          asset->{
-            _id,
-            url,
-            metadata { dimensions }
-          },
-          alt
-        },
-        video {
-          asset->{ playbackId }
-        }
+        image${IMAGE_PROJECTION},
+        video { asset->{ playbackId } }
       },
       content[]{
         ...,
         _type == 'imageBlock' => {
           ...,
-          image{..., asset->}
+          image${IMAGE_PROJECTION}
         },
         _type == 'videoBlock' => {
           ...,
@@ -101,7 +92,7 @@ export default async function DynamicPage(props: PageProps) {
           ...,
           items[]{
             kind,
-            image{..., asset->},
+            image${IMAGE_PROJECTION},
             video{asset->{playbackId}}
           }
         }

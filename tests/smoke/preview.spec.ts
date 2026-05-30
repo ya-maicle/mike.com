@@ -47,4 +47,23 @@ test.describe('Preview Smoke', () => {
     await expect(page.locator('h1')).toBeVisible()
     await expect(page.locator('h1')).not.toBeEmpty()
   })
+
+  test('/work page images serve responsive srcset with h+w params', async ({ page }) => {
+    await page.goto('/work')
+    await page.waitForLoadState('networkidle')
+
+    const firstThumb = page.locator('a[href^="/work/"] img').first()
+    await expect(firstThumb).toBeVisible({ timeout: 10_000 })
+
+    const srcset = await firstThumb.getAttribute('srcset')
+    expect(srcset, 'image must have a srcset').toBeTruthy()
+    expect(srcset!.split(',').length, 'srcset must have multiple candidates').toBeGreaterThan(1)
+    // Every Sanity candidate must have both w and h so the CDN can return the right pixels
+    for (const candidate of srcset!.split(',')) {
+      const url = candidate.trim().split(' ')[0]
+      if (!url.includes('cdn.sanity.io')) continue
+      expect(url, `srcset entry must include w param: ${url}`).toContain('w=')
+      expect(url, `srcset entry must include h param: ${url}`).toContain('h=')
+    }
+  })
 })

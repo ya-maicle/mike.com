@@ -4,7 +4,7 @@
 import { cn } from '@/lib/utils'
 import { gridCols } from '@/lib/grid-columns'
 import { SanityImage } from '@/components/sanity-image'
-import { CustomVideoPlayer } from '@/components/custom-video-player'
+import { MuxContentPlayer } from '@/components/mux-content-player'
 import { DecorativeVideoBlock } from '@/components/decorative-video-block'
 import { CaseStudyCarousel } from '@/components/case-study-carousel'
 import { PortableText } from 'next-sanity'
@@ -61,7 +61,12 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
 
     return (
       <section className={cn(widthClass, 'space-y-3')}>
-        <SanityImage image={block.image} className="w-full h-auto rounded-[8px]" />
+        <SanityImage
+          image={block.image}
+          className="w-full h-auto rounded-[8px]"
+          sizes="(min-width: 1376px) 1376px, 100vw"
+          aspectRatio="auto"
+        />
         {block.image?.caption && (
           <div className={cn(narrowClass, 'text-center text-sm text-muted-foreground')}>
             {block.image.caption}
@@ -103,7 +108,7 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
 
     return (
       <section className={cn(widthClass, 'space-y-3')}>
-        <CustomVideoPlayer
+        <MuxContentPlayer
           playbackId={playbackId}
           title={block.title}
           className="w-full h-auto rounded-[8px] overflow-hidden"
@@ -143,6 +148,7 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
               image={block.leftImage}
               className="w-full h-auto rounded-[8px]"
               sizes="(max-width: 768px) 100vw, 50vw"
+              aspectRatio="auto"
             />
             {block.leftImage?.caption && (
               <div className="text-sm text-muted-foreground">{block.leftImage.caption}</div>
@@ -153,6 +159,7 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
               image={block.rightImage}
               className="w-full h-auto rounded-[8px]"
               sizes="(max-width: 768px) 100vw, 50vw"
+              aspectRatio="auto"
             />
             {block.rightImage?.caption && (
               <div className="text-sm text-muted-foreground">{block.rightImage.caption}</div>
