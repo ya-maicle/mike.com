@@ -51,7 +51,7 @@
   --background: var(--zinc-950);
   --foreground: var(--zinc-50);
 
-  --card: var(--zinc-900);
+  --card: var(--black);
   --card-foreground: var(--zinc-50);
 
   --popover: var(--zinc-900);

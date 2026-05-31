@@ -17,6 +17,15 @@ export const caseStudy = defineType({
     }),
 
     defineField({
+      name: 'featuredOrder',
+      title: 'Display Order',
+      description:
+        'Position on the /work page. Lower numbers appear first (e.g. 1, 2, 3). Leave blank to sort by publish date.',
+      type: 'number',
+      validation: (Rule) => Rule.integer().min(0),
+    }),
+
+    defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',

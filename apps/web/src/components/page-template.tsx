@@ -86,6 +86,8 @@ export function PageTemplate({
                 className="w-full h-auto object-cover max-h-[90vh] rounded-[8px]"
                 priority
                 sizes="100vw"
+                aspectRatio="auto"
+                quality={90}
               />
             ) : null}
           </section>
