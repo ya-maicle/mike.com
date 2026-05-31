@@ -21,6 +21,8 @@ interface PageTemplateProps {
   subtitle?: string
   /** Optional cover media (image or video) */
   coverMedia?: CoverMedia
+  /** Optional custom cover content rendered in the cover-media area (takes precedence over coverMedia) */
+  cover?: ReactNode
   /** Page content */
   children: ReactNode
   /** Header text alignment */
@@ -34,11 +36,12 @@ export function PageTemplate({
   metadata,
   subtitle,
   coverMedia,
+  cover,
   children,
   headerAlign = 'center',
   className,
 }: PageTemplateProps) {
-  const hasCover = !!coverMedia
+  const hasCover = !!coverMedia || !!cover
 
   return (
     <div className={cn('pb-24', className)}>
@@ -71,8 +74,11 @@ export function PageTemplate({
         </header>
       </div>
 
-      {/* Cover Media - full width with grid */}
-      {coverMedia && (
+      {cover ? (
+        <ContentGrid>
+          <section className={cn(gridCols.full, 'mb-8')}>{cover}</section>
+        </ContentGrid>
+      ) : coverMedia ? (
         <ContentGrid>
           <section className={cn(gridCols.full, 'mb-8')}>
             {coverMedia.type === 'video' && coverMedia.video?.asset?.playbackId ? (
@@ -92,7 +98,7 @@ export function PageTemplate({
             ) : null}
           </section>
         </ContentGrid>
-      )}
+      ) : null}
 
       {/* Page Content - Rendered as grid children */}
       <ContentGrid>{children}</ContentGrid>

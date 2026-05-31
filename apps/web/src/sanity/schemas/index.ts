@@ -8,10 +8,12 @@ import { twoColumnImageBlock } from './objects/two-column-image-block'
 import { homePage } from './home-page'
 import { legalPage } from './legal-page'
 import { portfolioAccessProfile } from './portfolio-access-profile'
+import { program } from './program'
 
 export const schemaTypes = [
   homePage,
   caseStudy,
+  program,
   page,
   imageBlock,
   videoBlock,

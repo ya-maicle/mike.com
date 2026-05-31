@@ -143,50 +143,11 @@ export const homePage = defineType({
           name: 'programs',
           title: 'Programs',
           type: 'array',
+          description: 'Select which programs to feature in the list. Each links to its own page.',
           of: [
             {
-              type: 'object',
-              fields: [
-                defineField({
-                  name: 'title',
-                  title: 'Title',
-                  type: 'string',
-                }),
-                defineField({
-                  name: 'description',
-                  title: 'Description',
-                  type: 'text',
-                  rows: 2,
-                }),
-              ],
-              preview: {
-                select: {
-                  title: 'title',
-                  subtitle: 'description',
-                },
-              },
-            },
-          ],
-          initialValue: [
-            {
-              title: 'Ambiguity to Direction',
-              description: 'When teams are debating instead of deciding.',
-            },
-            {
-              title: 'Stalled Momentum',
-              description: "When work is happening, but progress isn't.",
-            },
-            {
-              title: 'Systems Under Strain',
-              description: 'When products outgrow ad-hoc decisions and need structure.',
-            },
-            {
-              title: 'Strategy That Ships',
-              description: 'When vision exists, but execution keeps slipping.',
-            },
-            {
-              title: 'Complexity to Clarity',
-              description: "When the problem isn't UI - it's everything around it.",
+              type: 'reference',
+              to: [{ type: 'program' }],
             },
           ],
         }),

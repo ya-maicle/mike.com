@@ -53,8 +53,6 @@ export const MuxContentPlayer = React.forwardRef<HTMLVideoElement | null, MuxCon
           width: '100%',
           height: '100%',
           aspectRatio: 'auto',
-          borderRadius: '0.5rem',
-          overflow: 'hidden',
           '--controls': controls ? undefined : 'none',
           '--media-object-fit': 'cover',
         }}
