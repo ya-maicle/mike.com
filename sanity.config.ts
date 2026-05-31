@@ -36,6 +36,13 @@ export default defineConfig({
               .child(S.documentTypeList('caseStudy').title('Case Studies')),
 
             S.listItem()
+              .title('Portfolio Access')
+              .icon(() => '🔐')
+              .child(
+                S.documentTypeList('portfolioAccessProfile').title('Portfolio Access Profiles'),
+              ),
+
+            S.listItem()
               .title('Legal Pages')
               .icon(() => '⚖️')
               .child(S.documentTypeList('legalPage').title('Legal Pages')),

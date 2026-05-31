@@ -2,15 +2,17 @@
 
 import * as React from 'react'
 import getSupabaseClient from '@/lib/supabase'
+import { isValidReturnPath } from '@/lib/url-validation'
 
 type Mode = 'login' | 'signup'
+type OpenLoginOptions = { returnTo?: string }
 
 type LoginModalContextValue = {
   open: boolean
   setOpen: (open: boolean) => void
   mode: Mode
   setMode: (mode: Mode) => void
-  openLogin: () => void
+  openLogin: (options?: OpenLoginOptions) => void
   openSignup: () => void
   closeLogin: () => void
 }
@@ -20,7 +22,10 @@ const LoginModalContext = React.createContext<LoginModalContextValue | undefined
 export function LoginModalProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(false)
   const [mode, setMode] = React.useState<Mode>('login')
-  const openLogin = React.useCallback(() => {
+  const openLogin = React.useCallback((options?: OpenLoginOptions) => {
+    if (typeof window !== 'undefined' && isValidReturnPath(options?.returnTo ?? null)) {
+      localStorage.setItem('auth-return-url', options!.returnTo!)
+    }
     setMode('login')
     setOpen(true)
   }, [])

@@ -38,6 +38,23 @@ export const caseStudy = defineType({
     }),
 
     defineField({
+      name: 'visibility',
+      title: 'Visibility',
+      type: 'string',
+      description:
+        'Public case studies are fully visible. Recruiter-only case studies show public cards but gate the detail page.',
+      initialValue: 'public',
+      options: {
+        layout: 'radio',
+        list: [
+          { title: 'Public', value: 'public' },
+          { title: 'Recruiter-only', value: 'recruiter' },
+        ],
+      },
+      validation: (Rule) => Rule.required(),
+    }),
+
+    defineField({
       name: 'summary',
       title: 'Summary',
       type: 'text',

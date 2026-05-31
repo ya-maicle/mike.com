@@ -10,6 +10,9 @@ import { ProgramsSection } from '@/components/programs-section'
 import { FeaturedWorkSection } from '@/components/featured-work-section'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { getPortfolioAccessState } from '@/lib/portfolio-access'
+
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Home',
@@ -18,7 +21,10 @@ export const metadata: Metadata = {
 
 export default async function Home() {
   // Fetch home page data from Sanity
-  const data = await sanityFetch<HomePage>(HOME_PAGE_QUERY, {}, { tag: homePageTag })
+  const [data, accessState] = await Promise.all([
+    sanityFetch<HomePage>(HOME_PAGE_QUERY, {}, { tag: homePageTag }),
+    getPortfolioAccessState(),
+  ])
 
   // Fallback values if no data exists yet
   const tagline = data?.tagline || 'Make progress inevitable.'
@@ -112,6 +118,7 @@ export default async function Home() {
           heading={data.featuredWorkSection.heading}
           button={data.featuredWorkSection.button}
           projects={data.featuredWorkSection.projects}
+          hasRecruiterAccess={accessState.hasRecruiterAccess}
         />
       )}
     </ContentGrid>

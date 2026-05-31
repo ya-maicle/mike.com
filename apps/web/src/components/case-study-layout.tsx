@@ -17,14 +17,18 @@ import { createPortal } from 'react-dom'
 interface CaseStudyLayoutProps {
   data: CaseStudy
   otherStudies?: ProjectCardData[]
+  hasRecruiterAccess?: boolean
 }
 
-export function CaseStudyLayout({ data, otherStudies }: CaseStudyLayoutProps) {
+export function CaseStudyLayout({
+  data,
+  otherStudies,
+  hasRecruiterAccess = false,
+}: CaseStudyLayoutProps) {
   const [isPanelOpen, setIsPanelOpen] = React.useState(false)
 
   const togglePanel = () => setIsPanelOpen(!isPanelOpen)
 
-  // Close panel when mobile navigation opens
   React.useEffect(() => {
     const handleNavOpening = () => {
       setIsPanelOpen(false)
@@ -36,7 +40,6 @@ export function CaseStudyLayout({ data, otherStudies }: CaseStudyLayoutProps) {
     }
   }, [])
 
-  // Lock body scroll when mobile panel is open
   React.useEffect(() => {
     const mobileMediaQuery = window.matchMedia('(max-width: 767px)')
 
@@ -48,10 +51,7 @@ export function CaseStudyLayout({ data, otherStudies }: CaseStudyLayoutProps) {
       }
     }
 
-    // Initial check
     handleScrollLock()
-
-    // Listen for changes
     mobileMediaQuery.addEventListener('change', handleScrollLock)
 
     return () => {
@@ -62,7 +62,6 @@ export function CaseStudyLayout({ data, otherStudies }: CaseStudyLayoutProps) {
 
   return (
     <div className="relative min-h-screen flex flex-col md:flex-row">
-      {/* Main Content Area */}
       <div
         className={cn(
           'flex-1 transition-all duration-500 ease-in-out w-full',
@@ -92,11 +91,12 @@ export function CaseStudyLayout({ data, otherStudies }: CaseStudyLayoutProps) {
           }
         >
           {data.content && <PortableText value={data.content} components={gridComponents} />}
-          {otherStudies && <KeepExploringSection projects={otherStudies} />}
+          {otherStudies && (
+            <KeepExploringSection projects={otherStudies} hasRecruiterAccess={hasRecruiterAccess} />
+          )}
         </PageTemplate>
       </div>
 
-      {/* Side Panel (Desktop) */}
       <div
         className={cn(
           'hidden md:block transition-all duration-500 ease-in-out bg-background z-50',
@@ -111,7 +111,6 @@ export function CaseStudyLayout({ data, otherStudies }: CaseStudyLayoutProps) {
         )}
       </div>
 
-      {/* Side Panel (Mobile - Portal) */}
       {isPanelOpen &&
         typeof document !== 'undefined' &&
         createPortal(
@@ -123,10 +122,8 @@ export function CaseStudyLayout({ data, otherStudies }: CaseStudyLayoutProps) {
           document.body,
         )}
 
-      {/* Sticky Button - Mobile uses portal, Desktop uses absolute positioning */}
       {isPanelOpen && typeof document !== 'undefined'
-        ? // Mobile: Render button as portal when panel is open to ensure proper z-index stacking
-          createPortal(
+        ? createPortal(
             <div className="md:hidden fixed left-0 right-0 bottom-0 pointer-events-none z-[70]">
               <div className="flex flex-col justify-end pb-8 items-center">
                 <div className="pointer-events-auto">
@@ -145,7 +142,6 @@ export function CaseStudyLayout({ data, otherStudies }: CaseStudyLayoutProps) {
             document.body,
           )
         : null}
-      {/* Desktop button and mobile button when panel is closed */}
       <div
         className={cn(
           'absolute left-0 right-0 bottom-0 top-[-5rem] md:top-[-6rem] pointer-events-none z-[70]',
@@ -178,7 +174,6 @@ export function CaseStudyLayout({ data, otherStudies }: CaseStudyLayoutProps) {
 function PanelContent({ data }: { data: CaseStudy }) {
   return (
     <div className="max-w-[592px] mx-auto w-full space-y-8 pb-24">
-      {/* Panel Content */}
       {data.panelContent && (
         <div className="space-y-0">
           {data.panelContent.map((block, i) => (
@@ -187,7 +182,6 @@ function PanelContent({ data }: { data: CaseStudy }) {
         </div>
       )}
 
-      {/* Metadata Grid */}
       <div className="grid grid-cols-2 gap-x-4 gap-y-6">
         {data.projectInfo?.client && (
           <div>

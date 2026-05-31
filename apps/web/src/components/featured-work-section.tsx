@@ -11,6 +11,7 @@ type FeaturedWorkSectionProps = {
   heading?: string
   button?: { text?: string; link?: string }
   projects: ProjectCardData[]
+  hasRecruiterAccess?: boolean
 }
 
 export function FeaturedWorkSection({
@@ -18,6 +19,7 @@ export function FeaturedWorkSection({
   heading,
   button,
   projects,
+  hasRecruiterAccess = false,
 }: FeaturedWorkSectionProps) {
   if (!projects || projects.length === 0) return null
 
@@ -36,7 +38,7 @@ export function FeaturedWorkSection({
           </div>
         </div>
 
-        <ProjectGrid projects={projects} />
+        <ProjectGrid projects={projects} hasRecruiterAccess={hasRecruiterAccess} />
       </div>
     </section>
   )

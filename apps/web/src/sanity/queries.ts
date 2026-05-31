@@ -6,7 +6,7 @@ export const IMAGE_ASSET_PROJECTION = groq`{ _id, url, metadata { lqip, dimensio
 export const IMAGE_PROJECTION = groq`{..., asset->${IMAGE_ASSET_PROJECTION}}`
 
 export const ALL_CASE_STUDY_SLUGS_QUERY = groq`
-  *[_type == "caseStudy" && defined(slug.current) && published != false]{
+  *[_type == "caseStudy" && defined(slug.current)]{
     "slug": slug.current
   }
 `
@@ -16,6 +16,7 @@ export const CASE_STUDY_BY_SLUG_QUERY = groq`
     _id,
     title,
     summary,
+    "visibility": coalesce(visibility, "public"),
     publishedAt,
     seoSettings,
     slug,
@@ -104,6 +105,7 @@ export type CaseStudy = {
   _type: 'caseStudy'
   title: string
   summary?: string
+  visibility?: 'public' | 'recruiter'
   slug: { current: string }
   publishedAt?: string
   coverImage?: SanityImage

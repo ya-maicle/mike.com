@@ -34,6 +34,12 @@ export default defineConfig({
               .title('Work')
               .icon(() => '💼')
               .child(S.documentTypeList('caseStudy').title('Case Studies')),
+            S.listItem()
+              .title('Portfolio Access')
+              .icon(() => '🔐')
+              .child(
+                S.documentTypeList('portfolioAccessProfile').title('Portfolio Access Profiles'),
+              ),
             // Pages section
             S.listItem()
               .title('Pages')
@@ -53,7 +59,9 @@ export default defineConfig({
   schema: {
     types: schemaTypes,
     templates: (templates) =>
-      templates.filter(({ schemaType }) => ['homePage', 'caseStudy', 'page'].includes(schemaType)),
+      templates.filter(({ schemaType }) =>
+        ['homePage', 'caseStudy', 'page', 'portfolioAccessProfile'].includes(schemaType),
+      ),
   },
 
   document: {
@@ -65,7 +73,9 @@ export default defineConfig({
       return prev
     },
     newDocumentOptions: (prev) =>
-      prev.filter(({ templateId }) => ['homePage', 'caseStudy', 'page'].includes(templateId)),
+      prev.filter(({ templateId }) =>
+        ['homePage', 'caseStudy', 'page', 'portfolioAccessProfile'].includes(templateId),
+      ),
   },
 
   tools: (prev) => {

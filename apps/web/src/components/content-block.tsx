@@ -17,11 +17,6 @@ interface ContentBlockProps {
   layout?: LayoutMode
 }
 
-/**
- * Get width class based on layout mode
- * - grid: Uses CSS Grid column classes
- * - max-width: Uses max-width with mx-auto centering
- */
 function getWidthClass(width: string | undefined, layout: LayoutMode): string {
   if (layout === 'grid') {
     if (width && width in gridCols) {
@@ -30,7 +25,6 @@ function getWidthClass(width: string | undefined, layout: LayoutMode): string {
     return gridCols.full
   }
 
-  // max-width mode: use max-width classes for different widths
   const maxWidths: Record<string, string> = {
     narrow: 'max-w-[592px] mx-auto w-full',
     medium: 'max-w-[800px] mx-auto w-full',
@@ -47,10 +41,6 @@ function getNarrowClass(layout: LayoutMode): string {
   return 'max-w-[592px] mx-auto'
 }
 
-/**
- * Unified content block renderer
- * Supports both grid-based (LegalPageContent) and max-width (CaseStudy) layouts
- */
 export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps) {
   if (!block || !block._type) return null
 
