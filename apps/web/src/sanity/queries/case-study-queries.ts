@@ -64,7 +64,11 @@ export const PUBLISHED_CASE_STUDIES = groq`
     featuredOrder,
     publishedAt,
     coverImage${IMAGE_PROJECTION},
-    listingImages[]${IMAGE_PROJECTION},
+    headerMedia{
+      type,
+      image${IMAGE_PROJECTION},
+      video{asset->{playbackId}}
+    },
     projectInfo
   }
 `

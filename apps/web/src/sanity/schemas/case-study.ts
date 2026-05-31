@@ -64,29 +64,6 @@ export const caseStudy = defineType({
     }),
 
     defineField({
-      name: 'listingImages',
-      title: 'Listing Images',
-      description:
-        'Images shown in the row on the /work index page. Provide 4 for the full desktop row; mobile shows 1, small tablets show 2.',
-      type: 'array',
-      of: [
-        {
-          type: 'image',
-          options: { hotspot: true },
-          fields: [
-            {
-              name: 'alt',
-              type: 'string',
-              title: 'Alt text',
-              validation: (Rule) => Rule.required(),
-            },
-          ],
-        },
-      ],
-      validation: (Rule) => Rule.min(1).max(4),
-    }),
-
-    defineField({
       name: 'headerMedia',
       title: 'Header Media',
       description: 'Full width media shown below the header (Image or Video)',

@@ -107,7 +107,6 @@ export type CaseStudy = {
   slug: { current: string }
   publishedAt?: string
   coverImage?: SanityImage
-  listingImages?: SanityImage[]
   headerMedia?: {
     type: 'image' | 'video'
     image?: SanityImage

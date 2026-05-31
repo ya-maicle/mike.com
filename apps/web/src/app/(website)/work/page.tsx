@@ -4,20 +4,13 @@ import { sanityFetch } from '@/sanity/client'
 import { PUBLISHED_CASE_STUDIES } from '@/sanity/queries/case-study-queries'
 import type { CaseStudy } from '@/sanity/queries'
 import { SanityImage } from '@/components/sanity-image'
+import { DecorativeVideo } from '@/components/decorative-video'
+import { buttonVariants } from '@/components/ui/button'
 
 export const metadata: Metadata = {
   title: 'Work',
   description: 'Portfolio of work and projects',
 }
-
-const TILE_ASPECT_CLASSES = [
-  'aspect-[4/5]',
-  'aspect-[3/4]',
-  'aspect-[2/3]',
-  'aspect-[5/7]',
-] as const
-const TILE_ASPECT_RATIOS = ['4/5', '3/4', '2/3', '5/7'] as const
-const TILE_HIDE_CLASSES = ['', 'hidden sm:block', 'hidden md:block', 'hidden lg:block'] as const
 
 export default async function WorkPage() {
   const caseStudies = await sanityFetch<CaseStudy[]>(
@@ -26,8 +19,14 @@ export default async function WorkPage() {
     { tag: 'caseStudies' },
   )
 
+  const earliestYear = caseStudies.reduce<number | null>((min, s) => {
+    const y = s.projectInfo?.year ? parseInt(s.projectInfo.year, 10) : null
+    return y !== null && (min === null || y < min) ? y : min
+  }, null)
+  const currentYear = new Date().getFullYear()
+
   return (
-    <div className="flex flex-col gap-12 pb-16 md:gap-16 md:pb-24">
+    <div className="flex flex-col pb-16 md:pb-24">
       <div className="max-w-[var(--content-max-width)] mx-auto w-full">
         <header className="max-w-[592px] mx-auto text-center flex flex-col items-center pt-4 md:pt-6 pb-12 md:pb-16 space-y-4 md:space-y-6">
           <div className="flex items-center gap-4 text-sm font-normal text-foreground">
@@ -35,69 +34,91 @@ export default async function WorkPage() {
           </div>
           <h1>Case Studies</h1>
           <p className="text-xl text-foreground leading-relaxed max-w-prose mt-2">
-            An archive of projects completed between 2023 and 2026.
+            An archive of projects completed
+            {earliestYear ? ` between ${earliestYear} and` : ' through'} {currentYear}.
           </p>
         </header>
       </div>
 
-      <div className="flex flex-col gap-12 md:gap-16">
+      <div className="flex flex-col gap-8">
         {caseStudies.map((study, index) => {
-          const images = (
-            study.listingImages?.length
-              ? study.listingImages
-              : study.coverImage
-                ? [study.coverImage]
-                : []
-          ).slice(0, 4)
+          const cover = study.coverImage
+          const header = study.headerMedia
+          const heroVideoId = header?.type === 'video' ? header.video?.asset?.playbackId : undefined
+          const heroImage = header?.type === 'image' ? header.image : null
+          const desktopImage = heroImage ?? cover
+          const hasMedia = Boolean(heroVideoId || desktopImage)
+          const sector = study.projectInfo?.sector?.length
+            ? study.projectInfo.sector.join(', ')
+            : null
+          const year = study.projectInfo?.year ?? null
 
           return (
             <Link
               key={study._id}
               href={`/work/${study.slug.current}`}
-              className="group flex flex-col gap-4 cursor-pointer"
+              className="group block cursor-pointer"
             >
-              {images.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-4 items-end">
-                  {images.map((image, i) => {
-                    const hideClass = TILE_HIDE_CLASSES[i] ?? ''
-                    const aspectClass = TILE_ASPECT_CLASSES[i] ?? 'aspect-[3/4]'
-                    const aspectRatio = TILE_ASPECT_RATIOS[i] ?? '3/4'
-                    return (
-                      <div
-                        key={i}
-                        className={`group/card [perspective:1500px] ${aspectClass} ${hideClass}`.trim()}
-                      >
-                        <div className="relative h-full w-full overflow-hidden rounded-lg bg-muted origin-bottom will-change-transform [transition:transform_800ms_cubic-bezier(0.19,1,0.22,1)] [@media(hover:hover)_and_(pointer:fine)]:group-hover/card:[transform:rotateX(-10deg)]">
-                          <SanityImage
-                            image={image}
-                            className="h-full w-full object-cover"
-                            sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                            aspectRatio={aspectRatio}
-                            priority={index === 0 && i === 0}
-                          />
-                        </div>
-                      </div>
-                    )
-                  })}
-                </div>
-              ) : null}
-
-              <div className="flex flex-col space-y-2 transition-opacity duration-200 group-hover:opacity-60">
-                <h4 className="text-3xl font-normal leading-tight text-foreground">
-                  {study.title}
-                </h4>
-                {study.summary ? (
-                  <p className="text-base text-foreground">{study.summary}</p>
-                ) : null}
-                {study.projectInfo?.sector?.length || study.projectInfo?.year ? (
-                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
-                    {study.projectInfo?.sector?.length ? (
-                      <span>{study.projectInfo.sector.join(', ')}</span>
+              <article className="flex flex-col overflow-hidden lg:grid lg:grid-cols-5 lg:items-stretch lg:rounded-[12px] lg:border lg:border-border">
+                <div className="flex flex-col lg:col-span-2 lg:p-8">
+                  <div className="flex w-full max-w-[480px] flex-col gap-3 pt-4 lg:pt-0">
+                    <h4 className="m-0 text-3xl font-normal leading-tight text-foreground">
+                      {study.title}
+                    </h4>
+                    {study.summary ? (
+                      <p className="m-0 text-base text-foreground">{study.summary}</p>
                     ) : null}
-                    {study.projectInfo?.year ? <span>{study.projectInfo.year}</span> : null}
+                    {sector || year ? (
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
+                        {sector ? <span>{sector}</span> : null}
+                        {year ? <span>{year}</span> : null}
+                      </div>
+                    ) : null}
+                  </div>
+
+                  {/* Reason: aria-hidden — the whole card is the link, this CTA is decorative */}
+                  <div className="mt-auto hidden pt-8 lg:block">
+                    <span aria-hidden="true" className={buttonVariants()}>
+                      View case study
+                    </span>
+                  </div>
+                </div>
+
+                {hasMedia ? (
+                  <div className="order-first flex items-center lg:order-none lg:col-span-3 lg:p-4">
+                    {cover ? (
+                      <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-muted md:hidden">
+                        <SanityImage
+                          image={cover}
+                          className="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.025]"
+                          sizes="(min-width: 768px) 1px, 100vw"
+                          aspectRatio="1/1"
+                          priority={index === 0}
+                        />
+                        <div className="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-border" />
+                      </div>
+                    ) : null}
+
+                    <div className="relative hidden aspect-[16/9] w-full overflow-hidden rounded-lg bg-muted md:block">
+                      {heroVideoId ? (
+                        <DecorativeVideo
+                          playbackId={heroVideoId}
+                          className="pointer-events-none absolute inset-0 transition-transform duration-300 ease-out group-hover:scale-[1.025]"
+                        />
+                      ) : desktopImage ? (
+                        <SanityImage
+                          image={desktopImage}
+                          className="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.025]"
+                          sizes="(min-width: 1024px) 60vw, (min-width: 768px) 100vw, 1px"
+                          aspectRatio="16/9"
+                          priority={index === 0}
+                        />
+                      ) : null}
+                      <div className="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-border" />
+                    </div>
                   </div>
                 ) : null}
-              </div>
+              </article>
             </Link>
           )
         })}
