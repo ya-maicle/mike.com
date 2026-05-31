@@ -31,7 +31,9 @@
   },
   "devDependencies": {
     "@maicle/config": "workspace:*",
+    "@tailwindcss/postcss": "^4",
     "geist": "^1.4.2",
+    "tailwindcss": "^4",
     "@storybook/addon-a11y": "^8",
     "@storybook/addon-essentials": "^8",
     "@storybook/addon-interactions": "^8",
@@ -39,8 +41,8 @@
     "@storybook/react-vite": "^8",
     "@storybook/test": "^8",
     "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "storybook": "^8",
     "typescript": "^5",
     "vite": "^5"

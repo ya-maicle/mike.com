@@ -137,6 +137,10 @@
 - Do not delete or overwrite existing code unless explicitly required and within the task scope.
 - Mock only in tests; never add stubs/fakes affecting dev or prod behavior.
 
+### 🤖 Ralph Agent
+
+- The Ralph agent is an autonomous agent that works on this codebase. See `scripts/ralph/` for its configuration and `ralph-loop` for the execution script.
+
 ### 🧰 Commands (reference)
 
 - Install deps: `pnpm install`

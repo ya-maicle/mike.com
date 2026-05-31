@@ -15,7 +15,7 @@ export function ContentGrid({ children, className }: ContentGridProps) {
   return (
     <div
       className={cn(
-        'grid grid-cols-12 gap-y-0 max-w-[var(--content-max-width)] mx-auto w-full',
+        '@container grid grid-cols-12 gap-y-0 max-w-[var(--content-max-width)] mx-auto w-full',
         className,
       )}
     >

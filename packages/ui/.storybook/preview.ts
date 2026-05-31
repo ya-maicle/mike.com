@@ -1,9 +1,7 @@
 import type { Preview } from '@storybook/react'
 import React from 'react'
 
-import '../styles/primitives.css'
-import '../styles/semantic.css'
-import './fonts.css'
+import './tailwind.css'
 
 const preview: Preview = {
   parameters: {

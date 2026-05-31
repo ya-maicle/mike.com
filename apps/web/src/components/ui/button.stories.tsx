@@ -13,7 +13,17 @@ const meta: Meta<typeof Button> = {
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['default', 'secondary', 'destructive', 'success', 'warning', 'info', 'outline', 'ghost', 'link'],
+      options: [
+        'default',
+        'secondary',
+        'destructive',
+        'success',
+        'warning',
+        'info',
+        'outline',
+        'ghost',
+        'link',
+      ],
     },
     size: {
       control: { type: 'select' },
@@ -69,7 +79,6 @@ export const Info: Story = {
   },
 }
 
-
 export const Outline: Story = {
   args: {
     variant: 'outline',
@@ -116,7 +125,7 @@ export const WithIcon: Story = {
   args: {
     children: (
       <>
-        <Icon icon={Icons.Download} size="sm" className="mr-2" />
+        <Icon icon={Icons.Download} size="sm" />
         Download
       </>
     ),
@@ -129,7 +138,7 @@ export const WithRightIcon: Story = {
     children: (
       <>
         Continue
-        <Icon icon={Icons.ChevronRight} size="sm" className="ml-2" />
+        <Icon icon={Icons.ChevronRight} size="sm" />
       </>
     ),
   },
@@ -147,7 +156,7 @@ export const Loading: Story = {
     disabled: true,
     children: (
       <>
-        <Icon icon={Icons.Spinner} size="sm" className="mr-2 animate-spin" />
+        <Icon icon={Icons.Spinner} size="sm" className="animate-spin" />
         Loading...
       </>
     ),
@@ -187,23 +196,23 @@ export const ActionButtons: Story = {
   render: () => (
     <div className="flex flex-wrap gap-4">
       <Button>
-        <Icon icon={Icons.Plus} size="sm" className="mr-2" />
+        <Icon icon={Icons.Plus} size="sm" />
         Create
       </Button>
       <Button variant="outline">
-        <Icon icon={Icons.Edit} size="sm" className="mr-2" />
+        <Icon icon={Icons.Edit} size="sm" />
         Edit
       </Button>
       <Button variant="destructive">
-        <Icon icon={Icons.Trash} size="sm" className="mr-2" />
+        <Icon icon={Icons.Trash} size="sm" />
         Delete
       </Button>
       <Button variant="secondary">
-        <Icon icon={Icons.Copy} size="sm" className="mr-2" />
+        <Icon icon={Icons.Copy} size="sm" />
         Copy
       </Button>
       <Button variant="ghost">
-        <Icon icon={Icons.Share} size="sm" className="mr-2" />
+        <Icon icon={Icons.Share} size="sm" />
         Share
       </Button>
     </div>

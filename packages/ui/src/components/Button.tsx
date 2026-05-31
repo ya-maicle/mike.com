@@ -4,7 +4,7 @@ import { forwardRef } from 'react'
 
 const buttonVariants = cva(
   // Base styles (always applied)
-  'inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+  'inline-flex items-center justify-center rounded-[8px] text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
   {
     variants: {
       variant: {
@@ -51,18 +51,20 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled || loading}
         {...props}
       >
-        {loading ? (
-          <>
-            <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-            {children}
-          </>
-        ) : (
-          <>
-            {leftIcon && <span className="mr-2">{leftIcon}</span>}
-            {children}
-            {rightIcon && <span className="ml-2">{rightIcon}</span>}
-          </>
-        )}
+        <span className="translate-y-[3px] inline-flex items-center">
+          {loading ? (
+            <>
+              <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              {children}
+            </>
+          ) : (
+            <>
+              {leftIcon && <span className="mr-2">{leftIcon}</span>}
+              {children}
+              {rightIcon && <span className="ml-2">{rightIcon}</span>}
+            </>
+          )}
+        </span>
       </button>
     )
   },

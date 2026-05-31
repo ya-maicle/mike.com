@@ -1,94 +1,95 @@
 import { groq } from 'next-sanity'
+import { IMAGE_PROJECTION } from '../queries'
 
-// Tag helpers for ISR revalidation in Next fetch calls
 export const caseStudyTag = (slug: string) => `caseStudy:${slug}`
 export const caseStudiesTag = 'caseStudies'
 
-// Fetch a single case study by slug with all populated blocks and client
-// Includes prerequisites[]-> for caseStudyBlock documents
+const CASE_STUDY_BLOCKS_PROJECTION = groq`{
+  ...,
+  _type == 'imageBlock' => {
+    ...,
+    image${IMAGE_PROJECTION}
+  },
+  _type == 'videoBlock' => {
+    ...,
+    mode,
+    video{asset->{playbackId}}
+  },
+  _type == 'carouselBlock' => {
+    ...,
+    items[]{
+      kind,
+      image${IMAGE_PROJECTION},
+      video{asset->{playbackId}}
+    }
+  },
+  _type == 'twoColumnImageBlock' => {
+    ...,
+    leftImage${IMAGE_PROJECTION},
+    rightImage${IMAGE_PROJECTION}
+  }
+}`
+
 export const CASE_STUDY_WITH_BLOCKS = groq`
   *[_type == "caseStudy" && slug.current == $slug][0]{
     _id,
     _type,
     title,
     summary,
+    "visibility": coalesce(visibility, "public"),
     publishedAt,
     seoSettings,
     slug,
-    coverImage{..., asset->},
+    coverImage${IMAGE_PROJECTION},
     headerMedia{
       type,
-      image{..., asset->},
+      image${IMAGE_PROJECTION},
       video{asset->{playbackId}}
     },
     projectInfo,
-    
-    // Panel content blocks
-    panelContent[]{
-      ...,
-      _type == 'imageBlock' => {
-        ...,
-        image{..., asset->}
-      },
-      _type == 'videoBlock' => {
-        ...,
-        mode,
-        video{asset->{playbackId}}
-      },
-      _type == 'carouselBlock' => {
-        ...,
-        items[]{
-          kind,
-          image{..., asset->},
-          video{asset->{playbackId}}
-        }
-      },
-      _type == 'twoColumnImageBlock' => {
-        ...,
-        leftImage{..., asset->},
-        rightImage{..., asset->}
-      }
-    },
 
-    // Inline content blocks
-    content[]{
-      ...,
-      _type == 'imageBlock' => {
-        ...,
-        image{..., asset->}
-      },
-      _type == 'videoBlock' => {
-        ...,
-        mode,
-        video{asset->{playbackId}}
-      },
-      _type == 'carouselBlock' => {
-        ...,
-        items[]{
-          kind,
-          image{..., asset->},
-          video{asset->{playbackId}}
-        }
-      },
-      _type == 'twoColumnImageBlock' => {
-        ...,
-        leftImage{..., asset->},
-        rightImage{..., asset->}
-      }
+    panelContent[]${CASE_STUDY_BLOCKS_PROJECTION},
+    content[]${CASE_STUDY_BLOCKS_PROJECTION}
+  }
+`
+
+export const CASE_STUDY_TEASER_BY_SLUG = groq`
+  *[_type == "caseStudy" && slug.current == $slug][0]{
+    _id,
+    _type,
+    title,
+    summary,
+    "visibility": coalesce(visibility, "public"),
+    publishedAt,
+    slug,
+    coverImage${IMAGE_PROJECTION},
+    headerMedia{
+      type,
+      image${IMAGE_PROJECTION},
+      video{asset->{playbackId}}
+    },
+    projectInfo{
+      sector,
+      year
     }
   }
 `
 
-// Fetch all published case studies for listing (minimal projection)
 export const PUBLISHED_CASE_STUDIES = groq`
-  *[_type == "caseStudy" && defined(slug.current)] | order(featuredOrder asc){
+  *[_type == "caseStudy" && defined(slug.current)] | order(coalesce(featuredOrder, 9999) asc, publishedAt desc){
     _id,
     title,
     summary,
+    "visibility": coalesce(visibility, "public"),
     slug,
     featuredOrder,
     publishedAt,
-    coverImage{..., asset->},
+    coverImage${IMAGE_PROJECTION},
+    headerMedia{
+      type,
+      image${IMAGE_PROJECTION},
+      video{asset->{playbackId}}
+    },
     projectInfo
   }
 `

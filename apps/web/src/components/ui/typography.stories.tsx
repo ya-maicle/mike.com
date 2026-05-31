@@ -20,7 +20,7 @@ export const Overview: Story = {
   render: () => (
     <div className="space-y-8 max-w-5xl">
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold tracking-tight">Typography System</h2>
+        <h2 className="text-2xl font-semibold">Typography System</h2>
         <p className="text-muted-foreground max-w-prose">
           Our typography system uses fluid scaling and specific font weights to ensure optimal
           readability across all devices. Use these utility classes to apply the design
@@ -42,43 +42,43 @@ export const Overview: Story = {
                 {
                   token: 'Hero (H1)',
                   class: 'text-5xl',
-                  specs: 'Medium (500), -0.02em',
-                  styles: 'font-medium tracking-tight',
+                  specs: 'Medium (500)',
+                  styles: 'font-medium',
                   example: 'The quick brown fox',
                 },
                 {
                   token: 'H2',
                   class: 'text-5xl',
-                  specs: 'Medium (500), -0.02em',
-                  styles: 'font-medium tracking-tight',
+                  specs: 'Medium (500)',
+                  styles: 'font-medium',
                   example: 'The quick brown fox',
                 },
                 {
                   token: 'H3',
                   class: 'text-4xl',
-                  specs: 'Medium (500), -0.02em',
-                  styles: 'font-medium tracking-tight',
+                  specs: 'Medium (500)',
+                  styles: 'font-medium',
                   example: 'The quick brown fox',
                 },
                 {
                   token: 'H4',
                   class: 'text-3xl',
-                  specs: 'Regular (400), -0.02em',
-                  styles: 'font-normal tracking-tight',
+                  specs: 'Regular (400)',
+                  styles: 'font-normal',
                   example: 'The quick brown fox',
                 },
                 {
                   token: 'H5',
                   class: 'text-2xl',
-                  specs: 'Medium (500), -0.02em',
-                  styles: 'font-medium tracking-tight',
+                  specs: 'Medium (500)',
+                  styles: 'font-medium',
                   example: 'The quick brown fox',
                 },
                 {
                   token: 'H6',
                   class: 'text-lg',
-                  specs: 'Medium (500), -0.02em',
-                  styles: 'font-medium tracking-tight',
+                  specs: 'Medium (500)',
+                  styles: 'font-medium',
                   example: 'The quick brown fox',
                 },
                 {
@@ -91,8 +91,8 @@ export const Overview: Story = {
                 {
                   token: 'P2 (Body)',
                   class: 'text-base',
-                  specs: 'Regular (400), Leading-7',
-                  styles: 'font-normal leading-7',
+                  specs: 'Regular (400), Leading-6',
+                  styles: 'font-normal leading-6',
                   example: 'The quick brown fox jumps over the lazy dog.',
                 },
                 {
@@ -137,7 +137,7 @@ export const DefaultStyles: Story = {
   render: () => (
     <div className="space-y-8 max-w-3xl">
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold tracking-tight">Default HTML Elements</h2>
+        <h2 className="text-2xl font-semibold">Default HTML Elements</h2>
         <p className="text-muted-foreground">
           These elements rely purely on global CSS styles from <code>globals.css</code> without any
           utility classes. This ensures that markdown content or unstyled HTML renders correctly.
@@ -194,7 +194,7 @@ export const FontWeights: Story = {
   render: () => (
     <div className="space-y-8 max-w-3xl">
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold tracking-tight">Font Weights</h2>
+        <h2 className="text-2xl font-semibold">Font Weights</h2>
         <p className="text-muted-foreground">
           The Plain font family includes weights from 100 to 900.
         </p>
@@ -235,7 +235,7 @@ export const Paragraphs: Story = {
   render: () => (
     <div className="space-y-12 max-w-2xl">
       <div className="space-y-4">
-        <h2 className="text-2xl font-semibold tracking-tight">Paragraph Typography</h2>
+        <h2 className="text-2xl font-semibold">Paragraph Typography</h2>
         <p className="text-muted-foreground">
           Multiple paragraphs demonstrating body text styling, line height, and spacing. Use this to
           evaluate readability and visual rhythm.
@@ -272,13 +272,13 @@ export const Paragraphs: Story = {
           Elements). It uses <code>text-base</code> size.
         </p>
         <article className="space-y-4">
-          <p className="text-base leading-7">
+          <p className="text-base leading-6">
             In the realm of digital design, typography serves as the backbone of communication.
             Every choice—from font family to weight to size—carries meaning and influences how users
             perceive and interact with content. The subtle art lies in making these choices
             invisible, allowing the message to shine through without interference.
           </p>
-          <p className="text-base leading-7">
+          <p className="text-base leading-6">
             Consider the rhythm of reading: the eye moves across lines, drops to the next, and
             continues its dance across the page. This rhythm must be comfortable, predictable, and
             effortless. Too tight, and words blur together; too loose, and the text becomes
@@ -321,7 +321,7 @@ export const Paragraphs: Story = {
           </div>
           <div className="space-y-3">
             <span className="text-xs text-muted-foreground font-mono">P2 / Detail (text-base)</span>
-            <p className="text-base leading-7">
+            <p className="text-base leading-6">
               Standard body text optimized for denser information or UI elements.
             </p>
           </div>

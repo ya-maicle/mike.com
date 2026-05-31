@@ -8,20 +8,27 @@ import { PageTemplate } from '@/components/page-template'
 import { CaseStudyBlock } from '@/components/case-study-block'
 import { PortableText } from 'next-sanity'
 import { gridComponents } from '@/components/portable-text-grid'
+import { KeepExploringSection } from '@/components/keep-exploring-section'
+import type { ProjectCardData } from '@/components/project-card'
 import type { CaseStudy } from '@/sanity/queries'
 import { cn } from '@/lib/utils'
 import { createPortal } from 'react-dom'
 
 interface CaseStudyLayoutProps {
   data: CaseStudy
+  otherStudies?: ProjectCardData[]
+  hasRecruiterAccess?: boolean
 }
 
-export function CaseStudyLayout({ data }: CaseStudyLayoutProps) {
+export function CaseStudyLayout({
+  data,
+  otherStudies,
+  hasRecruiterAccess = false,
+}: CaseStudyLayoutProps) {
   const [isPanelOpen, setIsPanelOpen] = React.useState(false)
 
   const togglePanel = () => setIsPanelOpen(!isPanelOpen)
 
-  // Close panel when mobile navigation opens
   React.useEffect(() => {
     const handleNavOpening = () => {
       setIsPanelOpen(false)
@@ -33,7 +40,6 @@ export function CaseStudyLayout({ data }: CaseStudyLayoutProps) {
     }
   }, [])
 
-  // Lock body scroll when mobile panel is open
   React.useEffect(() => {
     const mobileMediaQuery = window.matchMedia('(max-width: 767px)')
 
@@ -45,10 +51,7 @@ export function CaseStudyLayout({ data }: CaseStudyLayoutProps) {
       }
     }
 
-    // Initial check
     handleScrollLock()
-
-    // Listen for changes
     mobileMediaQuery.addEventListener('change', handleScrollLock)
 
     return () => {
@@ -59,7 +62,6 @@ export function CaseStudyLayout({ data }: CaseStudyLayoutProps) {
 
   return (
     <div className="relative min-h-screen flex flex-col md:flex-row">
-      {/* Main Content Area */}
       <div
         className={cn(
           'flex-1 transition-all duration-500 ease-in-out w-full',
@@ -68,7 +70,14 @@ export function CaseStudyLayout({ data }: CaseStudyLayoutProps) {
       >
         <PageTemplate
           title={data.title}
-          metadata={[data.projectInfo?.year, data.projectInfo?.sector].filter(Boolean) as string[]}
+          metadata={
+            [
+              data.projectInfo?.year,
+              ...(Array.isArray(data.projectInfo?.sector)
+                ? data.projectInfo.sector
+                : [data.projectInfo?.sector]),
+            ].filter(Boolean) as string[]
+          }
           subtitle={data.summary}
           className="pb-0"
           coverMedia={
@@ -82,23 +91,26 @@ export function CaseStudyLayout({ data }: CaseStudyLayoutProps) {
           }
         >
           {data.content && <PortableText value={data.content} components={gridComponents} />}
+          {otherStudies && (
+            <KeepExploringSection projects={otherStudies} hasRecruiterAccess={hasRecruiterAccess} />
+          )}
         </PageTemplate>
       </div>
 
-      {/* Side Panel (Desktop) */}
       <div
         className={cn(
           'hidden md:block transition-all duration-500 ease-in-out bg-background z-50',
-          'relative min-h-screen',
-          isPanelOpen ? 'w-1/2 opacity-100' : 'w-0 opacity-0 overflow-hidden',
+          'relative',
+          isPanelOpen ? 'min-h-screen w-1/2 opacity-100' : 'w-0 opacity-0 overflow-hidden',
         )}
       >
-        <div className="sticky top-16 p-8 flex flex-col">
-          <PanelContent data={data} />
-        </div>
+        {isPanelOpen && (
+          <div className="sticky top-16 p-8 flex flex-col">
+            <PanelContent data={data} />
+          </div>
+        )}
       </div>
 
-      {/* Side Panel (Mobile - Portal) */}
       {isPanelOpen &&
         typeof document !== 'undefined' &&
         createPortal(
@@ -110,10 +122,8 @@ export function CaseStudyLayout({ data }: CaseStudyLayoutProps) {
           document.body,
         )}
 
-      {/* Sticky Button - Mobile uses portal, Desktop uses absolute positioning */}
       {isPanelOpen && typeof document !== 'undefined'
-        ? // Mobile: Render button as portal when panel is open to ensure proper z-index stacking
-          createPortal(
+        ? createPortal(
             <div className="md:hidden fixed left-0 right-0 bottom-0 pointer-events-none z-[70]">
               <div className="flex flex-col justify-end pb-8 items-center">
                 <div className="pointer-events-auto">
@@ -121,7 +131,7 @@ export function CaseStudyLayout({ data }: CaseStudyLayoutProps) {
                     variant="secondary"
                     size="lg"
                     onClick={togglePanel}
-                    className="shadow-none bg-secondary/40 backdrop-blur-md hover:bg-secondary/60 hover:scale-105 transition-all duration-300 cursor-pointer"
+                    className="shadow-none bg-border/90 backdrop-blur-md hover:bg-border/95 hover:scale-105 transition-all duration-300 cursor-pointer"
                   >
                     <Plus className="size-4 transition-transform duration-300 ease-in-out rotate-45" />
                     About the project
@@ -132,7 +142,6 @@ export function CaseStudyLayout({ data }: CaseStudyLayoutProps) {
             document.body,
           )
         : null}
-      {/* Desktop button and mobile button when panel is closed */}
       <div
         className={cn(
           'absolute left-0 right-0 bottom-0 top-[-5rem] md:top-[-6rem] pointer-events-none z-[70]',
@@ -145,7 +154,7 @@ export function CaseStudyLayout({ data }: CaseStudyLayoutProps) {
               variant="secondary"
               size="lg"
               onClick={togglePanel}
-              className="shadow-none bg-secondary/40 backdrop-blur-md hover:bg-secondary/60 hover:scale-105 transition-all duration-300 cursor-pointer"
+              className="shadow-none bg-border/90 backdrop-blur-md hover:bg-border/95 hover:scale-105 transition-all duration-300 cursor-pointer"
             >
               <Plus
                 className={cn(
@@ -165,7 +174,6 @@ export function CaseStudyLayout({ data }: CaseStudyLayoutProps) {
 function PanelContent({ data }: { data: CaseStudy }) {
   return (
     <div className="max-w-[592px] mx-auto w-full space-y-8 pb-24">
-      {/* Panel Content */}
       {data.panelContent && (
         <div className="space-y-0">
           {data.panelContent.map((block, i) => (
@@ -174,7 +182,6 @@ function PanelContent({ data }: { data: CaseStudy }) {
         </div>
       )}
 
-      {/* Metadata Grid */}
       <div className="grid grid-cols-2 gap-x-4 gap-y-6">
         {data.projectInfo?.client && (
           <div>
@@ -185,13 +192,21 @@ function PanelContent({ data }: { data: CaseStudy }) {
         {data.projectInfo?.sector && (
           <div>
             <h3 className="text-sm font-medium text-muted-foreground mb-1">Sector</h3>
-            <p className="text-lg">{data.projectInfo?.sector}</p>
+            <p className="text-lg">
+              {Array.isArray(data.projectInfo.sector)
+                ? data.projectInfo.sector.join(', ')
+                : data.projectInfo.sector}
+            </p>
           </div>
         )}
         {data.projectInfo?.discipline && (
           <div>
             <h3 className="text-sm font-medium text-muted-foreground mb-1">Discipline</h3>
-            <p className="text-lg">{data.projectInfo?.discipline}</p>
+            <p className="text-lg">
+              {Array.isArray(data.projectInfo.discipline)
+                ? data.projectInfo.discipline.join(', ')
+                : data.projectInfo.discipline}
+            </p>
           </div>
         )}
         {data.projectInfo?.year && (
@@ -204,11 +219,17 @@ function PanelContent({ data }: { data: CaseStudy }) {
           <div className="col-span-2">
             <h3 className="text-sm font-medium text-muted-foreground mb-1">Link</h3>
             <Link
-              href={data.projectInfo?.link}
+              href={
+                typeof data.projectInfo.link === 'string'
+                  ? data.projectInfo.link
+                  : data.projectInfo.link.url || '#'
+              }
               target="_blank"
               className="text-lg underline hover:text-muted-foreground transition-colors"
             >
-              Visit Project
+              {typeof data.projectInfo.link === 'string'
+                ? 'Visit Project'
+                : data.projectInfo.link.text || 'Visit Project'}
             </Link>
           </div>
         )}

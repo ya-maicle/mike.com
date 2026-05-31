@@ -28,10 +28,7 @@ test.beforeEach(async ({ page }) => {
 
 test.describe('Preview Smoke', () => {
   test('Health API returns 200 and expected body', async ({ request }) => {
-    const bypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET
-    const headers = { 'x-vercel-bypass-secret': bypassSecret! }
-
-    const res = await request.get('/api/health', { headers })
+    const res = await request.get('/api/health')
     expect(res.status()).toBe(200)
 
     const body = await res.json()
@@ -43,17 +40,30 @@ test.describe('Preview Smoke', () => {
     await page.goto('/')
     await page.waitForLoadState('networkidle')
 
-    // Check for the Next.js logo (reliable indicator the page loaded)
-    await expect(page.getByAltText('Next.js logo')).toBeVisible()
+    // Check that main content area exists
+    await expect(page.locator('main')).toBeVisible()
 
-    // Check for the "Get started by editing" text
-    await expect(page.getByText('Get started by editing')).toBeVisible()
+    // Check that the H1 heading exists and is not empty
+    await expect(page.locator('h1')).toBeVisible()
+    await expect(page.locator('h1')).not.toBeEmpty()
+  })
 
-    // Check for the E2E pipeline test indicator
-    await expect(page.getByText('✅ E2E Branching Pipeline Test')).toBeVisible()
+  test('/work page images serve responsive srcset with h+w params', async ({ page }) => {
+    await page.goto('/work')
+    await page.waitForLoadState('networkidle')
 
-    // Check for main action buttons
-    await expect(page.getByRole('link', { name: /deploy now/i })).toBeVisible()
-    await expect(page.getByRole('link', { name: /read our docs/i })).toBeVisible()
+    const firstThumb = page.locator('a[href^="/work/"] img').first()
+    await expect(firstThumb).toBeVisible({ timeout: 10_000 })
+
+    const srcset = await firstThumb.getAttribute('srcset')
+    expect(srcset, 'image must have a srcset').toBeTruthy()
+    expect(srcset!.split(',').length, 'srcset must have multiple candidates').toBeGreaterThan(1)
+    // Every Sanity candidate must have both w and h so the CDN can return the right pixels
+    for (const candidate of srcset!.split(',')) {
+      const url = candidate.trim().split(' ')[0]
+      if (!url.includes('cdn.sanity.io')) continue
+      expect(url, `srcset entry must include w param: ${url}`).toContain('w=')
+      expect(url, `srcset entry must include h param: ${url}`).toContain('h=')
+    }
   })
 })

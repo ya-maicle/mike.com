@@ -1,0 +1,6 @@
+#!/bin/bash
+# Ralph Wiggum - Autonomous AI agent loop
+# Usage: ./ralph-loop [--tool gemini|claude|amp] [max_iterations]
+# Default: gemini, 10 iterations
+
+exec "$(dirname "$0")/scripts/ralph/ralph.sh" "$@"

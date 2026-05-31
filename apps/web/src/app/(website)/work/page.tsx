@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import { sanityFetch } from '@/sanity/client'
 import { PUBLISHED_CASE_STUDIES } from '@/sanity/queries/case-study-queries'
 import type { CaseStudy } from '@/sanity/queries'
-import { Button } from '@/components/ui/button'
-import { SanityImage } from '@/components/sanity-image'
+import { WorkCaseStudyList } from '@/components/work-case-study-list'
+import { getPortfolioAccessState } from '@/lib/portfolio-access'
+
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Work',
@@ -12,42 +13,36 @@ export const metadata: Metadata = {
 }
 
 export default async function WorkPage() {
-  const caseStudies = await sanityFetch<CaseStudy[]>(
-    PUBLISHED_CASE_STUDIES,
-    {},
-    { tag: 'caseStudies' },
-  )
+  const [caseStudies, accessState] = await Promise.all([
+    sanityFetch<CaseStudy[]>(PUBLISHED_CASE_STUDIES, {}, { tag: 'caseStudies' }),
+    getPortfolioAccessState(),
+  ])
+
+  const earliestYear = caseStudies.reduce<number | null>((min, s) => {
+    const y = s.projectInfo?.year ? parseInt(s.projectInfo.year, 10) : null
+    return y !== null && (min === null || y < min) ? y : min
+  }, null)
+  const currentYear = new Date().getFullYear()
 
   return (
-    <div className="flex flex-col gap-16 py-8 lg:gap-32 lg:py-16">
-      {caseStudies.map((study) => (
-        <section key={study._id} className="group grid gap-8 lg:gap-12 items-end lg:grid-cols-2">
-          <div className="flex flex-col items-start space-y-4 lg:space-y-6 lg:order-1">
-            <div className="space-y-2 lg:space-y-3">
-              <h2 className="text-5xl font-normal tracking-tight text-foreground">{study.title}</h2>
-              {study.summary ? (
-                <p className="max-w-[600px] text-xl text-foreground leading-relaxed">
-                  {study.summary}
-                </p>
-              ) : null}
-            </div>
-
-            <Button asChild variant="secondary">
-              <Link href={`/work/${study.slug.current}`}>View Case Study</Link>
-            </Button>
+    <div className="flex flex-col pb-16 md:pb-24">
+      <div className="max-w-[var(--content-max-width)] mx-auto w-full">
+        <header className="max-w-[592px] mx-auto text-center flex flex-col items-center pt-4 md:pt-6 pb-12 md:pb-16 space-y-4 md:space-y-6">
+          <div className="flex items-center gap-4 text-sm font-normal text-foreground">
+            <span>Work Archive</span>
           </div>
+          <h1>Case Studies</h1>
+          <p className="text-xl text-foreground leading-relaxed max-w-prose mt-2">
+            An archive of projects completed
+            {earliestYear ? ` between ${earliestYear} and` : ' through'} {currentYear}.
+          </p>
+        </header>
+      </div>
 
-          <div className="relative aspect-square overflow-hidden bg-muted rounded-lg lg:order-2">
-            {study.coverImage ? (
-              <SanityImage
-                image={study.coverImage}
-                className="object-cover"
-                sizes="(min-width: 1024px) 50vw, 100vw"
-              />
-            ) : null}
-          </div>
-        </section>
-      ))}
+      <WorkCaseStudyList
+        caseStudies={caseStudies}
+        hasRecruiterAccess={accessState.hasRecruiterAccess}
+      />
     </div>
   )
 }

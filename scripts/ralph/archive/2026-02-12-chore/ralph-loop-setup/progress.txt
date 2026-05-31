@@ -1,0 +1,18 @@
+## 2026-02-12 00:16:56 UTC - PR-003
+- Pushed branch `chore/ralph-loop-setup` to origin.
+- Created draft pull request: https://github.com/ya-maicle/mike.com/pull/60
+- Updated `scripts/ralph/prd.json` to mark `PR-003` as complete.
+- Files changed: `scripts/ralph/prd.json`
+- **Learnings for future iterations:**
+  - `gh pr create` can fail if the specified label doesn't exist. It's safer to query for available labels first or omit the label flag if unsure.
+---
+
+## 2026-02-12 00:18:25 UTC - PR-004
+- Verified that all GitHub checks for PR #60 passed using `gh pr checks 60`.
+- This included Vercel preview deployment and other CI checks.
+- Files changed:
+  - `AGENTS.md`
+  - `scripts/ralph/prd.json`
+- **Learnings for future iterations:**
+  - Use `gh pr checks <PR_NUMBER>` to monitor the status of checks for a pull request. This is a quick way to verify if a PR is ready for the next step.
+---

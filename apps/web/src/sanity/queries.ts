@@ -1,7 +1,12 @@
 import { groq } from 'next-sanity'
 
+// Shared GROQ fragments — keep image projections identical across queries so
+// SanityImage always has _id + dimensions + lqip available client-side.
+export const IMAGE_ASSET_PROJECTION = groq`{ _id, url, metadata { lqip, dimensions } }`
+export const IMAGE_PROJECTION = groq`{..., asset->${IMAGE_ASSET_PROJECTION}}`
+
 export const ALL_CASE_STUDY_SLUGS_QUERY = groq`
-  *[_type == "caseStudy" && defined(slug.current) && published != false]{
+  *[_type == "caseStudy" && defined(slug.current)]{
     "slug": slug.current
   }
 `
@@ -11,18 +16,18 @@ export const CASE_STUDY_BY_SLUG_QUERY = groq`
     _id,
     title,
     summary,
+    "visibility": coalesce(visibility, "public"),
     publishedAt,
     seoSettings,
     slug,
-    coverImage{..., asset->},
+    coverImage${IMAGE_PROJECTION},
     projectInfo,
 
-    // Inline content blocks
     content[]{
       ...,
       _type == 'imageBlock' => {
         ...,
-        image{..., asset->}
+        image${IMAGE_PROJECTION}
       },
       _type == 'videoBlock' => {
         ...,
@@ -32,7 +37,7 @@ export const CASE_STUDY_BY_SLUG_QUERY = groq`
         ...,
         items[]{
           kind,
-          image{..., asset->},
+          image${IMAGE_PROJECTION},
           video{asset->{playbackId}}
         }
       }
@@ -47,9 +52,11 @@ export type SanityImage = {
     _id?: string
     url?: string
     metadata?: {
-      dimensions: {
+      lqip?: string
+      dimensions?: {
         width: number
         height: number
+        aspectRatio?: number
       }
     }
   }
@@ -98,6 +105,7 @@ export type CaseStudy = {
   _type: 'caseStudy'
   title: string
   summary?: string
+  visibility?: 'public' | 'recruiter'
   slug: { current: string }
   publishedAt?: string
   coverImage?: SanityImage
@@ -108,10 +116,10 @@ export type CaseStudy = {
   }
   projectInfo?: {
     client?: string
-    sector?: string
-    discipline?: string
+    sector?: string[]
+    discipline?: string[]
     year?: string
-    link?: string
+    link?: { text?: string; url?: string }
   }
   content?: (
     | { _type: 'block'; [key: string]: any } // eslint-disable-line @typescript-eslint/no-explicit-any

@@ -17,6 +17,15 @@ export const caseStudy = defineType({
     }),
 
     defineField({
+      name: 'featuredOrder',
+      title: 'Display Order',
+      description:
+        'Position on the /work page. Lower numbers appear first (e.g. 1, 2, 3). Leave blank to sort by publish date.',
+      type: 'number',
+      validation: (Rule) => Rule.integer().min(0),
+    }),
+
+    defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
@@ -24,6 +33,23 @@ export const caseStudy = defineType({
       options: {
         source: 'title',
         maxLength: 96,
+      },
+      validation: (Rule) => Rule.required(),
+    }),
+
+    defineField({
+      name: 'visibility',
+      title: 'Visibility',
+      type: 'string',
+      description:
+        'Public case studies are fully visible. Recruiter-only case studies show public cards but gate the detail page.',
+      initialValue: 'public',
+      options: {
+        layout: 'radio',
+        list: [
+          { title: 'Public', value: 'public' },
+          { title: 'Recruiter-only', value: 'recruiter' },
+        ],
       },
       validation: (Rule) => Rule.required(),
     }),
@@ -109,12 +135,20 @@ export const caseStudy = defineType({
         defineField({
           name: 'sector',
           title: 'Sector',
-          type: 'string',
+          type: 'array',
+          of: [{ type: 'string' }],
+          options: {
+            layout: 'tags',
+          },
         }),
         defineField({
           name: 'discipline',
           title: 'Discipline',
-          type: 'string',
+          type: 'array',
+          of: [{ type: 'string' }],
+          options: {
+            layout: 'tags',
+          },
         }),
         defineField({
           name: 'year',
@@ -124,7 +158,21 @@ export const caseStudy = defineType({
         defineField({
           name: 'link',
           title: 'Project Link',
-          type: 'url',
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'url',
+              title: 'URL',
+              type: 'url',
+              validation: (Rule) => Rule.uri({ scheme: ['http', 'https'] }),
+            }),
+            defineField({
+              name: 'text',
+              title: 'Link Text',
+              type: 'string',
+              initialValue: 'Visit Project',
+            }),
+          ],
         }),
       ],
     }),

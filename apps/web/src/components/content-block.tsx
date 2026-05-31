@@ -4,7 +4,7 @@
 import { cn } from '@/lib/utils'
 import { gridCols } from '@/lib/grid-columns'
 import { SanityImage } from '@/components/sanity-image'
-import { CustomVideoPlayer } from '@/components/custom-video-player'
+import { MuxContentPlayer } from '@/components/mux-content-player'
 import { DecorativeVideoBlock } from '@/components/decorative-video-block'
 import { CaseStudyCarousel } from '@/components/case-study-carousel'
 import { PortableText } from 'next-sanity'
@@ -17,11 +17,6 @@ interface ContentBlockProps {
   layout?: LayoutMode
 }
 
-/**
- * Get width class based on layout mode
- * - grid: Uses CSS Grid column classes
- * - max-width: Uses max-width with mx-auto centering
- */
 function getWidthClass(width: string | undefined, layout: LayoutMode): string {
   if (layout === 'grid') {
     if (width && width in gridCols) {
@@ -30,7 +25,6 @@ function getWidthClass(width: string | undefined, layout: LayoutMode): string {
     return gridCols.full
   }
 
-  // max-width mode: use max-width classes for different widths
   const maxWidths: Record<string, string> = {
     narrow: 'max-w-[592px] mx-auto w-full',
     medium: 'max-w-[800px] mx-auto w-full',
@@ -47,10 +41,6 @@ function getNarrowClass(layout: LayoutMode): string {
   return 'max-w-[592px] mx-auto'
 }
 
-/**
- * Unified content block renderer
- * Supports both grid-based (LegalPageContent) and max-width (CaseStudy) layouts
- */
 export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps) {
   if (!block || !block._type) return null
 
@@ -61,7 +51,12 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
 
     return (
       <section className={cn(widthClass, 'space-y-3')}>
-        <SanityImage image={block.image} className="w-full h-auto rounded-[8px]" />
+        <SanityImage
+          image={block.image}
+          className="w-full h-auto rounded-[8px]"
+          sizes="(min-width: 1376px) 1376px, 100vw"
+          aspectRatio="auto"
+        />
         {block.image?.caption && (
           <div className={cn(narrowClass, 'text-center text-sm text-muted-foreground')}>
             {block.image.caption}
@@ -69,7 +64,7 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
         )}
         {block.title && (
           <div className={narrowClass}>
-            <h3 className="text-xl font-semibold tracking-tight">{block.title}</h3>
+            <h3 className="text-xl font-semibold">{block.title}</h3>
           </div>
         )}
         {block.description && (
@@ -103,14 +98,14 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
 
     return (
       <section className={cn(widthClass, 'space-y-3')}>
-        <CustomVideoPlayer
+        <MuxContentPlayer
           playbackId={playbackId}
           title={block.title}
           className="w-full h-auto rounded-[8px] overflow-hidden"
         />
         {block.title && (
           <div className={narrowClass}>
-            <h3 className="text-xl font-semibold tracking-tight">{block.title}</h3>
+            <h3 className="text-xl font-semibold">{block.title}</h3>
           </div>
         )}
         {block.description && (
@@ -143,6 +138,7 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
               image={block.leftImage}
               className="w-full h-auto rounded-[8px]"
               sizes="(max-width: 768px) 100vw, 50vw"
+              aspectRatio="auto"
             />
             {block.leftImage?.caption && (
               <div className="text-sm text-muted-foreground">{block.leftImage.caption}</div>
@@ -153,6 +149,7 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
               image={block.rightImage}
               className="w-full h-auto rounded-[8px]"
               sizes="(max-width: 768px) 100vw, 50vw"
+              aspectRatio="auto"
             />
             {block.rightImage?.caption && (
               <div className="text-sm text-muted-foreground">{block.rightImage.caption}</div>

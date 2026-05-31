@@ -18,7 +18,7 @@ export function DecorativeVideoBlock({
       <DecorativeVideoPlayer playbackId={playbackId} />
       {(title || description) && (
         <div className="mx-auto max-w-[592px]">
-          {title && <h3 className="text-xl font-semibold tracking-tight">{title}</h3>}
+          {title && <h3 className="text-xl font-semibold">{title}</h3>}
           {description && <p className="text-muted-foreground">{description}</p>}
         </div>
       )}

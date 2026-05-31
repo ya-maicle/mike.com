@@ -51,15 +51,15 @@ const spacerSizes: Record<string, string> = {
 
 const styleClasses: Record<string, string> = {
   normal: 'leading-7 text-foreground',
-  h1: 'text-6xl font-medium tracking-tight text-foreground',
-  h2: 'text-5xl font-medium tracking-tight text-foreground',
-  h3: 'text-4xl font-medium tracking-tight text-foreground',
-  h4: 'text-3xl font-medium tracking-tight text-foreground',
-  h5: 'text-2xl font-medium tracking-tight text-foreground',
-  h6: 'text-lg font-medium tracking-tight text-foreground',
+  h1: 'text-6xl font-medium text-foreground',
+  h2: 'text-5xl font-medium text-foreground',
+  h3: 'text-4xl font-medium text-foreground',
+  h4: 'text-3xl font-medium text-foreground',
+  h5: 'text-2xl font-medium text-foreground',
+  h6: 'text-lg font-medium text-foreground',
   lead: 'text-xl leading-7 text-foreground',
   small: 'text-sm leading-6 text-muted-foreground',
-  blockquote: 'text-4xl font-normal tracking-tight text-foreground',
+  blockquote: 'text-4xl font-normal text-foreground',
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -166,7 +166,7 @@ export const gridComponents: PortableTextComponents = {
       )
     },
     lead: ({ children }: BlockProps) => (
-      <p className={cn(gridCols.narrow, 'text-foreground mb-6 text-base leading-7')}>{children}</p>
+      <p className={cn(gridCols.narrow, 'text-foreground mb-6 text-base leading-6')}>{children}</p>
     ),
     small: ({ children }: BlockProps) => (
       <p
@@ -182,7 +182,7 @@ export const gridComponents: PortableTextComponents = {
       <blockquote
         className={cn(
           gridCols.medium,
-          'text-4xl font-normal tracking-tight text-foreground text-center my-16 leading-snug',
+          'text-4xl font-normal text-foreground text-center my-16 leading-snug',
         )}
       >
         {children}
@@ -301,13 +301,13 @@ export const typographyComponents: PortableTextComponents = {
       )
     },
     lead: ({ children }: BlockProps) => (
-      <p className="text-foreground mb-6 text-base leading-7">{children}</p>
+      <p className="text-foreground mb-6 text-base leading-6">{children}</p>
     ),
     small: ({ children }: BlockProps) => (
       <p className="text-muted-foreground mb-4 text-sm leading-5 tracking-wide">{children}</p>
     ),
     blockquote: ({ children }: BlockProps) => (
-      <blockquote className="text-4xl font-normal tracking-tight text-foreground text-center my-16 leading-snug">
+      <blockquote className="text-4xl font-normal text-foreground text-center my-16 leading-snug">
         {children}
       </blockquote>
     ),

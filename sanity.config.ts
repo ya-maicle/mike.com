@@ -24,10 +24,23 @@ export default defineConfig({
         S.list()
           .title('mikeiu.com CMS')
           .items([
+            // Home Page (singleton)
+            S.listItem()
+              .title('Home Page')
+              .icon(() => '🏠')
+              .child(S.document().schemaType('homePage').documentId('homePage').title('Home Page')),
+
             S.listItem()
               .title('Work')
               .icon(() => '💼')
               .child(S.documentTypeList('caseStudy').title('Case Studies')),
+
+            S.listItem()
+              .title('Portfolio Access')
+              .icon(() => '🔐')
+              .child(
+                S.documentTypeList('portfolioAccessProfile').title('Portfolio Access Profiles'),
+              ),
 
             S.listItem()
               .title('Legal Pages')
@@ -36,7 +49,7 @@ export default defineConfig({
           ]),
     }),
 
-    muxInput(),
+    muxInput({ mp4_support: 'standard', max_resolution_tier: '2160p' }),
     media(),
     visionTool({
       defaultApiVersion: '2025-01-01',

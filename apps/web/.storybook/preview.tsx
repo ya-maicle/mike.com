@@ -5,7 +5,7 @@ import '../src/app/globals.css'
 // import 'geist/font/sans'
 // import 'geist/font/mono'
 
-import { plain } from '../src/lib/fonts'
+import { plain, optimistic } from '../src/lib/fonts'
 
 const geistMono = Geist_Mono({
   variable: '--font-geist-mono',
@@ -35,8 +35,8 @@ const preview: Preview = {
   decorators: [
     (Story) => (
       <div
-        className={`${plain.variable} ${geistMono.variable} antialiased bg-background text-foreground p-8`}
-        style={{ fontFamily: 'var(--font-maicle-plain)' }}
+        className={`${plain.variable} ${optimistic.variable} ${geistMono.variable} antialiased bg-background text-foreground p-8`}
+        style={{ fontFamily: 'var(--font-optimistic)' }}
       >
         <Story />
       </div>
