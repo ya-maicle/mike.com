@@ -3,7 +3,11 @@ import { notFound } from 'next/navigation'
 
 import { sanityFetch } from '@/sanity/client'
 import { ALL_CASE_STUDY_SLUGS_QUERY } from '@/sanity/queries'
-import { CASE_STUDY_WITH_BLOCKS } from '@/sanity/queries/case-study-queries'
+import {
+  CASE_STUDY_WITH_BLOCKS,
+  PUBLISHED_CASE_STUDIES,
+  caseStudiesTag,
+} from '@/sanity/queries/case-study-queries'
 import type { CaseStudy } from '@/sanity/queries'
 
 import { CaseStudyLayout } from '@/components/case-study-layout'
@@ -35,12 +39,13 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 
 export default async function CaseStudyPage(props: PageProps) {
   const { slug } = await props.params
-  const data = await sanityFetch<CaseStudy | null>(
-    CASE_STUDY_WITH_BLOCKS,
-    { slug },
-    { tag: `caseStudy:${slug}` },
-  )
+  const [data, allStudies] = await Promise.all([
+    sanityFetch<CaseStudy | null>(CASE_STUDY_WITH_BLOCKS, { slug }, { tag: `caseStudy:${slug}` }),
+    sanityFetch<CaseStudy[]>(PUBLISHED_CASE_STUDIES, {}, { tag: caseStudiesTag }),
+  ])
   if (!data) return notFound()
 
-  return <CaseStudyLayout data={data} />
+  const otherStudies = allStudies.filter((study) => study.slug.current !== slug).slice(0, 3)
+
+  return <CaseStudyLayout data={data} otherStudies={otherStudies} />
 }
