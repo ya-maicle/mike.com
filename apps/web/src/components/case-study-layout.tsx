@@ -8,15 +8,18 @@ import { PageTemplate } from '@/components/page-template'
 import { CaseStudyBlock } from '@/components/case-study-block'
 import { PortableText } from 'next-sanity'
 import { gridComponents } from '@/components/portable-text-grid'
+import { KeepExploringSection } from '@/components/keep-exploring-section'
+import type { ProjectCardData } from '@/components/project-card'
 import type { CaseStudy } from '@/sanity/queries'
 import { cn } from '@/lib/utils'
 import { createPortal } from 'react-dom'
 
 interface CaseStudyLayoutProps {
   data: CaseStudy
+  otherStudies?: ProjectCardData[]
 }
 
-export function CaseStudyLayout({ data }: CaseStudyLayoutProps) {
+export function CaseStudyLayout({ data, otherStudies }: CaseStudyLayoutProps) {
   const [isPanelOpen, setIsPanelOpen] = React.useState(false)
 
   const togglePanel = () => setIsPanelOpen(!isPanelOpen)
@@ -89,6 +92,7 @@ export function CaseStudyLayout({ data }: CaseStudyLayoutProps) {
           }
         >
           {data.content && <PortableText value={data.content} components={gridComponents} />}
+          {otherStudies && <KeepExploringSection projects={otherStudies} />}
         </PageTemplate>
       </div>
 

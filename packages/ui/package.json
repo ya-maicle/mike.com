@@ -41,8 +41,8 @@
     "@storybook/react-vite": "^8",
     "@storybook/test": "^8",
     "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
     "storybook": "^8",
     "typescript": "^5",
     "vite": "^5"

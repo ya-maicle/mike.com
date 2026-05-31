@@ -5,27 +5,32 @@ import Link from 'next/link'
 import { SanityImage } from '@/components/sanity-image'
 import type { SanityImage as SanityImageType } from '@/sanity/queries'
 
-type ProjectCardProps = {
-  project: {
-    title: string
-    slug: { current: string }
-    summary: string
-    coverImage: SanityImageType
-    projectInfo?: {
-      sector?: string[]
-      year?: string
-      link?: { text?: string; url?: string }
-    }
-    publishedAt: string
+export type ProjectCardData = {
+  _id: string
+  title: string
+  slug: { current: string }
+  summary?: string
+  coverImage?: SanityImageType
+  projectInfo?: {
+    sector?: string[]
+    year?: string
+    link?: { text?: string; url?: string }
   }
+  publishedAt?: string
+}
+
+type ProjectCardProps = {
+  project: ProjectCardData
 }
 
 export function ProjectCard({ project }: ProjectCardProps) {
-  const formattedDate = new Date(project.publishedAt).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  })
+  const formattedDate = project.publishedAt
+    ? new Date(project.publishedAt).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+      })
+    : undefined
 
   return (
     <article className="group">
