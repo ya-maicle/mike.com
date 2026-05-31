@@ -1,10 +1,8 @@
 import { groq } from 'next-sanity'
 import { IMAGE_PROJECTION, type SanityImage } from '../queries'
 
-// Tag for ISR revalidation
 export const homePageTag = 'homePage'
 
-// Fetch home page singleton document
 export const HOME_PAGE_QUERY = groq`
   *[_type == "homePage"][0]{
     _id,
@@ -38,6 +36,7 @@ export const HOME_PAGE_QUERY = groq`
         title,
         slug,
         summary,
+        "visibility": coalesce(visibility, "public"),
         coverImage${IMAGE_PROJECTION},
         projectInfo{
           sector,
@@ -82,6 +81,7 @@ export type HomePage = {
       title: string
       slug: { current: string }
       summary: string
+      visibility?: 'public' | 'recruiter'
       coverImage: SanityImage
       projectInfo?: {
         sector?: string[]

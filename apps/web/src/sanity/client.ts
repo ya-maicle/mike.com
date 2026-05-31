@@ -17,6 +17,8 @@ export const sanityClient = createClient({
   perspective: 'published',
 })
 
+const sanityNoCdnClient = sanityClient.withConfig({ useCdn: false })
+
 // Convenience wrapper with stable defaults; tags aid ISR revalidation later.
 export async function sanityFetch<T>(
   query: string,
@@ -30,5 +32,14 @@ export async function sanityFetch<T>(
       revalidate,
       ...(options?.tag ? { tags: [options.tag] } : {}),
     },
+  })
+}
+
+export async function sanityNoStoreFetch<T>(
+  query: string,
+  params: Record<string, unknown> = {},
+): Promise<T> {
+  return sanityNoCdnClient.fetch<T>(query, params, {
+    cache: 'no-store',
   })
 }

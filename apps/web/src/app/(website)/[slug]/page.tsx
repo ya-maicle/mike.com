@@ -1,10 +1,14 @@
 import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
-import { sanityFetch } from '@/sanity/client'
+import { notFound, redirect } from 'next/navigation'
+import { sanityFetch, sanityNoStoreFetch } from '@/sanity/client'
 import { PageTemplate } from '@/components/page-template'
 import { LegalPageContent } from '@/components/legal-page-content'
 import type { PortableTextBlock } from '@portabletext/types'
 import { IMAGE_PROJECTION, type SanityImage } from '@/sanity/queries'
+import {
+  ACTIVE_PORTFOLIO_ACCESS_PROFILE_BY_SLUG,
+  type PortfolioAccessProfile,
+} from '@/sanity/queries/portfolio-access-queries'
 
 type CoverMedia =
   | { type: 'image'; image: SanityImage }
@@ -66,6 +70,14 @@ export default async function DynamicPage(props: PageProps) {
   // Skip reserved slugs - they have their own routes
   if (RESERVED_SLUGS.includes(slug)) {
     return notFound()
+  }
+
+  const accessProfile = await sanityNoStoreFetch<PortfolioAccessProfile | null>(
+    ACTIVE_PORTFOLIO_ACCESS_PROFILE_BY_SLUG,
+    { slug },
+  )
+  if (accessProfile) {
+    redirect(`/api/portfolio-access/link?slug=${encodeURIComponent(slug)}`)
   }
 
   const page = await sanityFetch<PageData | null>(

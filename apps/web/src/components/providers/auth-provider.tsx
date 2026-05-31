@@ -5,6 +5,7 @@ import getSupabaseClient from '@/lib/supabase'
 import type { Session, User } from '@supabase/supabase-js'
 import { upsertProfileFromUser } from '@/lib/profile'
 import { isValidReturnPath } from '@/lib/url-validation'
+import { isCaseStudyPath, withAccessDenied } from '@/lib/portfolio-access-client'
 
 type AuthContextValue = {
   user: User | null
@@ -43,6 +44,73 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     [isDebug],
   )
 
+  const claimPortfolioAccess = React.useCallback(
+    async (newSession: Session, path?: string | null) => {
+      try {
+        const res = await fetch('/api/portfolio-access/claim', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            accessToken: newSession.access_token,
+            path,
+          }),
+        })
+        if (!res.ok) return 'denied'
+        const payload = (await res.json()) as { status?: 'granted' | 'denied' | 'blocked' }
+        dlog('Portfolio access claim:', payload.status)
+        return payload.status ?? 'denied'
+      } catch (error) {
+        dlog('Portfolio access claim failed:', error)
+        return 'denied'
+      }
+    },
+    [dlog],
+  )
+
+  const handleSignedInSession = React.useCallback(
+    async (newSession: Session, isOAuthCallback: boolean) => {
+      upsertProfileFromUser(newSession.user).catch(() => {})
+
+      let urlReturnUrl: string | null = null
+      try {
+        const url = new URL(window.location.href)
+        const params = url.searchParams
+        const maybeReturnUrl = params.get('auth_return_to')
+        urlReturnUrl = isValidReturnPath(maybeReturnUrl) ? maybeReturnUrl : null
+        if (params.has('code') || params.has('error')) {
+          params.delete('code')
+          params.delete('error')
+          params.delete('error_description')
+          params.delete('error_code')
+          params.delete('auth_return_to')
+          window.history.replaceState({}, '', url.toString())
+          dlog('Cleaned up URL params')
+        }
+      } catch {}
+
+      const returnUrl = localStorage.getItem('auth-return-url')
+      const safeReturnUrl = urlReturnUrl || (isValidReturnPath(returnUrl) ? returnUrl : null)
+      const claimStatus = await claimPortfolioAccess(
+        newSession,
+        safeReturnUrl || window.location.pathname,
+      )
+
+      if (!safeReturnUrl || (!isOAuthCallback && claimStatus !== 'granted')) return
+
+      localStorage.removeItem('auth-return-url')
+
+      if (claimStatus === 'granted' || !isCaseStudyPath(safeReturnUrl)) {
+        dlog('Redirecting to:', safeReturnUrl)
+        window.location.replace(safeReturnUrl)
+        return
+      }
+
+      dlog('Redirecting to restricted case study prompt:', safeReturnUrl)
+      window.location.replace(withAccessDenied(safeReturnUrl))
+    },
+    [claimPortfolioAccess, dlog],
+  )
+
   React.useEffect(() => {
     let mounted = true
     const supabase = getSupabaseClient()
@@ -66,29 +134,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const shouldHandlePostLogin = (event === 'SIGNED_IN' || isOAuthCallback) && !!newSession?.user
 
       if (shouldHandlePostLogin) {
-        upsertProfileFromUser(newSession.user).catch(() => {})
-
-        try {
-          const url = new URL(window.location.href)
-          const params = url.searchParams
-          if (params.has('code') || params.has('error')) {
-            params.delete('code')
-            params.delete('error')
-            params.delete('error_description')
-            params.delete('error_code')
-            window.history.replaceState({}, '', url.toString())
-            dlog('Cleaned up URL params')
-          }
-        } catch {}
-
-        try {
-          const returnUrl = localStorage.getItem('auth-return-url')
-          if (isValidReturnPath(returnUrl)) {
-            dlog('Redirecting to:', returnUrl)
-            localStorage.removeItem('auth-return-url')
-            window.location.replace(returnUrl!)
-          }
-        } catch {}
+        handleSignedInSession(newSession, isOAuthCallback).catch(() => {})
       }
     })
 
@@ -103,18 +149,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false)
 
       if (data.session?.user) {
-        upsertProfileFromUser(data.session.user).catch(() => {})
-
-        if (isOAuthCallback) {
-          try {
-            const returnUrl = localStorage.getItem('auth-return-url')
-            if (isValidReturnPath(returnUrl)) {
-              dlog('Redirecting to:', returnUrl)
-              localStorage.removeItem('auth-return-url')
-              window.location.replace(returnUrl!)
-            }
-          } catch {}
-        }
+        handleSignedInSession(data.session, isOAuthCallback).catch(() => {})
       }
     })
 
@@ -166,7 +201,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       window.removeEventListener('storage', onStorage)
       document.removeEventListener('visibilitychange', onVisible)
     }
-  }, [dlog])
+  }, [dlog, handleSignedInSession])
 
   const signOut = React.useCallback(async () => {
     const supabase = getSupabaseClient()
@@ -177,6 +212,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         new Promise((resolve) => setTimeout(resolve, 500)),
       ])
     } catch {}
+
+    fetch('/api/portfolio-access/logout', { method: 'POST' }).catch(() => {})
 
     try {
       const toDelete: string[] = []

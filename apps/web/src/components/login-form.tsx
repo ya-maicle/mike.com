@@ -56,17 +56,35 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
     }
   }, [cooldown])
 
+  const getReturnPath = React.useCallback(() => {
+    if (typeof window === 'undefined') return '/'
+
+    const existingReturnUrl = localStorage.getItem('auth-return-url')
+    if (isValidReturnPath(existingReturnUrl)) return existingReturnUrl!
+
+    const currentPath = `${window.location.pathname}${window.location.search}${window.location.hash}`
+    return isValidReturnPath(currentPath) ? currentPath : '/'
+  }, [])
+
+  const getRedirectTo = React.useCallback(
+    (returnPath: string) => {
+      const url = new URL(SITE_URL)
+      if (isValidReturnPath(returnPath) && returnPath !== '/') {
+        url.searchParams.set('auth_return_to', returnPath)
+      }
+      return url.toString()
+    },
+    [SITE_URL],
+  )
+
   const handleGoogleLogin = async () => {
     try {
       const supabase = getSupabaseClient()
-      const currentPath =
-        typeof window !== 'undefined'
-          ? `${window.location.pathname}${window.location.search}${window.location.hash}`
-          : '/'
-      const redirectTo = SITE_URL
+      const returnPath = getReturnPath()
+      const redirectTo = getRedirectTo(returnPath)
 
-      if (typeof window !== 'undefined' && isValidReturnPath(currentPath)) {
-        localStorage.setItem('auth-return-url', currentPath)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('auth-return-url', returnPath)
       }
 
       const { error } = await supabase.auth.signInWithOAuth({
@@ -88,14 +106,11 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
     setPending(true)
     try {
       const supabase = getSupabaseClient()
-      const currentPath =
-        typeof window !== 'undefined'
-          ? `${window.location.pathname}${window.location.search}${window.location.hash}`
-          : '/'
-      const emailRedirectTo = SITE_URL
+      const returnPath = getReturnPath()
+      const emailRedirectTo = getRedirectTo(returnPath)
 
-      if (typeof window !== 'undefined' && isValidReturnPath(currentPath)) {
-        localStorage.setItem('auth-return-url', currentPath)
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('auth-return-url', returnPath)
       }
 
       const { error } = await supabase.auth.signInWithOtp({

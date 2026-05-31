@@ -5,9 +5,13 @@ import type { ProjectCardData } from '@/components/project-card'
 
 type KeepExploringSectionProps = {
   projects: ProjectCardData[]
+  hasRecruiterAccess?: boolean
 }
 
-export function KeepExploringSection({ projects }: KeepExploringSectionProps) {
+export function KeepExploringSection({
+  projects,
+  hasRecruiterAccess = false,
+}: KeepExploringSectionProps) {
   if (!projects || projects.length === 0) return null
 
   return (
@@ -23,7 +27,7 @@ export function KeepExploringSection({ projects }: KeepExploringSectionProps) {
           </Link>
         </div>
 
-        <ProjectGrid projects={projects} />
+        <ProjectGrid projects={projects} hasRecruiterAccess={hasRecruiterAccess} />
       </div>
     </section>
   )

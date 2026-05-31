@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 import { sanityFetch } from '@/sanity/client'
-import { ALL_CASE_STUDY_SLUGS_QUERY } from '@/sanity/queries'
 import {
+  CASE_STUDY_TEASER_BY_SLUG,
   CASE_STUDY_WITH_BLOCKS,
   PUBLISHED_CASE_STUDIES,
   caseStudiesTag,
@@ -11,34 +11,47 @@ import {
 import type { CaseStudy } from '@/sanity/queries'
 
 import { CaseStudyLayout } from '@/components/case-study-layout'
+import { CaseStudyAccessGate } from '@/components/case-study-access-gate'
+import { getPortfolioAccessState } from '@/lib/portfolio-access'
 
-type PageProps = { params: Promise<{ slug: string }> }
+export const dynamic = 'force-dynamic'
 
-export async function generateStaticParams() {
-  const slugs = await sanityFetch<{ slug: string }[]>(
-    ALL_CASE_STUDY_SLUGS_QUERY,
-    {},
-    { tag: 'caseStudy' },
-  )
-  return slugs.map(({ slug }) => ({ slug }))
+type PageProps = {
+  params: Promise<{ slug: string }>
+  searchParams?: Promise<{ access?: string }>
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
   const { slug } = await props.params
   const data = await sanityFetch<CaseStudy | null>(
-    CASE_STUDY_WITH_BLOCKS,
+    CASE_STUDY_TEASER_BY_SLUG,
     { slug },
     { tag: `caseStudy:${slug}` },
   )
   if (!data) return { title: 'Case Study not found' }
   return {
-    title: data.seoSettings?.metaTitle || data.title,
-    description: data.seoSettings?.metaDescription || data.summary || undefined,
+    title: data.title,
+    description: data.summary || undefined,
   }
 }
 
 export default async function CaseStudyPage(props: PageProps) {
   const { slug } = await props.params
+  const searchParams = await props.searchParams
+  const [teaser, accessState] = await Promise.all([
+    sanityFetch<CaseStudy | null>(
+      CASE_STUDY_TEASER_BY_SLUG,
+      { slug },
+      { tag: `caseStudy:${slug}` },
+    ),
+    getPortfolioAccessState(),
+  ])
+  if (!teaser) return notFound()
+
+  if (teaser.visibility === 'recruiter' && !accessState.hasRecruiterAccess) {
+    return <CaseStudyAccessGate study={teaser} denied={searchParams?.access === 'denied'} />
+  }
+
   const [data, allStudies] = await Promise.all([
     sanityFetch<CaseStudy | null>(CASE_STUDY_WITH_BLOCKS, { slug }, { tag: `caseStudy:${slug}` }),
     sanityFetch<CaseStudy[]>(PUBLISHED_CASE_STUDIES, {}, { tag: caseStudiesTag }),
@@ -47,5 +60,11 @@ export default async function CaseStudyPage(props: PageProps) {
 
   const otherStudies = allStudies.filter((study) => study.slug.current !== slug).slice(0, 3)
 
-  return <CaseStudyLayout data={data} otherStudies={otherStudies} />
+  return (
+    <CaseStudyLayout
+      data={data}
+      otherStudies={otherStudies}
+      hasRecruiterAccess={accessState.hasRecruiterAccess}
+    />
+  )
 }
