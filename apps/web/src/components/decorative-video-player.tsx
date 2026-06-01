@@ -9,9 +9,21 @@ import { cn } from '@/lib/utils'
 interface DecorativeVideoPlayerProps {
   playbackId: string
   className?: string
+  aspectRatio?: string
 }
 
-export function DecorativeVideoPlayer({ playbackId, className }: DecorativeVideoPlayerProps) {
+function toCssAspectRatio(ratio?: string): string {
+  if (!ratio) return '16 / 9'
+  const [w, h] = ratio.split(/[:/]/).map((n) => Number(n.trim()))
+  if (!w || !h || !Number.isFinite(w) || !Number.isFinite(h)) return '16 / 9'
+  return `${w} / ${h}`
+}
+
+export function DecorativeVideoPlayer({
+  playbackId,
+  className,
+  aspectRatio,
+}: DecorativeVideoPlayerProps) {
   const [isPlaying, setIsPlaying] = React.useState(true)
   const videoRef = React.useRef<HTMLVideoElement>(null)
 
@@ -28,11 +40,16 @@ export function DecorativeVideoPlayer({ playbackId, className }: DecorativeVideo
   }
 
   return (
-    <div className="relative group overflow-hidden rounded-[8px]">
+    <div
+      className={cn('relative group overflow-hidden rounded-[8px]', className)}
+      style={{ aspectRatio: toCssAspectRatio(aspectRatio) }}
+    >
       <DecorativeVideo
         ref={videoRef}
         playbackId={playbackId}
-        className={cn('w-full h-auto', className)}
+        className="absolute inset-0 h-full w-full"
+        // scale-[1.02]: overfills the rounded clip to prevent subpixel hairlines
+        videoClassName="block h-full w-full object-cover scale-[1.02] origin-center"
       />
 
       <div className="absolute bottom-4 right-4 z-10">

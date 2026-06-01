@@ -1,5 +1,5 @@
 import { groq } from 'next-sanity'
-import { IMAGE_PROJECTION } from '../queries'
+import { COVER_PROJECTION, IMAGE_PROJECTION, MUX_VIDEO_PROJECTION } from '../queries'
 
 export const caseStudyTag = (slug: string) => `caseStudy:${slug}`
 export const caseStudiesTag = 'caseStudies'
@@ -13,20 +13,22 @@ const CASE_STUDY_BLOCKS_PROJECTION = groq`{
   _type == 'videoBlock' => {
     ...,
     mode,
-    video{asset->{playbackId}}
+    video${MUX_VIDEO_PROJECTION}
   },
   _type == 'carouselBlock' => {
     ...,
     items[]{
       kind,
       image${IMAGE_PROJECTION},
-      video{asset->{playbackId}}
+      video${MUX_VIDEO_PROJECTION}
     }
   },
   _type == 'twoColumnImageBlock' => {
     ...,
     leftImage${IMAGE_PROJECTION},
-    rightImage${IMAGE_PROJECTION}
+    rightImage${IMAGE_PROJECTION},
+    leftVideo${MUX_VIDEO_PROJECTION},
+    rightVideo${MUX_VIDEO_PROJECTION}
   }
 }`
 
@@ -40,11 +42,12 @@ export const CASE_STUDY_WITH_BLOCKS = groq`
     publishedAt,
     seoSettings,
     slug,
+    cover${COVER_PROJECTION},
     coverImage${IMAGE_PROJECTION},
     headerMedia{
       type,
       image${IMAGE_PROJECTION},
-      video{asset->{playbackId}}
+      video${MUX_VIDEO_PROJECTION}
     },
     projectInfo,
 
@@ -62,11 +65,12 @@ export const CASE_STUDY_TEASER_BY_SLUG = groq`
     "visibility": coalesce(visibility, "public"),
     publishedAt,
     slug,
+    cover${COVER_PROJECTION},
     coverImage${IMAGE_PROJECTION},
     headerMedia{
       type,
       image${IMAGE_PROJECTION},
-      video{asset->{playbackId}}
+      video${MUX_VIDEO_PROJECTION}
     },
     projectInfo{
       sector,
@@ -84,11 +88,12 @@ export const PUBLISHED_CASE_STUDIES = groq`
     slug,
     featuredOrder,
     publishedAt,
+    cover${COVER_PROJECTION},
     coverImage${IMAGE_PROJECTION},
     headerMedia{
       type,
       image${IMAGE_PROJECTION},
-      video{asset->{playbackId}}
+      video${MUX_VIDEO_PROJECTION}
     },
     projectInfo
   }

@@ -1,5 +1,11 @@
 import { groq } from 'next-sanity'
-import { IMAGE_PROJECTION, type SanityImage } from '../queries'
+import {
+  COVER_PROJECTION,
+  IMAGE_PROJECTION,
+  MUX_VIDEO_PROJECTION,
+  type CoverMedia,
+  type SanityImage,
+} from '../queries'
 
 export const homePageTag = 'homePage'
 
@@ -15,7 +21,7 @@ export const HOME_PAGE_QUERY = groq`
     coverMedia{
       type,
       image${IMAGE_PROJECTION},
-      video{asset->{playbackId}}
+      video${MUX_VIDEO_PROJECTION}
     },
     programsSection{
       label,
@@ -37,6 +43,7 @@ export const HOME_PAGE_QUERY = groq`
         slug,
         summary,
         "visibility": coalesce(visibility, "public"),
+        cover${COVER_PROJECTION},
         coverImage${IMAGE_PROJECTION},
         projectInfo{
           sector,
@@ -60,7 +67,7 @@ export type HomePage = {
   coverMedia?: {
     type: 'image' | 'video'
     image?: SanityImage
-    video?: { asset: { playbackId: string } }
+    video?: { asset: { playbackId: string; aspectRatio?: string } }
   }
   programsSection?: {
     label?: string
@@ -82,7 +89,8 @@ export type HomePage = {
       slug: { current: string }
       summary: string
       visibility?: 'public' | 'recruiter'
-      coverImage: SanityImage
+      cover?: CoverMedia
+      coverImage?: SanityImage
       projectInfo?: {
         sector?: string[]
         year?: string

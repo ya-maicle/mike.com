@@ -4,6 +4,8 @@ import Link from 'next/link'
 
 import { SanityImage } from '@/components/sanity-image'
 import { DecorativeVideo } from '@/components/decorative-video'
+import { CoverMediaFill } from '@/components/cover-media-fill'
+import { resolveCover } from '@/lib/cover-media'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import * as Icons from '@/components/ui/icons'
@@ -25,12 +27,11 @@ export function WorkCaseStudyList({
     <div className="flex flex-col gap-8">
       {caseStudies.map((study, index) => {
         const href = `/work/${study.slug.current}`
-        const cover = study.coverImage
+        const cover = resolveCover(study.cover, study.coverImage)
         const header = study.headerMedia
         const heroVideoId = header?.type === 'video' ? header.video?.asset?.playbackId : undefined
         const heroImage = header?.type === 'image' ? header.image : null
-        const desktopImage = heroImage ?? cover
-        const hasMedia = Boolean(heroVideoId || desktopImage)
+        const hasMedia = Boolean(heroVideoId || heroImage || cover)
         const sector = study.projectInfo?.sector?.length
           ? study.projectInfo.sector.join(', ')
           : null
@@ -69,11 +70,11 @@ export function WorkCaseStudyList({
               <div className="order-first flex items-center lg:order-none lg:col-span-3 lg:p-4">
                 {cover ? (
                   <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-muted md:hidden">
-                    <SanityImage
-                      image={cover}
-                      className="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.025]"
+                    <CoverMediaFill
+                      cover={cover}
+                      className="transition-transform duration-300 ease-out group-hover:scale-[1.025]"
                       sizes="(min-width: 768px) 1px, 100vw"
-                      aspectRatio="1/1"
+                      imageAspectRatio="1/1"
                       priority={index === 0}
                     />
                     <div className="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-border" />
@@ -86,15 +87,23 @@ export function WorkCaseStudyList({
                       playbackId={heroVideoId}
                       className="pointer-events-none absolute inset-0 transition-transform duration-300 ease-out group-hover:scale-[1.025]"
                     />
-                  ) : desktopImage ? (
+                  ) : heroImage ? (
                     <SanityImage
-                      image={desktopImage}
+                      image={heroImage}
                       className="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.025]"
                       sizes="(min-width: 1024px) 60vw, (min-width: 768px) 100vw, 1px"
                       aspectRatio="16/9"
                       priority={index === 0}
                     />
-                  ) : null}
+                  ) : (
+                    <CoverMediaFill
+                      cover={cover}
+                      className="transition-transform duration-300 ease-out group-hover:scale-[1.025]"
+                      sizes="(min-width: 1024px) 60vw, (min-width: 768px) 100vw, 1px"
+                      imageAspectRatio="16/9"
+                      priority={index === 0}
+                    />
+                  )}
                   <div className="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-border" />
                 </div>
               </div>
