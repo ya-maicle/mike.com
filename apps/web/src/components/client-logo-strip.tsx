@@ -225,11 +225,36 @@ type LogoItem = {
 }
 
 const logos: LogoItem[] = [
-  { id: 'numan', label: 'Numan', Svg: NumanSvg, maxW: 'max-w-[100px]' },
-  { id: 'meta', label: 'Meta', Svg: MetaSvg, maxW: 'max-w-[100px]' },
-  { id: 'emirates', label: 'Emirates', Svg: EmiratesSvg, maxW: 'max-w-[100px]' },
-  { id: 'asus', label: 'Asus', Svg: AsusSvg, maxW: 'max-w-[100px]' },
-  { id: 'time-and-place', label: 'Time & Place', Svg: TimeAndPlaceSvg, maxW: 'max-w-[140px]' },
+  {
+    id: 'numan',
+    label: 'Numan',
+    Svg: NumanSvg,
+    maxW: 'max-w-[70px] md:max-w-[80px] lg:max-w-[96px] xl:max-w-[108px]',
+  },
+  {
+    id: 'meta',
+    label: 'Meta',
+    Svg: MetaSvg,
+    maxW: 'max-w-[70px] md:max-w-[80px] lg:max-w-[96px] xl:max-w-[108px]',
+  },
+  {
+    id: 'emirates',
+    label: 'Emirates',
+    Svg: EmiratesSvg,
+    maxW: 'max-w-[70px] md:max-w-[80px] lg:max-w-[96px] xl:max-w-[108px]',
+  },
+  {
+    id: 'asus',
+    label: 'Asus',
+    Svg: AsusSvg,
+    maxW: 'max-w-[70px] md:max-w-[80px] lg:max-w-[96px] xl:max-w-[108px]',
+  },
+  {
+    id: 'time-and-place',
+    label: 'Time & Place',
+    Svg: TimeAndPlaceSvg,
+    maxW: 'max-w-[96px] md:max-w-[110px] lg:max-w-[132px] xl:max-w-[148px]',
+  },
 ]
 
 export function ClientLogoStrip() {
@@ -241,24 +266,24 @@ export function ClientLogoStrip() {
       {/* Desktop: static flex row — logos revealed at breakpoints before they'd overflow */}
       <div className="hidden md:flex w-full" aria-hidden="true">
         {/* Numan: needs lg+ (4 logos × 224px = 896px ≤ 960px content at 1024px viewport) */}
-        <div className="hidden lg:flex flex-1 h-[114px] items-center justify-center">
+        <div className="hidden lg:flex flex-1 h-[96px] lg:h-[108px] xl:h-[120px] items-center justify-center">
           <NumanSvg className={cn('h-auto text-foreground', logos[0].maxW)} />
         </div>
 
-        <div className="flex flex-1 h-[114px] items-center justify-center">
+        <div className="flex flex-1 h-[96px] lg:h-[108px] xl:h-[120px] items-center justify-center">
           <MetaSvg className={cn('h-auto text-foreground', logos[1].maxW)} />
         </div>
 
-        <div className="flex flex-1 h-[114px] items-center justify-center">
+        <div className="flex flex-1 h-[96px] lg:h-[108px] xl:h-[120px] items-center justify-center">
           <EmiratesSvg className={cn('h-auto text-foreground', logos[2].maxW)} />
         </div>
 
-        <div className="flex flex-1 h-[114px] items-center justify-center">
+        <div className="flex flex-1 h-[96px] lg:h-[108px] xl:h-[120px] items-center justify-center">
           <AsusSvg className={cn('h-auto text-foreground', logos[3].maxW)} />
         </div>
 
         {/* Time & Place: needs xl+ (5 logos × 224px = 1120px ≤ 1216px content at 1280px viewport) */}
-        <div className="hidden xl:flex flex-1 h-[114px] items-center justify-center">
+        <div className="hidden xl:flex flex-1 h-[96px] lg:h-[108px] xl:h-[120px] items-center justify-center">
           <TimeAndPlaceSvg className={cn('h-auto text-foreground', logos[4].maxW)} />
         </div>
       </div>
@@ -269,7 +294,7 @@ export function ClientLogoStrip() {
           {[...logos, ...logos].map(({ id, Svg, maxW }, i) => (
             <div
               key={`${id}-${i}`}
-              className="w-[224px] shrink-0 h-[114px] flex items-center justify-center"
+              className="w-[180px] shrink-0 h-[80px] flex items-center justify-center"
             >
               <Svg className={cn('h-auto text-foreground', maxW)} />
             </div>
