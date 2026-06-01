@@ -6,6 +6,7 @@ import { gridCols } from '@/lib/grid-columns'
 import { SanityImage } from '@/components/sanity-image'
 import { MuxContentPlayer } from '@/components/mux-content-player'
 import { DecorativeVideoBlock } from '@/components/decorative-video-block'
+import { DecorativeVideoPlayer } from '@/components/decorative-video-player'
 import { CaseStudyCarousel } from '@/components/case-study-carousel'
 import { PortableText } from 'next-sanity'
 import { typographyComponents } from '@/components/portable-text-grid'
@@ -89,6 +90,7 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
         <div className={widthClass}>
           <DecorativeVideoBlock
             playbackId={playbackId}
+            aspectRatio={block.video?.asset?.aspectRatio}
             title={block.title}
             description={block.description}
           />
@@ -130,30 +132,36 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
   }
 
   if (block._type === 'twoColumnImageBlock') {
+    const renderColumn = (kind: string | undefined, image: any, video: any) => {
+      if (kind === 'video') {
+        const playbackId: string | undefined = video?.asset?.playbackId
+        if (!playbackId) return null
+        return (
+          <DecorativeVideoPlayer playbackId={playbackId} aspectRatio={video?.asset?.aspectRatio} />
+        )
+      }
+      if (!image) return null
+      return (
+        <>
+          <SanityImage
+            image={image}
+            className="w-full h-auto rounded-[8px]"
+            sizes="(max-width: 768px) 100vw, 50vw"
+            aspectRatio="auto"
+          />
+          {image?.caption && <div className="text-sm text-muted-foreground">{image.caption}</div>}
+        </>
+      )
+    }
+
     return (
       <section className="w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <SanityImage
-              image={block.leftImage}
-              className="w-full h-auto rounded-[8px]"
-              sizes="(max-width: 768px) 100vw, 50vw"
-              aspectRatio="auto"
-            />
-            {block.leftImage?.caption && (
-              <div className="text-sm text-muted-foreground">{block.leftImage.caption}</div>
-            )}
+            {renderColumn(block.leftKind, block.leftImage, block.leftVideo)}
           </div>
           <div className="space-y-2">
-            <SanityImage
-              image={block.rightImage}
-              className="w-full h-auto rounded-[8px]"
-              sizes="(max-width: 768px) 100vw, 50vw"
-              aspectRatio="auto"
-            />
-            {block.rightImage?.caption && (
-              <div className="text-sm text-muted-foreground">{block.rightImage.caption}</div>
-            )}
+            {renderColumn(block.rightKind, block.rightImage, block.rightVideo)}
           </div>
         </div>
       </section>

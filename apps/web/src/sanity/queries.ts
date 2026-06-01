@@ -5,6 +5,9 @@ import { groq } from 'next-sanity'
 export const IMAGE_ASSET_PROJECTION = groq`{ _id, url, metadata { lqip, dimensions } }`
 export const IMAGE_PROJECTION = groq`{..., asset->${IMAGE_ASSET_PROJECTION}}`
 
+export const MUX_VIDEO_PROJECTION = groq`{ asset->{ playbackId, "aspectRatio": data.aspect_ratio } }`
+export const COVER_PROJECTION = groq`{ type, image${IMAGE_PROJECTION}, video${MUX_VIDEO_PROJECTION} }`
+
 export const ALL_CASE_STUDY_SLUGS_QUERY = groq`
   *[_type == "caseStudy" && defined(slug.current)]{
     "slug": slug.current
@@ -20,6 +23,7 @@ export const CASE_STUDY_BY_SLUG_QUERY = groq`
     publishedAt,
     seoSettings,
     slug,
+    cover${COVER_PROJECTION},
     coverImage${IMAGE_PROJECTION},
     projectInfo,
 
@@ -31,7 +35,7 @@ export const CASE_STUDY_BY_SLUG_QUERY = groq`
       },
       _type == 'videoBlock' => {
         ...,
-        video{asset->{playbackId}}
+        video${MUX_VIDEO_PROJECTION}
       },
       _type == 'carouselBlock' => {
         ...,
@@ -77,7 +81,7 @@ export type ImageBlock = {
 export type VideoBlock = {
   _type: 'videoBlock'
   _key?: string
-  video: { asset: { playbackId: string } }
+  video: { asset: { playbackId: string; aspectRatio?: string } }
   title?: string
   description?: string
 }
@@ -96,8 +100,18 @@ export type CarouselBlock = {
 export type TwoColumnImageBlock = {
   _type: 'twoColumnImageBlock'
   _key?: string
-  leftImage: SanityImage
-  rightImage: SanityImage
+  leftKind?: 'image' | 'video'
+  rightKind?: 'image' | 'video'
+  leftImage?: SanityImage
+  rightImage?: SanityImage
+  leftVideo?: { asset?: { playbackId?: string; aspectRatio?: string } }
+  rightVideo?: { asset?: { playbackId?: string; aspectRatio?: string } }
+}
+
+export type CoverMedia = {
+  type?: 'image' | 'video'
+  image?: SanityImage
+  video?: { asset?: { playbackId?: string; aspectRatio?: string } }
 }
 
 export type CaseStudy = {
@@ -108,11 +122,13 @@ export type CaseStudy = {
   visibility?: 'public' | 'recruiter'
   slug: { current: string }
   publishedAt?: string
+  cover?: CoverMedia
+  /** @deprecated Legacy field; migrated into `cover`. Kept for fallback until the migration runs. */
   coverImage?: SanityImage
   headerMedia?: {
     type: 'image' | 'video'
     image?: SanityImage
-    video?: { asset: { playbackId: string } }
+    video?: { asset: { playbackId: string; aspectRatio?: string } }
   }
   projectInfo?: {
     client?: string

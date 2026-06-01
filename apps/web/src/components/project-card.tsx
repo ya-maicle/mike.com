@@ -2,8 +2,9 @@
 
 import * as React from 'react'
 import Link from 'next/link'
-import { SanityImage } from '@/components/sanity-image'
-import type { SanityImage as SanityImageType } from '@/sanity/queries'
+import { CoverMediaFill } from '@/components/cover-media-fill'
+import { resolveCover } from '@/lib/cover-media'
+import type { CoverMedia, SanityImage as SanityImageType } from '@/sanity/queries'
 import { Icon } from '@/components/ui/icon'
 import * as Icons from '@/components/ui/icons'
 import { useLoginModal } from '@/components/providers/login-modal-provider'
@@ -14,6 +15,7 @@ export type ProjectCardData = {
   slug: { current: string }
   summary?: string
   visibility?: 'public' | 'recruiter'
+  cover?: CoverMedia
   coverImage?: SanityImageType
   projectInfo?: {
     sector?: string[]
@@ -39,18 +41,17 @@ export function ProjectCard({ project, hasRecruiterAccess = false }: ProjectCard
     : undefined
   const href = `/work/${project.slug.current}`
   const isLocked = project.visibility === 'recruiter' && !hasRecruiterAccess
+  const cover = resolveCover(project.cover, project.coverImage)
 
   const content = (
     <>
       <div className="relative aspect-square mb-3 overflow-hidden rounded-lg bg-muted">
-        {project.coverImage?.asset && (
-          <SanityImage
-            image={project.coverImage}
-            className="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-[1.025]"
-            sizes="(max-width: 768px) 85vw, (max-width: 1200px) 33vw, 450px"
-            aspectRatio="1/1"
-          />
-        )}
+        <CoverMediaFill
+          cover={cover}
+          className="transition-transform duration-300 ease-out group-hover:scale-[1.025]"
+          sizes="(max-width: 768px) 85vw, (max-width: 1200px) 33vw, 450px"
+          imageAspectRatio="1/1"
+        />
       </div>
 
       <div className="space-y-2">

@@ -10,7 +10,7 @@ import type { SanityImage as SanityImageType } from '@/sanity/queries'
 
 type CoverMedia =
   | { type: 'image'; image: SanityImageType }
-  | { type: 'video'; video: { asset: { playbackId: string } } }
+  | { type: 'video'; video: { asset: { playbackId: string; aspectRatio?: string } } }
 
 interface PageTemplateProps {
   /** Page title (uses h2 styling) */
@@ -78,7 +78,7 @@ export function PageTemplate({
             {coverMedia.type === 'video' && coverMedia.video?.asset?.playbackId ? (
               <DecorativeVideoPlayer
                 playbackId={coverMedia.video.asset.playbackId}
-                className="max-h-[90vh] object-cover"
+                aspectRatio={coverMedia.video.asset.aspectRatio}
               />
             ) : coverMedia.type === 'image' && coverMedia.image ? (
               <SanityImage

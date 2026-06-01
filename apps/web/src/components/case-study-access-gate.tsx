@@ -6,6 +6,7 @@ import { Icon } from '@/components/ui/icon'
 import * as Icons from '@/components/ui/icons'
 import { gridCols } from '@/lib/grid-columns'
 import { useLoginModal } from '@/components/providers/login-modal-provider'
+import { resolveStudyCoverMedia } from '@/lib/cover-media'
 import type { CaseStudy } from '@/sanity/queries'
 
 type CaseStudyAccessGateProps = {
@@ -16,14 +17,7 @@ type CaseStudyAccessGateProps = {
 export function CaseStudyAccessGate({ study, denied = false }: CaseStudyAccessGateProps) {
   const { openLogin } = useLoginModal()
   const href = `/work/${study.slug.current}`
-  const coverMedia =
-    study.headerMedia?.type === 'video' && study.headerMedia?.video?.asset?.playbackId
-      ? { type: 'video' as const, video: study.headerMedia.video }
-      : study.headerMedia?.image
-        ? { type: 'image' as const, image: study.headerMedia.image }
-        : study.coverImage
-          ? { type: 'image' as const, image: study.coverImage }
-          : undefined
+  const coverMedia = resolveStudyCoverMedia(study.headerMedia, study.cover, study.coverImage)
 
   return (
     <PageTemplate

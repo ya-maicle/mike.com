@@ -11,6 +11,7 @@ import { gridComponents } from '@/components/portable-text-grid'
 import { KeepExploringSection } from '@/components/keep-exploring-section'
 import type { ProjectCardData } from '@/components/project-card'
 import type { CaseStudy } from '@/sanity/queries'
+import { resolveStudyCoverMedia } from '@/lib/cover-media'
 import { cn } from '@/lib/utils'
 import { createPortal } from 'react-dom'
 
@@ -80,15 +81,7 @@ export function CaseStudyLayout({
           }
           subtitle={data.summary}
           className="pb-0"
-          coverMedia={
-            data.headerMedia?.type === 'video' && data.headerMedia?.video?.asset?.playbackId
-              ? { type: 'video', video: data.headerMedia.video }
-              : data.headerMedia?.image
-                ? { type: 'image', image: data.headerMedia.image }
-                : data.coverImage
-                  ? { type: 'image', image: data.coverImage }
-                  : undefined
-          }
+          coverMedia={resolveStudyCoverMedia(data.headerMedia, data.cover, data.coverImage)}
         >
           {data.content && <PortableText value={data.content} components={gridComponents} />}
           {otherStudies && (
