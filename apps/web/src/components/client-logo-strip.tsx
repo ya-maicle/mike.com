@@ -232,10 +232,6 @@ const logos: LogoItem[] = [
   { id: 'time-and-place', label: 'Time & Place', Svg: TimeAndPlaceSvg, maxW: 'max-w-[140px]' },
 ]
 
-function Divider({ className }: { className?: string }) {
-  return <div className={cn('w-px bg-border self-stretch', className)} />
-}
-
 export function ClientLogoStrip() {
   return (
     <div>
@@ -243,41 +239,37 @@ export function ClientLogoStrip() {
       <p className="sr-only">Clients include: {logos.map((l) => l.label).join(', ')}</p>
 
       {/* Desktop: static flex row — logos revealed at breakpoints before they'd overflow */}
-      <div className="hidden md:flex w-full border-y border-border" aria-hidden="true">
+      <div className="hidden md:flex w-full" aria-hidden="true">
         {/* Numan: needs lg+ (4 logos × 224px = 896px ≤ 960px content at 1024px viewport) */}
         <div className="hidden lg:flex flex-1 h-[114px] items-center justify-center">
           <NumanSvg className={cn('h-auto text-foreground', logos[0].maxW)} />
         </div>
-        <Divider className="hidden lg:block" />
 
         <div className="flex flex-1 h-[114px] items-center justify-center">
           <MetaSvg className={cn('h-auto text-foreground', logos[1].maxW)} />
         </div>
-        <Divider />
 
         <div className="flex flex-1 h-[114px] items-center justify-center">
           <EmiratesSvg className={cn('h-auto text-foreground', logos[2].maxW)} />
         </div>
-        <Divider />
 
         <div className="flex flex-1 h-[114px] items-center justify-center">
           <AsusSvg className={cn('h-auto text-foreground', logos[3].maxW)} />
         </div>
 
         {/* Time & Place: needs xl+ (5 logos × 224px = 1120px ≤ 1216px content at 1280px viewport) */}
-        <Divider className="hidden xl:block" />
         <div className="hidden xl:flex flex-1 h-[114px] items-center justify-center">
           <TimeAndPlaceSvg className={cn('h-auto text-foreground', logos[4].maxW)} />
         </div>
       </div>
 
       {/* Mobile: infinite marquee — all 5 logos, duplicated for seamless loop */}
-      <div className="flex md:hidden overflow-hidden border-y border-border" aria-hidden="true">
+      <div className="flex md:hidden overflow-hidden" aria-hidden="true">
         <div className="flex motion-safe:animate-marquee">
           {[...logos, ...logos].map(({ id, Svg, maxW }, i) => (
             <div
               key={`${id}-${i}`}
-              className="w-[224px] shrink-0 h-[114px] flex items-center justify-center border-r border-border"
+              className="w-[224px] shrink-0 h-[114px] flex items-center justify-center"
             >
               <Svg className={cn('h-auto text-foreground', maxW)} />
             </div>

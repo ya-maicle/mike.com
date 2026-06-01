@@ -28,7 +28,7 @@ export default async function WorkPage() {
   return (
     <div className="flex flex-col pb-16 md:pb-24">
       <div className="max-w-[var(--content-max-width)] mx-auto w-full">
-        <header className="max-w-[592px] mx-auto text-center flex flex-col items-center pt-4 md:pt-6 pb-12 md:pb-16 space-y-4 md:space-y-6">
+        <header className="max-w-[592px] mx-auto text-center flex flex-col items-center pt-4 md:pt-6 pb-8 md:pb-10 space-y-4 md:space-y-6">
           <div className="flex items-center gap-4 text-sm font-normal text-foreground">
             <span>Work Archive</span>
           </div>
@@ -41,6 +41,8 @@ export default async function WorkPage() {
       </div>
 
       <ClientLogoStrip />
+
+      <div className="pb-8 md:pb-10" />
 
       <WorkCaseStudyList
         caseStudies={caseStudies}
