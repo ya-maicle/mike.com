@@ -1,5 +1,3 @@
-import { cn } from '@/lib/utils'
-
 function NumanSvg({ className }: { className?: string }) {
   return (
     <svg
@@ -217,90 +215,16 @@ function TimeAndPlaceSvg({ className }: { className?: string }) {
   )
 }
 
-type LogoItem = {
+export type LogoItem = {
   id: string
   label: string
   Svg: (props: { className?: string }) => React.JSX.Element
-  maxW: string
 }
 
-const logos: LogoItem[] = [
-  {
-    id: 'numan',
-    label: 'Numan',
-    Svg: NumanSvg,
-    maxW: 'max-w-[70px] md:max-w-[80px] lg:max-w-[96px] xl:max-w-[108px]',
-  },
-  {
-    id: 'meta',
-    label: 'Meta',
-    Svg: MetaSvg,
-    maxW: 'max-w-[70px] md:max-w-[80px] lg:max-w-[96px] xl:max-w-[108px]',
-  },
-  {
-    id: 'emirates',
-    label: 'Emirates',
-    Svg: EmiratesSvg,
-    maxW: 'max-w-[70px] md:max-w-[80px] lg:max-w-[96px] xl:max-w-[108px]',
-  },
-  {
-    id: 'asus',
-    label: 'Asus',
-    Svg: AsusSvg,
-    maxW: 'max-w-[70px] md:max-w-[80px] lg:max-w-[96px] xl:max-w-[108px]',
-  },
-  {
-    id: 'time-and-place',
-    label: 'Time & Place',
-    Svg: TimeAndPlaceSvg,
-    maxW: 'max-w-[96px] md:max-w-[110px] lg:max-w-[132px] xl:max-w-[148px]',
-  },
+export const logos: LogoItem[] = [
+  { id: 'numan', label: 'Numan', Svg: NumanSvg },
+  { id: 'meta', label: 'Meta', Svg: MetaSvg },
+  { id: 'emirates', label: 'Emirates', Svg: EmiratesSvg },
+  { id: 'asus', label: 'Asus', Svg: AsusSvg },
+  { id: 'time-and-place', label: 'Time & Place', Svg: TimeAndPlaceSvg },
 ]
-
-export function ClientLogoStrip() {
-  return (
-    <div>
-      {/* Screen reader label — visible to AT on all viewport sizes */}
-      <p className="sr-only">Clients include: {logos.map((l) => l.label).join(', ')}</p>
-
-      {/* Desktop: static flex row — logos revealed at breakpoints before they'd overflow */}
-      <div className="hidden md:flex w-full" aria-hidden="true">
-        {/* Numan: needs lg+ (4 logos × 224px = 896px ≤ 960px content at 1024px viewport) */}
-        <div className="hidden lg:flex flex-1 h-[96px] lg:h-[108px] xl:h-[120px] items-center justify-center">
-          <NumanSvg className={cn('h-auto text-foreground', logos[0].maxW)} />
-        </div>
-
-        <div className="flex flex-1 h-[96px] lg:h-[108px] xl:h-[120px] items-center justify-center">
-          <MetaSvg className={cn('h-auto text-foreground', logos[1].maxW)} />
-        </div>
-
-        <div className="flex flex-1 h-[96px] lg:h-[108px] xl:h-[120px] items-center justify-center">
-          <EmiratesSvg className={cn('h-auto text-foreground', logos[2].maxW)} />
-        </div>
-
-        <div className="flex flex-1 h-[96px] lg:h-[108px] xl:h-[120px] items-center justify-center">
-          <AsusSvg className={cn('h-auto text-foreground', logos[3].maxW)} />
-        </div>
-
-        {/* Time & Place: needs xl+ (5 logos × 224px = 1120px ≤ 1216px content at 1280px viewport) */}
-        <div className="hidden xl:flex flex-1 h-[96px] lg:h-[108px] xl:h-[120px] items-center justify-center">
-          <TimeAndPlaceSvg className={cn('h-auto text-foreground', logos[4].maxW)} />
-        </div>
-      </div>
-
-      {/* Mobile: infinite marquee — bleeds to viewport edges by cancelling the layout's px-6 padding */}
-      <div className="flex md:hidden overflow-hidden -ml-6 w-[calc(100%+3rem)]" aria-hidden="true">
-        <div className="flex motion-safe:animate-marquee">
-          {[...logos, ...logos].map(({ id, Svg, maxW }, i) => (
-            <div
-              key={`${id}-${i}`}
-              className="w-[180px] shrink-0 h-[80px] flex items-center justify-center"
-            >
-              <Svg className={cn('h-auto text-foreground', maxW)} />
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  )
-}
