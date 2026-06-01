@@ -63,21 +63,61 @@ export const caseStudy = defineType({
     }),
 
     defineField({
-      name: 'coverImage',
-      title: 'Cover Image',
-      type: 'image',
-      options: {
-        hotspot: true,
-      },
+      name: 'cover',
+      title: 'Cover',
+      description:
+        'Cover media shown on cards and as the hero fallback. Choose Image or Video, then upload the asset.',
+      type: 'object',
+      options: { collapsed: false, collapsible: false },
       fields: [
-        {
-          name: 'alt',
+        defineField({
+          name: 'type',
+          title: 'Media Type',
           type: 'string',
-          title: 'Alt text',
+          options: {
+            list: [
+              { title: 'Image', value: 'image' },
+              { title: 'Video', value: 'video' },
+            ],
+            layout: 'radio',
+          },
+          initialValue: 'image',
           validation: (Rule) => Rule.required(),
-        },
+        }),
+        defineField({
+          name: 'image',
+          title: 'Image',
+          type: 'image',
+          options: { hotspot: true },
+          hidden: ({ parent }) => parent?.type !== 'image',
+          fields: [
+            {
+              name: 'alt',
+              type: 'string',
+              title: 'Alt text',
+              validation: (Rule) => Rule.required(),
+            },
+          ],
+          validation: (Rule) =>
+            Rule.custom((value, context) => {
+              const parent = context.parent as { type?: string } | undefined
+              if (parent?.type === 'image' && !value) return 'An image is required'
+              return true
+            }),
+        }),
+        defineField({
+          name: 'video',
+          title: 'Video',
+          type: 'mux.video',
+          hidden: ({ parent }) => parent?.type !== 'video',
+          validation: (Rule) =>
+            Rule.custom((value, context) => {
+              const parent = context.parent as { type?: string } | undefined
+              if (parent?.type === 'video' && !value) return 'A video is required'
+              return true
+            }),
+        }),
       ],
-      validation: (Rule) => Rule.required(),
     }),
 
     defineField({
@@ -223,7 +263,7 @@ export const caseStudy = defineType({
   preview: {
     select: {
       title: 'title',
-      media: 'coverImage',
+      media: 'cover.image',
     },
     prepare({ title, media }) {
       return {

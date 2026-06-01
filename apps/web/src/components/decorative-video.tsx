@@ -22,22 +22,17 @@ export const DecorativeVideo = React.forwardRef<HTMLVideoElement | null, Decorat
     ref,
   ) {
     const containerRef = React.useRef<HTMLDivElement>(null)
-    const playerRef = React.useRef<HTMLVideoElement | null>(null)
-    React.useImperativeHandle<HTMLVideoElement | null, HTMLVideoElement | null>(
-      ref,
-      () => playerRef.current,
-      [],
-    )
 
-    const [isVisible, setIsVisible] = React.useState(false)
+    const [hasBeenVisible, setHasBeenVisible] = React.useState(false)
 
     React.useEffect(() => {
       const container = containerRef.current
       if (!container) return
       const observer = new IntersectionObserver(
         (entries) => {
-          for (const entry of entries) {
-            setIsVisible(entry.isIntersecting)
+          if (entries[0]?.isIntersecting) {
+            setHasBeenVisible(true)
+            observer.disconnect()
           }
         },
         { rootMargin: '200px' },
@@ -48,9 +43,9 @@ export const DecorativeVideo = React.forwardRef<HTMLVideoElement | null, Decorat
 
     return (
       <div ref={containerRef} className={className}>
-        {isVisible ? (
+        {hasBeenVisible ? (
           <MuxContentPlayer
-            ref={playerRef}
+            ref={ref}
             playbackId={playbackId}
             poster={poster}
             autoPlay

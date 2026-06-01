@@ -4,7 +4,7 @@ import { sanityFetch, sanityNoStoreFetch } from '@/sanity/client'
 import { PageTemplate } from '@/components/page-template'
 import { LegalPageContent } from '@/components/legal-page-content'
 import type { PortableTextBlock } from '@portabletext/types'
-import { IMAGE_PROJECTION, type SanityImage } from '@/sanity/queries'
+import { IMAGE_PROJECTION, MUX_VIDEO_PROJECTION, type SanityImage } from '@/sanity/queries'
 import {
   ACTIVE_PORTFOLIO_ACCESS_PROFILE_BY_SLUG,
   type PortfolioAccessProfile,
@@ -12,7 +12,7 @@ import {
 
 type CoverMedia =
   | { type: 'image'; image: SanityImage }
-  | { type: 'video'; video: { asset: { playbackId: string } } }
+  | { type: 'video'; video: { asset: { playbackId: string; aspectRatio?: string } } }
 
 type PageData = {
   _id: string
@@ -88,7 +88,7 @@ export default async function DynamicPage(props: PageProps) {
       coverMedia {
         type,
         image${IMAGE_PROJECTION},
-        video { asset->{ playbackId } }
+        video${MUX_VIDEO_PROJECTION}
       },
       content[]{
         ...,
@@ -98,7 +98,7 @@ export default async function DynamicPage(props: PageProps) {
         },
         _type == 'videoBlock' => {
           ...,
-          video{asset->{playbackId}}
+          video${MUX_VIDEO_PROJECTION}
         },
         _type == 'carouselBlock' => {
           ...,
