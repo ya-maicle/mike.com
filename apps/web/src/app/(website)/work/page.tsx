@@ -3,6 +3,7 @@ import { sanityFetch } from '@/sanity/client'
 import { PUBLISHED_CASE_STUDIES } from '@/sanity/queries/case-study-queries'
 import type { CaseStudy } from '@/sanity/queries'
 import { WorkCaseStudyList } from '@/components/work-case-study-list'
+import { ClientLogoStrip } from '@/components/client-logo-strip'
 import { getPortfolioAccessState } from '@/lib/portfolio-access'
 
 export const dynamic = 'force-dynamic'
@@ -38,6 +39,8 @@ export default async function WorkPage() {
           </p>
         </header>
       </div>
+
+      <ClientLogoStrip />
 
       <WorkCaseStudyList
         caseStudies={caseStudies}
