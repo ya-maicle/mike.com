@@ -8,6 +8,7 @@ import { SanityImage } from '@/components/sanity-image'
 import { DecorativeVideoBlock } from '@/components/decorative-video-block'
 import { ProgramsSection } from '@/components/programs-section'
 import { FeaturedWorkSection } from '@/components/featured-work-section'
+import { HomeLogoStrip } from '@/components/home-logo-strip'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { getPortfolioAccessState } from '@/lib/portfolio-access'
@@ -35,7 +36,7 @@ export default async function Home() {
   return (
     <ContentGrid>
       <section
-        className={`${gridCols.wide} min-h-[calc(80dvh-56px)] md:min-h-[calc(80dvh-64px)] pt-4 md:pt-6 pb-12 md:pb-16 flex flex-col items-center justify-center text-center`}
+        className={`${gridCols.wide} min-h-[calc(80dvh-112px)] md:min-h-[calc(80dvh-128px)] pt-4 md:pt-6 pb-12 md:pb-16 flex flex-col items-center justify-center text-center`}
       >
         {/* Tagline */}
         <h1 className="font-normal whitespace-nowrap text-[7vw] md:text-[5vw] lg:text-[min(4.5vw,64px)] leading-none mb-6 md:mb-8">
@@ -70,10 +71,14 @@ export default async function Home() {
         )}
       </section>
 
+      <section className={`${gridCols.full}`}>
+        <HomeLogoStrip />
+      </section>
+
       {/* Media Block - renders if coverMedia exists in Sanity */}
       {data?.coverMedia && (
         <section
-          className={`${gridCols.full} my-12 md:my-16 aspect-video rounded-[8px] overflow-hidden`}
+          className={`${gridCols.full} mt-6 md:mt-8 mb-12 md:mb-16 aspect-video rounded-[8px] overflow-hidden`}
         >
           {data.coverMedia.type === 'image' && data.coverMedia.image?.asset ? (
             <SanityImage
@@ -96,7 +101,7 @@ export default async function Home() {
       {/* Placeholder if no coverMedia exists yet */}
       {!data?.coverMedia && (
         <section
-          className={`${gridCols.full} my-12 md:my-16 aspect-video bg-secondary rounded-[8px] overflow-hidden`}
+          className={`${gridCols.full} mt-6 md:mt-8 mb-12 md:mb-16 aspect-video bg-secondary rounded-[8px] overflow-hidden`}
         />
       )}
 
