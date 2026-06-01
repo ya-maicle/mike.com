@@ -263,8 +263,8 @@ export function ClientLogoStrip() {
         </div>
       </div>
 
-      {/* Mobile: infinite marquee — all 5 logos, duplicated for seamless loop */}
-      <div className="flex md:hidden overflow-hidden" aria-hidden="true">
+      {/* Mobile: infinite marquee — bleeds to viewport edges by cancelling the layout's px-6 padding */}
+      <div className="flex md:hidden overflow-hidden -ml-6 w-[calc(100%+3rem)]" aria-hidden="true">
         <div className="flex motion-safe:animate-marquee">
           {[...logos, ...logos].map(({ id, Svg, maxW }, i) => (
             <div
