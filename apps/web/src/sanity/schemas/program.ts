@@ -1,18 +1,17 @@
 import { defineType, defineField } from 'sanity'
-import { blockStyles } from './objects/block-styles'
 
 export const program = defineType({
   name: 'program',
-  title: 'Program',
+  title: 'Strength',
   type: 'document',
-  description: 'A "Ways I help" program with its own page',
+  description: 'A strength page — what you bring to a team',
 
   fields: [
     defineField({
       name: 'title',
       title: 'Title',
       type: 'string',
-      description: 'Program name (e.g. "Brand Refresh")',
+      description: 'Strength name (e.g. "Finding the direction")',
       validation: (Rule) => Rule.required().min(3).max(100),
     }),
 
@@ -32,7 +31,7 @@ export const program = defineType({
       name: 'featuredOrder',
       title: 'Display Order',
       description:
-        'Position in the home list and /programs index. Lower numbers appear first. Leave blank to sort by title.',
+        'Position in the home list and /strengths index. Lower numbers appear first. Leave blank to sort by title.',
       type: 'number',
       validation: (Rule) => Rule.integer().min(0),
     }),
@@ -43,7 +42,7 @@ export const program = defineType({
       type: 'text',
       rows: 2,
       description:
-        'Short one-liner shown beside the title in the home "Ways I help" list (e.g. "When teams are debating instead of deciding.")',
+        'Short one-liner shown beside the title in the home strengths list (e.g. "Turning uncertainty into a clear plan and concrete decisions.")',
       validation: (Rule) => Rule.required().max(200),
     }),
 
@@ -52,7 +51,7 @@ export const program = defineType({
       title: 'Tagline',
       type: 'string',
       description:
-        'Punchy slogan shown above the title on the program page (e.g. "Stay Relevant. Stay Valuable.")',
+        'Shown above the title on the strength page (e.g. "Find the signal. Name the direction.")',
     }),
 
     defineField({
@@ -60,41 +59,125 @@ export const program = defineType({
       title: 'Summary',
       type: 'text',
       rows: 3,
-      description: 'Descriptive paragraph used as the page subtitle and SEO description',
+      description: 'Subtitle shown in the hero and used for SEO description',
       validation: (Rule) => Rule.required().min(20).max(400),
     }),
 
     defineField({
       name: 'heroExamples',
-      title: 'Hero Examples',
-      description:
-        'Case studies that represent this program. Shown as a gallery in place of a hero image (2-4).',
+      title: 'Case Studies',
+      description: 'Case studies shown in the hero slider for this strength.',
       type: 'array',
       of: [
         {
-          type: 'reference',
-          to: [{ type: 'caseStudy' }],
+          type: 'object',
+          name: 'proofStudy',
+          title: 'Case Study',
+          fields: [
+            defineField({
+              name: 'study',
+              title: 'Case Study',
+              type: 'reference',
+              to: [{ type: 'caseStudy' }],
+              validation: (Rule) => Rule.required(),
+            }),
+          ],
+          preview: {
+            select: {
+              title: 'study.title',
+              media: 'study.coverImage',
+            },
+          },
         },
       ],
       validation: (Rule) => Rule.required().min(1).max(4),
     }),
 
     defineField({
-      name: 'content',
-      title: 'Content',
-      description: 'Page content blocks (program details). Rendered below the hero.',
+      name: 'thesis',
+      title: 'Thesis',
+      type: 'text',
+      rows: 6,
+      description:
+        'The problem-cost statement. First person, from experience. What expensive problem have you walked into? What does it cost? No colons or em-dashes.',
+    }),
+
+    defineField({
+      name: 'approachIntro',
+      title: 'Approach Intro',
+      type: 'text',
+      rows: 3,
+      description:
+        'Short paragraph shown above the move cards under "The approach." (e.g. "Here is how I typically navigate this…")',
+    }),
+
+    defineField({
+      name: 'moves',
+      title: 'How — Moves',
+      description: '3 named moves that describe your method for this strength.',
       type: 'array',
       of: [
         {
-          type: 'block',
-          styles: blockStyles,
+          type: 'object',
+          name: 'move',
+          title: 'Move',
+          fields: [
+            defineField({
+              name: 'title',
+              title: 'Title',
+              type: 'string',
+              description: 'Verb-led move title (e.g. "Map what actually matters")',
+              validation: (Rule) => Rule.required().max(80),
+            }),
+            defineField({
+              name: 'body',
+              title: 'Body',
+              type: 'text',
+              rows: 3,
+              description: '1–3 short sentences explaining this move',
+              validation: (Rule) => Rule.required().max(300),
+            }),
+            defineField({
+              name: 'media',
+              title: 'Media',
+              type: 'object',
+              description: 'Square image or short video shown on the card',
+              fields: [
+                defineField({
+                  name: 'type',
+                  title: 'Type',
+                  type: 'string',
+                  options: {
+                    list: [
+                      { title: 'Image', value: 'image' },
+                      { title: 'Video', value: 'video' },
+                    ],
+                    layout: 'radio',
+                  },
+                  initialValue: 'image',
+                }),
+                defineField({
+                  name: 'image',
+                  title: 'Image',
+                  type: 'image',
+                  options: { hotspot: true },
+                  hidden: ({ parent }) => parent?.type !== 'image',
+                }),
+                defineField({
+                  name: 'video',
+                  title: 'Video',
+                  type: 'mux.video',
+                  hidden: ({ parent }) => parent?.type !== 'video',
+                }),
+              ],
+            }),
+          ],
+          preview: {
+            select: { title: 'title', subtitle: 'body' },
+          },
         },
-        { type: 'imageBlock' },
-        { type: 'videoBlock' },
-        { type: 'carouselBlock' },
-        { type: 'spacerBlock' },
-        { type: 'twoColumnImageBlock' },
       ],
+      validation: (Rule) => Rule.max(4),
     }),
 
     defineField({
@@ -130,14 +213,10 @@ export const program = defineType({
     select: {
       title: 'title',
       subtitle: 'homeListDescription',
-      media: 'heroExamples.0.coverImage',
+      media: 'heroExamples.0.study.coverImage',
     },
     prepare({ title, subtitle, media }) {
-      return {
-        title,
-        subtitle,
-        media,
-      }
+      return { title, subtitle, media }
     },
   },
 })

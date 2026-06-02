@@ -15,6 +15,7 @@ import { UserMenu } from '@/components/user-menu'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Footer } from '@/components/footer'
+import { isStrengthDetailPath } from '@/lib/program-display'
 
 export function HeaderWithNavLayout({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = React.useState(false)
@@ -257,7 +258,12 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
         style={isMobile ? { transform: navOpen ? 'translateX(80vw)' : 'translateX(0)' } : undefined}
       >
         {/* Content Area */}
-        <main className="px-6 md:px-8 py-6 md:py-8">
+        <main
+          className={cn(
+            'px-6 md:px-8 pt-6 md:pt-8',
+            isStrengthDetailPath(pathname) ? 'pb-0' : 'pb-6 md:pb-8',
+          )}
+        >
           <div className="max-w-[var(--content-max-width)] mx-auto">{children}</div>
         </main>
         <Footer />

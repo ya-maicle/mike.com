@@ -13,18 +13,27 @@ type ProgramHeroExamplesProps = {
   examples?: ProgramHeroExample[]
 }
 
+type ValidProgramHeroExample = ProgramHeroExample & {
+  study: NonNullable<ProgramHeroExample['study']>
+}
+
 export function ProgramHeroExamples({ examples }: ProgramHeroExamplesProps) {
   const [api, setApi] = React.useState<CarouselApi>()
 
-  if (!examples || examples.length === 0) return null
+  const validExamples =
+    examples?.filter((example): example is ValidProgramHeroExample =>
+      Boolean(example.study?._id && example.study.slug?.current),
+    ) ?? []
+  if (validExamples.length === 0) return null
 
-  const slideInner = (example: ProgramHeroExample) => {
+  const slideInner = (example: ValidProgramHeroExample) => {
+    const { study } = example
     const isVideo =
-      example.headerMedia?.type === 'video' && example.headerMedia.video?.asset?.playbackId
+      study.headerMedia?.type === 'video' && study.headerMedia.video?.asset?.playbackId
     const image =
-      example.headerMedia?.type === 'image' && example.headerMedia.image
-        ? example.headerMedia.image
-        : example.coverImage
+      study.headerMedia?.type === 'image' && study.headerMedia.image
+        ? study.headerMedia.image
+        : study.coverImage
 
     return (
       // Safari bug: aspect-ratio + absolutely-positioned children causes incorrect layout.
@@ -32,7 +41,7 @@ export function ProgramHeroExamples({ examples }: ProgramHeroExamplesProps) {
       <div className="relative w-full bg-muted" style={{ paddingBottom: '56.25%' }}>
         {isVideo ? (
           <DecorativeVideo
-            playbackId={example.headerMedia!.video!.asset.playbackId}
+            playbackId={study.headerMedia!.video!.asset.playbackId}
             className="absolute inset-0 w-full h-full"
             videoClassName="object-cover"
           />
@@ -48,26 +57,26 @@ export function ProgramHeroExamples({ examples }: ProgramHeroExamplesProps) {
         ) : null}
 
         <Link
-          href={`/work/${example.slug.current}`}
+          href={`/work/${study.slug.current}`}
           className="absolute bottom-4 right-4 inline-flex items-center gap-1.5 rounded-full bg-background/80 px-4 py-2 text-sm font-medium text-foreground backdrop-blur-sm transition-colors hover:bg-background"
         >
-          {example.title}
+          {study.title}
           <ChevronRight className="size-4 shrink-0" />
         </Link>
       </div>
     )
   }
 
-  if (examples.length === 1) {
-    return <div className="rounded-[8px] overflow-hidden">{slideInner(examples[0])}</div>
+  if (validExamples.length === 1) {
+    return <div className="rounded-[8px] overflow-hidden">{slideInner(validExamples[0])}</div>
   }
 
   return (
     <div className="relative rounded-[8px] overflow-hidden">
       <Carousel setApi={setApi} opts={{ loop: true, align: 'start' }} className="w-full">
         <CarouselContent className="-ml-0">
-          {examples.map((example) => (
-            <CarouselItem key={example._id} className="pl-0 basis-full">
+          {validExamples.map((example) => (
+            <CarouselItem key={example.study._id} className="pl-0 basis-full">
               {slideInner(example)}
             </CarouselItem>
           ))}

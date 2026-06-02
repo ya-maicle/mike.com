@@ -19,20 +19,22 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
     { slug },
     { tag: programTag(slug) },
   )
-  if (!data) return { title: 'Program not found' }
+  if (!data) return { title: 'Strength not found' }
   return {
     title: data.seoSettings?.metaTitle || data.title,
     description: data.seoSettings?.metaDescription || data.summary,
   }
 }
 
-export default async function ProgramPage(props: PageProps) {
+export default async function StrengthPage(props: PageProps) {
   const { slug } = await props.params
+
   const data = await sanityFetch<Program | null>(
     PROGRAM_BY_SLUG,
     { slug },
     { tag: programTag(slug) },
   )
+
   if (!data) return notFound()
 
   return <ProgramLayout data={data} />

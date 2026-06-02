@@ -10,11 +10,11 @@ import { programPath } from '@/lib/program-display'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Programs',
-  description: 'Ways I help brands make progress.',
+  title: 'Strengths',
+  description: 'What I bring to a team.',
 }
 
-export default async function ProgramsPage() {
+export default async function StrengthsPage() {
   const programs = await sanityFetch<Program[]>(PUBLISHED_PROGRAMS, {}, { tag: programsTag })
 
   return (
@@ -22,12 +22,11 @@ export default async function ProgramsPage() {
       <div className="max-w-[var(--content-max-width)] mx-auto w-full px-4">
         <header className="max-w-[592px] mx-auto text-center flex flex-col items-center pt-4 md:pt-6 pb-12 md:pb-16 space-y-4 md:space-y-6">
           <div className="flex items-center gap-4 text-sm font-normal text-foreground">
-            <span>Ways I help brands</span>
+            <span>My strengths</span>
           </div>
-          <h1>Programs</h1>
+          <h1>What I bring</h1>
           <p className="text-xl text-foreground leading-relaxed max-w-prose mt-2">
-            Focused engagements for when momentum matters, ambiguity is high, and decisions need to
-            land.
+            Five things I do well. Each one with a clear purpose and real examples behind it.
           </p>
         </header>
 

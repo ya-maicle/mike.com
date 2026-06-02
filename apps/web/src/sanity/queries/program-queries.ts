@@ -1,20 +1,22 @@
 import { groq } from 'next-sanity'
-import { IMAGE_PROJECTION } from '../queries'
+import { IMAGE_PROJECTION, MUX_VIDEO_PROJECTION } from '../queries'
 import type { SanityImage } from '../queries'
 
 export const programTag = (slug: string) => `program:${slug}`
 export const programsTag = 'programs'
 
 const HERO_EXAMPLE_PROJECTION = groq`{
-  _id,
-  title,
-  slug,
-  headerMedia{
-    type,
-    image${IMAGE_PROJECTION},
-    video{asset->{playbackId}}
-  },
-  coverImage${IMAGE_PROJECTION}
+  study->{
+    _id,
+    title,
+    slug,
+    headerMedia{
+      type,
+      image${IMAGE_PROJECTION},
+      video{asset->{playbackId}}
+    },
+    coverImage${IMAGE_PROJECTION}
+  }
 }`
 
 export const PROGRAM_BY_SLUG = groq`
@@ -26,7 +28,19 @@ export const PROGRAM_BY_SLUG = groq`
     tagline,
     summary,
     homeListDescription,
-    heroExamples[]->${HERO_EXAMPLE_PROJECTION},
+    heroExamples[]${HERO_EXAMPLE_PROJECTION},
+    thesis,
+    approachIntro,
+    moves[]{
+      _key,
+      title,
+      body,
+      media{
+        type,
+        image${IMAGE_PROJECTION},
+        video${MUX_VIDEO_PROJECTION}
+      }
+    },
     seoSettings
   }
 `
@@ -44,15 +58,28 @@ export const PUBLISHED_PROGRAMS = groq`
 `
 
 export type ProgramHeroExample = {
-  _id: string
+  study?: {
+    _id: string
+    title: string
+    slug: { current: string }
+    headerMedia?: {
+      type: 'image' | 'video'
+      image?: SanityImage
+      video?: { asset: { playbackId: string } }
+    }
+    coverImage?: SanityImage
+  } | null
+}
+
+export type ProgramMove = {
+  _key: string
   title: string
-  slug: { current: string }
-  headerMedia?: {
+  body: string
+  media?: {
     type: 'image' | 'video'
     image?: SanityImage
-    video?: { asset: { playbackId: string } }
+    video?: { asset: { playbackId: string; aspectRatio?: string } }
   }
-  coverImage?: SanityImage
 }
 
 export type Program = {
@@ -65,6 +92,9 @@ export type Program = {
   homeListDescription: string
   featuredOrder?: number
   heroExamples?: ProgramHeroExample[]
+  thesis?: string
+  approachIntro?: string
+  moves?: ProgramMove[]
   seoSettings?: {
     metaTitle?: string
     metaDescription?: string

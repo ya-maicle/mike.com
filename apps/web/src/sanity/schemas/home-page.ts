@@ -136,7 +136,12 @@ export const homePage = defineType({
               type: 'string',
               initialValue: 'Explore Programs',
             }),
-            defineField({ name: 'link', title: 'Link', type: 'string', initialValue: '/programs' }),
+            defineField({
+              name: 'link',
+              title: 'Link',
+              type: 'string',
+              initialValue: '/strengths',
+            }),
           ],
         }),
         defineField({
@@ -162,7 +167,12 @@ export const homePage = defineType({
               type: 'string',
               initialValue: 'All Programs (11)',
             }),
-            defineField({ name: 'link', title: 'Link', type: 'string', initialValue: '/programs' }),
+            defineField({
+              name: 'link',
+              title: 'Link',
+              type: 'string',
+              initialValue: '/strengths',
+            }),
           ],
         }),
       ],
