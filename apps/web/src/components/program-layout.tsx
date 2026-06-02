@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ChevronRight } from 'lucide-react'
+import { ArrowDown, ArrowRight, ArrowUp, ChevronRight } from 'lucide-react'
 import { PageTemplate } from '@/components/page-template'
 import { ProgramHeroExamples } from '@/components/program-hero-examples'
 import { SanityImage } from '@/components/sanity-image'
@@ -7,7 +7,7 @@ import { DecorativeVideo } from '@/components/decorative-video'
 import { Button } from '@/components/ui/button'
 import { gridCols } from '@/lib/grid-columns'
 import { cn } from '@/lib/utils'
-import type { Program, ProgramMove } from '@/sanity/queries/program-queries'
+import type { Program, ProgramMove, ProgramProof } from '@/sanity/queries/program-queries'
 
 interface ProgramLayoutProps {
   data: Program
@@ -98,10 +98,87 @@ function HowSection({ moves }: { moves?: ProgramMove[] }) {
   if (!moves || moves.length === 0) return null
 
   return (
-    <section className={cn(gridCols.narrow, 'pb-12 md:pb-16')}>
+    <section className={cn(gridCols.medium, 'pb-12 md:pb-16')}>
       <div className="flex flex-col gap-2">
         {moves.map((move, i) => (
           <MoveCard key={move._key} move={move} index={i} />
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function ProofCard({ proof }: { proof: ProgramProof }) {
+  const caseStudySlug = proof.caseStudy?.slug?.current
+  const caseStudyHref = caseStudySlug ? `/work/${caseStudySlug}` : null
+  const caseStudyTitle = proof.caseStudy?.title ?? 'Case study'
+  const isOutcome = proof.markerType === 'outcome'
+  const isDirection = proof.markerType === 'direction'
+  const normalizedMarker = proof.marker.trim().toLowerCase()
+  const DirectionIcon =
+    normalizedMarker === 'down' || normalizedMarker === '↓'
+      ? ArrowDown
+      : normalizedMarker === 'right' || normalizedMarker === '→'
+        ? ArrowRight
+        : ArrowUp
+
+  return (
+    <article className="flex aspect-[3/4] min-h-72 flex-col rounded-lg bg-secondary p-5 transition-colors hover:bg-secondary/80 md:p-6">
+      {isDirection ? (
+        <DirectionIcon className="mb-12 size-20 stroke-[1] text-foreground md:size-24" />
+      ) : (
+        <p
+          className={cn(
+            'mb-12 text-7xl leading-none tracking-normal text-foreground md:text-8xl',
+            isOutcome && 'text-3xl leading-tight md:text-4xl',
+          )}
+        >
+          {proof.marker}
+        </p>
+      )}
+      <div className="mt-auto">
+        <h5 className="mb-0 mt-0 text-foreground">{proof.title}</h5>
+        <p className="mb-0 mt-3 text-foreground">{proof.body}</p>
+        {caseStudyHref && (
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="mt-5 w-fit border-transparent bg-background hover:border-transparent hover:bg-background/90"
+          >
+            <Link href={caseStudyHref}>
+              {caseStudyTitle}
+              <ChevronRight className="size-4 shrink-0" />
+            </Link>
+          </Button>
+        )}
+      </div>
+    </article>
+  )
+}
+
+function ProofSection({ intro, proofs }: { intro?: string; proofs?: ProgramProof[] }) {
+  const validProofs =
+    proofs?.filter((proof) => proof.marker && proof.title && proof.body && proof.caseStudy) ?? []
+
+  if (validProofs.length === 0) return null
+
+  return (
+    <section className={cn(gridCols.medium, 'pb-12 md:pb-16')}>
+      <p className="mb-5 text-sm font-normal text-foreground">The proof.</p>
+      {intro && (
+        <p className="mb-6 text-lg leading-relaxed text-foreground whitespace-pre-line md:mb-8 md:text-xl">
+          {intro}
+        </p>
+      )}
+      <div className="viewport-carousel viewport-carousel-track flex snap-x snap-mandatory gap-2 overflow-x-auto pb-4 scrollbar-hide">
+        {validProofs.map((proof) => (
+          <div
+            key={proof._key}
+            className="w-[82vw] max-w-sm flex-none snap-start md:w-[32vw] md:min-w-80 md:max-w-md"
+          >
+            <ProofCard proof={proof} />
+          </div>
         ))}
       </div>
     </section>
@@ -145,14 +222,24 @@ export function ProgramLayout({ data }: ProgramLayoutProps) {
       cover={<ProgramHeroExamples examples={data.heroExamples} />}
     >
       {data.thesis && (
-        <TextSection label="The problem." body={data.thesis} className="py-12 md:py-16" />
+        <TextSection
+          label="The problem."
+          body={data.thesis}
+          className={cn(gridCols.medium, 'py-12 md:py-16')}
+        />
       )}
 
       {data.approachIntro && (
-        <TextSection label="The approach." body={data.approachIntro} className="pb-6 md:pb-8" />
+        <TextSection
+          label="The approach."
+          body={data.approachIntro}
+          className={cn(gridCols.medium, 'pb-6 md:pb-8')}
+        />
       )}
 
       {data.moves && data.moves.length > 0 && <HowSection moves={data.moves} />}
+
+      <ProofSection intro={data.proofIntro} proofs={data.proofs} />
 
       <CTASection />
     </PageTemplate>

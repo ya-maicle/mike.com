@@ -181,6 +181,87 @@ export const program = defineType({
     }),
 
     defineField({
+      name: 'proofIntro',
+      title: 'Proof Intro',
+      type: 'text',
+      rows: 3,
+      description: 'Short paragraph shown above the proof cards under "The proof."',
+    }),
+
+    defineField({
+      name: 'proofs',
+      title: 'Proofs',
+      description: 'Evidence that this strength has worked in a real case study.',
+      type: 'array',
+      of: [
+        {
+          type: 'object',
+          name: 'proof',
+          title: 'Proof',
+          fields: [
+            defineField({
+              name: 'markerType',
+              title: 'Marker Type',
+              type: 'string',
+              options: {
+                list: [
+                  { title: 'Metric', value: 'metric' },
+                  { title: 'Direction', value: 'direction' },
+                  { title: 'Outcome', value: 'outcome' },
+                ],
+                layout: 'radio',
+              },
+              initialValue: 'outcome',
+              validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: 'marker',
+              title: 'Marker',
+              type: 'string',
+              description:
+                'The leading proof signal, such as "3x" or "Clearer decisions". For direction, use "up", "down", or "right".',
+              validation: (Rule) => Rule.required().max(48),
+            }),
+            defineField({
+              name: 'title',
+              title: 'Title',
+              type: 'string',
+              validation: (Rule) => Rule.required().max(90),
+            }),
+            defineField({
+              name: 'body',
+              title: 'Body',
+              type: 'text',
+              rows: 3,
+              validation: (Rule) => Rule.required().max(280),
+            }),
+            defineField({
+              name: 'caseStudy',
+              title: 'Case Study',
+              type: 'reference',
+              to: [{ type: 'caseStudy' }],
+              validation: (Rule) => Rule.required(),
+            }),
+          ],
+          preview: {
+            select: {
+              marker: 'marker',
+              title: 'title',
+              subtitle: 'caseStudy.title',
+            },
+            prepare({ marker, title, subtitle }) {
+              return {
+                title: [marker, title].filter(Boolean).join(' — '),
+                subtitle,
+              }
+            },
+          },
+        },
+      ],
+      validation: (Rule) => Rule.max(4),
+    }),
+
+    defineField({
       name: 'publishedAt',
       title: 'Published At',
       type: 'datetime',

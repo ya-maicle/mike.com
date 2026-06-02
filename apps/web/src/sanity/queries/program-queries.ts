@@ -41,6 +41,18 @@ export const PROGRAM_BY_SLUG = groq`
         video${MUX_VIDEO_PROJECTION}
       }
     },
+    proofIntro,
+    proofs[]{
+      _key,
+      markerType,
+      marker,
+      title,
+      body,
+      caseStudy->{
+        title,
+        slug
+      }
+    },
     seoSettings
   }
 `
@@ -82,6 +94,18 @@ export type ProgramMove = {
   }
 }
 
+export type ProgramProof = {
+  _key: string
+  markerType?: 'metric' | 'direction' | 'outcome'
+  marker: string
+  title: string
+  body: string
+  caseStudy?: {
+    title: string
+    slug?: { current: string }
+  } | null
+}
+
 export type Program = {
   _id: string
   _type: 'program'
@@ -95,6 +119,8 @@ export type Program = {
   thesis?: string
   approachIntro?: string
   moves?: ProgramMove[]
+  proofIntro?: string
+  proofs?: ProgramProof[]
   seoSettings?: {
     metaTitle?: string
     metaDescription?: string
