@@ -218,6 +218,51 @@
   animation: slideUp 1s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+@layer components {
+  /**
+   * Full-bleed horizontal carousel: escapes the centered content container to
+   * both browser edges while its slides rest aligned to the content column.
+   *
+   * Reason: the inset is expressed explicitly (via `--content-max-width`) rather
+   * than with `%`, because `padding` percentages resolve against the containing
+   * block (content width) while `scroll-padding` percentages resolve against the
+   * scrollport (100vw). A `%`-based value therefore makes the two disagree, and
+   * with `snap-mandatory` the browser auto-scrolls the first slide off the
+   * content edge on load. Driving margin/padding/scroll-padding from one
+   * viewport-based length keeps them identical, so `scrollLeft` stays 0.
+   */
+  .carousel-bleed {
+    /* Distance from the viewport edge to the content-column edge. */
+    --carousel-edge: max(1.5rem, calc((100vw - var(--content-max-width)) / 2));
+    /* Where slides rest (defaults to the content edge; widened for `medium`). */
+    --carousel-inset: var(--carousel-edge);
+    box-sizing: border-box;
+    width: 100vw;
+    margin-left: calc(-1 * var(--carousel-edge));
+    padding-left: var(--carousel-inset);
+    padding-right: var(--carousel-inset);
+    scroll-padding-left: var(--carousel-inset);
+  }
+
+  @media (min-width: 768px) {
+    .carousel-bleed {
+      --carousel-edge: max(2rem, calc((100vw - var(--content-max-width)) / 2));
+    }
+  }
+
+  /**
+   * Rest slides at the medium (8/12 centered) column once the content area
+   * reaches desktop width, matching `gridCols.medium` (2/12 = 1/6 inset).
+   */
+  @container (min-width: 72rem) {
+    .carousel-bleed-medium {
+      --carousel-inset: calc(
+        var(--carousel-edge) + min(var(--content-max-width), 100vw - 4rem) / 6
+      );
+    }
+  }
+}
+
 /* ============================================
    Media Chrome Video Player Theme
    ============================================ */
