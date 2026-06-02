@@ -5,6 +5,7 @@ import { ProgramHeroExamples } from '@/components/program-hero-examples'
 import { SanityImage } from '@/components/sanity-image'
 import { DecorativeVideo } from '@/components/decorative-video'
 import { Button } from '@/components/ui/button'
+import { FullBleedCarousel } from '@/components/full-bleed-carousel'
 import { gridCols } from '@/lib/grid-columns'
 import { cn } from '@/lib/utils'
 import type { Program, ProgramMove, ProgramProof } from '@/sanity/queries/program-queries'
@@ -174,16 +175,7 @@ function ProofSection({ intro, proofs }: { intro?: string; proofs?: ProgramProof
         )}
       </section>
       <section className={cn(gridCols.full, 'pb-12 md:pb-16')}>
-        <div
-          className={cn(
-            'flex snap-x snap-mandatory gap-2 overflow-x-auto pb-4 scrollbar-hide',
-            'ml-[calc(50%_-_50vw)] w-screen',
-            'pl-[max(1.5rem,calc(50vw_-_50%))] pr-[max(1.5rem,calc(50vw_-_50%))]',
-            '[scroll-padding-left:max(1.5rem,calc(50vw_-_50%))]',
-            '@6xl:pl-[calc(max(1.5rem,50vw_-_50%)_+_16.6667%)] @6xl:pr-[calc(max(1.5rem,50vw_-_50%)_+_16.6667%)]',
-            '@6xl:[scroll-padding-left:calc(max(1.5rem,50vw_-_50%)_+_16.6667%)]',
-          )}
-        >
+        <FullBleedCarousel align="medium" gapClassName="gap-2">
           {validProofs.map((proof) => (
             <div
               key={proof._key}
@@ -192,7 +184,7 @@ function ProofSection({ intro, proofs }: { intro?: string; proofs?: ProgramProof
               <ProofCard proof={proof} />
             </div>
           ))}
-        </div>
+        </FullBleedCarousel>
       </section>
     </>
   )

@@ -218,26 +218,6 @@
   animation: slideUp 1s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@layer components {
-  .viewport-carousel {
-    box-sizing: border-box;
-    margin-left: calc(50% - 50vw);
-    width: 100vw;
-    padding-left: max(1.5rem, calc(50vw - 50%));
-    scroll-padding-left: max(1.5rem, calc(50vw - 50%));
-  }
-
-  .viewport-carousel-track {
-    padding-right: 1.5rem;
-  }
-
-  @media (min-width: 768px) {
-    .viewport-carousel-track {
-      padding-right: 2rem;
-    }
-  }
-}
-
 /* ============================================
    Media Chrome Video Player Theme
    ============================================ */
