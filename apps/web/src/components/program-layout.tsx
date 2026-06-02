@@ -125,7 +125,7 @@ function ProofCard({ proof }: { proof: ProgramProof }) {
   return (
     <article className="flex aspect-[3/4] min-h-72 flex-col rounded-lg bg-secondary p-5 transition-colors hover:bg-secondary/80 md:p-6">
       {isDirection ? (
-        <DirectionIcon className="mb-12 size-20 stroke-[1] text-foreground md:size-24" />
+        <DirectionIcon className="mb-12 size-20 stroke-[1.5] text-foreground md:size-24" />
       ) : (
         <p
           className={cn(
