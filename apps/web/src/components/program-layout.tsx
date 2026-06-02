@@ -164,24 +164,37 @@ function ProofSection({ intro, proofs }: { intro?: string; proofs?: ProgramProof
   if (validProofs.length === 0) return null
 
   return (
-    <section className={cn(gridCols.medium, 'pb-12 md:pb-16')}>
-      <p className="mb-5 text-sm font-normal text-foreground">The proof.</p>
-      {intro && (
-        <p className="mb-6 text-lg leading-relaxed text-foreground whitespace-pre-line md:mb-8 md:text-xl">
-          {intro}
-        </p>
-      )}
-      <div className="viewport-carousel viewport-carousel-track flex snap-x snap-mandatory gap-2 overflow-x-auto pb-4 scrollbar-hide">
-        {validProofs.map((proof) => (
-          <div
-            key={proof._key}
-            className="w-[82vw] max-w-sm flex-none snap-start md:w-[32vw] md:min-w-80 md:max-w-md"
-          >
-            <ProofCard proof={proof} />
-          </div>
-        ))}
-      </div>
-    </section>
+    <>
+      <section className={gridCols.medium}>
+        <p className="mb-5 text-sm font-normal text-foreground">The proof.</p>
+        {intro && (
+          <p className="mb-6 text-lg leading-relaxed text-foreground whitespace-pre-line md:mb-8 md:text-xl">
+            {intro}
+          </p>
+        )}
+      </section>
+      <section className={cn(gridCols.full, 'pb-12 md:pb-16')}>
+        <div
+          className={cn(
+            'flex snap-x snap-mandatory gap-2 overflow-x-auto pb-4 scrollbar-hide',
+            'ml-[calc(50%_-_50vw)] w-screen',
+            'pl-[max(1.5rem,calc(50vw_-_50%))] pr-[max(1.5rem,calc(50vw_-_50%))]',
+            '[scroll-padding-left:max(1.5rem,calc(50vw_-_50%))]',
+            '@6xl:pl-[calc(max(1.5rem,50vw_-_50%)_+_16.6667%)] @6xl:pr-[calc(max(1.5rem,50vw_-_50%)_+_16.6667%)]',
+            '@6xl:[scroll-padding-left:calc(max(1.5rem,50vw_-_50%)_+_16.6667%)]',
+          )}
+        >
+          {validProofs.map((proof) => (
+            <div
+              key={proof._key}
+              className="w-[82vw] max-w-sm flex-none snap-start md:w-[32vw] md:min-w-80 md:max-w-md"
+            >
+              <ProofCard proof={proof} />
+            </div>
+          ))}
+        </div>
+      </section>
+    </>
   )
 }
 
