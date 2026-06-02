@@ -2,10 +2,15 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { SITE_CONFIG } from '@/lib/constants'
+import { isStrengthDetailPath } from '@/lib/program-display'
+import { cn } from '@/lib/utils'
 
 export function Footer() {
   const [year, setYear] = useState<number>(2025)
+  const pathname = usePathname()
+  const flush = isStrengthDetailPath(pathname)
 
   useEffect(() => {
     setYear(new Date().getFullYear())
@@ -14,7 +19,7 @@ export function Footer() {
   return (
     <footer className="mt-auto px-6 md:px-8">
       <div className="max-w-[var(--content-max-width)] mx-auto">
-        <div className="border-t border-border py-8">
+        <div className={cn('py-8', !flush && 'border-t border-border')}>
           <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 text-base text-foreground">
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
               <span>

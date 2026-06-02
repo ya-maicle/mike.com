@@ -4,11 +4,13 @@ import * as React from 'react'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { gridCols } from '@/lib/grid-columns'
+import { programPath } from '@/lib/program-display'
 import { Button } from '@/components/ui/button'
 
 type Program = {
   title: string
   description: string
+  slug?: string | null
 }
 
 type ProgramsSectionProps = {
@@ -40,7 +42,8 @@ export function ProgramsSection({
     return () => mediaQuery.removeEventListener('change', handler)
   }, [])
 
-  if (!programs || programs.length === 0) return null
+  const validPrograms = programs?.filter(Boolean) ?? []
+  if (validPrograms.length === 0) return null
 
   // Calculate highlight position based on hovered row
   const getHighlightStyle = (): React.CSSProperties => {
@@ -86,7 +89,7 @@ export function ProgramsSection({
               style={getHighlightStyle()}
             />
 
-            {programs.map((program, index) => {
+            {validPrograms.map((program, index) => {
               const isHovered = isDesktop && hoveredIndex === index
               const isAnyHovered = isDesktop && hoveredIndex !== null
               const isDimmed = isAnyHovered && !isHovered
@@ -109,7 +112,7 @@ export function ProgramsSection({
                   onMouseEnter={() => isDesktop && setHoveredIndex(index)}
                 >
                   <Link
-                    href="/programs"
+                    href={programPath(program.slug)}
                     className={`relative z-10 flex flex-col md:flex-row md:items-center gap-1 md:gap-8 py-5 md:py-6 transition-all duration-300 ease-out ${
                       isHovered ? 'text-background' : ''
                     }`}

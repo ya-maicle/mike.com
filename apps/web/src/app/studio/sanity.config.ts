@@ -35,6 +35,10 @@ export default defineConfig({
               .icon(() => '💼')
               .child(S.documentTypeList('caseStudy').title('Case Studies')),
             S.listItem()
+              .title('Programs')
+              .icon(() => '🧭')
+              .child(S.documentTypeList('program').title('Programs')),
+            S.listItem()
               .title('Portfolio Access')
               .icon(() => '🔐')
               .child(
@@ -60,7 +64,7 @@ export default defineConfig({
     types: schemaTypes,
     templates: (templates) =>
       templates.filter(({ schemaType }) =>
-        ['homePage', 'caseStudy', 'page', 'portfolioAccessProfile'].includes(schemaType),
+        ['homePage', 'caseStudy', 'program', 'page', 'portfolioAccessProfile'].includes(schemaType),
       ),
   },
 
@@ -74,7 +78,7 @@ export default defineConfig({
     },
     newDocumentOptions: (prev) =>
       prev.filter(({ templateId }) =>
-        ['homePage', 'caseStudy', 'page', 'portfolioAccessProfile'].includes(templateId),
+        ['homePage', 'caseStudy', 'program', 'page', 'portfolioAccessProfile'].includes(templateId),
       ),
   },
 

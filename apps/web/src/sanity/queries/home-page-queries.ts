@@ -27,9 +27,11 @@ export const HOME_PAGE_QUERY = groq`
       label,
       heading,
       button,
-      programs[]{
+      programs[]->{
+        _id,
         title,
-        description
+        "description": homeListDescription,
+        "slug": slug.current
       },
       footerLink
     },
@@ -74,8 +76,10 @@ export type HomePage = {
     heading?: string
     button?: { text?: string; link?: string }
     programs?: Array<{
+      _id: string
       title: string
       description: string
+      slug: string | null
     }>
     footerLink?: { text?: string; link?: string }
   }

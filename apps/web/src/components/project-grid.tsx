@@ -10,24 +10,12 @@ type ProjectGridProps = {
 export function ProjectGrid({ projects, hasRecruiterAccess = false }: ProjectGridProps) {
   return (
     <div className="w-full">
-      <div className="md:hidden -mx-6">
-        <div className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4">
-          <div className="w-6 shrink-0 snap-start" role="presentation" />
-          {projects.map((project, index) => (
-            <div
-              key={project._id}
-              className={`flex-none w-[85vw] max-w-sm ${index > 0 ? 'snap-start ml-4' : ''}`}
-            >
-              <ProjectCard project={project} hasRecruiterAccess={hasRecruiterAccess} />
-            </div>
-          ))}
-          <div className="w-6 shrink-0 ml-4" role="presentation" />
-        </div>
-      </div>
-
-      <div className="hidden md:grid md:grid-cols-12 md:gap-6 lg:gap-8">
+      <div className="viewport-carousel viewport-carousel-track flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 scrollbar-hide md:gap-6 lg:gap-8">
         {projects.map((project) => (
-          <div key={project._id} className="col-span-4">
+          <div
+            key={project._id}
+            className="w-[85vw] max-w-sm flex-none snap-start md:w-[30vw] md:min-w-80 md:max-w-md"
+          >
             <ProjectCard project={project} hasRecruiterAccess={hasRecruiterAccess} />
           </div>
         ))}
