@@ -4,6 +4,11 @@ import { notFound } from 'next/navigation'
 import { sanityFetch } from '@/sanity/client'
 import { PROGRAM_BY_SLUG, programTag } from '@/sanity/queries/program-queries'
 import type { Program } from '@/sanity/queries/program-queries'
+import {
+  HOME_PAGE_PROGRAMS_QUERY,
+  homePageTag,
+  type HomePageProgram,
+} from '@/sanity/queries/home-page-queries'
 import { ProgramLayout } from '@/components/program-layout'
 
 export const dynamic = 'force-dynamic'
@@ -29,13 +34,14 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 export default async function StrengthPage(props: PageProps) {
   const { slug } = await props.params
 
-  const data = await sanityFetch<Program | null>(
-    PROGRAM_BY_SLUG,
-    { slug },
-    { tag: programTag(slug) },
-  )
+  const [data, homePrograms] = await Promise.all([
+    sanityFetch<Program | null>(PROGRAM_BY_SLUG, { slug }, { tag: programTag(slug) }),
+    sanityFetch<HomePageProgram[] | null>(HOME_PAGE_PROGRAMS_QUERY, {}, { tag: homePageTag }),
+  ])
 
   if (!data) return notFound()
 
-  return <ProgramLayout data={data} />
+  const otherPrograms = (homePrograms ?? []).filter((program) => program._id !== data._id)
+
+  return <ProgramLayout data={data} otherPrograms={otherPrograms} />
 }

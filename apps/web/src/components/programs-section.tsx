@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { gridCols } from '@/lib/grid-columns'
 import { programPath } from '@/lib/program-display'
+import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 
 type Program = {
@@ -19,6 +20,7 @@ type ProgramsSectionProps = {
   button?: { text?: string; link?: string }
   programs?: Program[]
   footerLink?: { text?: string; link?: string }
+  className?: string
 }
 
 export function ProgramsSection({
@@ -27,6 +29,7 @@ export function ProgramsSection({
   button,
   programs,
   footerLink,
+  className,
 }: ProgramsSectionProps) {
   const [hoveredIndex, setHoveredIndex] = React.useState<number | null>(null)
   const [isDesktop, setIsDesktop] = React.useState(false)
@@ -65,7 +68,7 @@ export function ProgramsSection({
   }
 
   return (
-    <section className={`${gridCols.full} pb-16 md:pb-24`}>
+    <section className={cn(className ?? gridCols.full, 'pb-16 md:pb-24')}>
       <div className="flex flex-col gap-12 md:gap-16">
         {/* Header - using grid system for column width */}
         <div className="grid grid-cols-12">
