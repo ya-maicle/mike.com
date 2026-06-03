@@ -266,6 +266,23 @@
 /* ============================================
    Media Chrome Video Player Theme
    ============================================ */
+
+/*
+ * Mux Player paints a black backdrop on its shadow :host
+ * (background-color: var(--media-background-color, #000)). Inside a rounded
+ * `overflow-hidden` frame, antialiasing at the corners/bottom edge reveals a
+ * thin black seam of that backdrop — the video "hairline".
+ *
+ * Reason: override the variable (custom properties inherit across the shadow
+ * boundary) so the backdrop is transparent. With no black box behind the
+ * frame, any subpixel clip seam falls back to the page/container colour and
+ * is imperceptible — fixing every video frame at the source rather than
+ * per-call-site overfill hacks.
+ */
+mux-player {
+  --media-background-color: transparent;
+}
+
 media-controller {
   --media-control-hover-background: transparent;
   --media-button-icon-width: 24px;
