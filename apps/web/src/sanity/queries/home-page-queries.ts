@@ -58,6 +58,22 @@ export const HOME_PAGE_QUERY = groq`
   }
 `
 
+export const HOME_PAGE_PROGRAMS_QUERY = groq`
+  *[_type == "homePage"][0].programsSection.programs[]->{
+    _id,
+    title,
+    "description": homeListDescription,
+    "slug": slug.current
+  }
+`
+
+export type HomePageProgram = {
+  _id: string
+  title: string
+  description: string
+  slug: string | null
+}
+
 export type HomePage = {
   _id: string
   tagline: string
@@ -75,12 +91,7 @@ export type HomePage = {
     label?: string
     heading?: string
     button?: { text?: string; link?: string }
-    programs?: Array<{
-      _id: string
-      title: string
-      description: string
-      slug: string | null
-    }>
+    programs?: HomePageProgram[]
     footerLink?: { text?: string; link?: string }
   }
   featuredWorkSection?: {

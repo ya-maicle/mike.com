@@ -6,12 +6,15 @@ import { SanityImage } from '@/components/sanity-image'
 import { DecorativeVideo } from '@/components/decorative-video'
 import { Button } from '@/components/ui/button'
 import { FullBleedCarousel } from '@/components/full-bleed-carousel'
+import { ProgramsSection } from '@/components/programs-section'
 import { gridCols } from '@/lib/grid-columns'
 import { cn } from '@/lib/utils'
 import type { Program, ProgramMove, ProgramProof } from '@/sanity/queries/program-queries'
+import type { HomePageProgram } from '@/sanity/queries/home-page-queries'
 
 interface ProgramLayoutProps {
   data: Program
+  otherPrograms?: HomePageProgram[]
 }
 
 function TextSection({
@@ -217,7 +220,7 @@ function CTASection() {
   )
 }
 
-export function ProgramLayout({ data }: ProgramLayoutProps) {
+export function ProgramLayout({ data, otherPrograms }: ProgramLayoutProps) {
   return (
     <PageTemplate
       className="pb-0"
@@ -245,6 +248,13 @@ export function ProgramLayout({ data }: ProgramLayoutProps) {
       {data.moves && data.moves.length > 0 && <HowSection moves={data.moves} />}
 
       <ProofSection intro={data.proofIntro} proofs={data.proofs} />
+
+      <ProgramsSection
+        label="Other strengths"
+        heading="More ways I can help"
+        programs={otherPrograms}
+        className={gridCols.medium}
+      />
 
       <CTASection />
     </PageTemplate>
