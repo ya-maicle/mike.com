@@ -48,8 +48,7 @@ export function DecorativeVideoPlayer({
         ref={videoRef}
         playbackId={playbackId}
         className="absolute inset-0 h-full w-full"
-        // scale-[1.02]: overfills the rounded clip to prevent subpixel hairlines
-        videoClassName="block h-full w-full object-cover scale-[1.02] origin-center"
+        videoClassName="block h-full w-full object-cover"
       />
 
       <div className="absolute bottom-4 right-4 z-10">
