@@ -16,6 +16,8 @@ export function HeaderWithNav() {
           {/* Left cluster (desktop: Logo + PanelRight; mobile: Logo only) */}
           <div className="flex items-center gap-2 md:gap-12">
             <Logotype
+              as="a"
+              href="/"
               size="2xl"
               showText={false}
               className="[&_svg]:w-[36px] md:[&_svg]:w-[42px] [&_svg]:h-auto text-foreground"
@@ -28,9 +30,9 @@ export function HeaderWithNav() {
               onClick={() => setOpen((v) => !v)}
             >
               {open ? (
-                <SideMenuOpen size={20} className="text-zinc-500" />
+                <SideMenuOpen size={18} className="text-zinc-500" />
               ) : (
-                <SideMenuClosed size={20} className="text-zinc-500" />
+                <SideMenuClosed size={18} className="text-zinc-500" />
               )}
             </Button>
           </div>
@@ -45,9 +47,9 @@ export function HeaderWithNav() {
               onClick={() => setOpen((v) => !v)}
             >
               {open ? (
-                <SideMenuOpen size={20} className="text-zinc-500" />
+                <SideMenuOpen size={18} className="text-zinc-500" />
               ) : (
-                <SideMenuClosed size={20} className="text-zinc-500" />
+                <SideMenuClosed size={18} className="text-zinc-500" />
               )}
             </Button>
             <Button className="hidden md:inline-flex" variant="secondary" size="default">
