@@ -1,152 +1,86 @@
 ### 🔄 Project Awareness & Context (Monorepo: pnpm + Next.js)
 
 - Always read:
-  - `docs/product_requirements_document.md` (PRD: goals, stack, phased plan)
-  - `docs/logs/phase-0-log.md` (build log: what’s done, next steps)
-  - `ENVIRONMENT.md` (env vars contract, per env)
-  - `README.md` (run/test/deploy flows, workspace overview)
+  - `README.md` (run/test/deploy flows, workspace overview, auth notes)
+  - `ENVIRONMENT.md` (env vars contract, per env, Mux signing runbook)
+  - `AGENTS.md` (conventions and gotchas, agent-maintained)
   - `.clinerules/maicle.co.uk_instructions.md` (process conventions, CI/CD, security)
 
 - Confirm target area before changes:
-  - Apps: `apps/web` (Next.js App Router)
-  - Packages: `packages/ui` (design system), `packages/config` (shared ESLint/TS config)
+  - Apps: `apps/web` (Next.js App Router) — the entire product lives here
+  - Packages: `packages/ui` (design **tokens** as CSS only), `packages/config` (shared ESLint/TS config)
 
-- Use Node LTS (≥18) and pnpm. Prefer workspace scripts. Do not introduce new tech for a fix unless necessary; if you do, remove the old implementation in the same change.
+- Use Node ≥20.17 and pnpm. Prefer workspace scripts. Do not introduce new tech for a fix unless necessary; if you do, remove the old implementation in the same change.
 
 ### 🧱 Code Structure & Modularity (Next.js + RSC)
 
 - Structure:
-  - `apps/web/src/app` for routes (App Router, RSC-first; minimal `"use client"`).
-  - `apps/web/src/sanity` for Sanity clients/queries (server-only token usage).
-  - `packages/ui` for tokens, primitives, patterns, Storybook.
-  - `packages/config` for shared ESLint/TS configurations.
+  - `apps/web/src/app` — routes (App Router, RSC-first; minimal `"use client"`).
+  - `apps/web/src/components/ui` — **the design system** (shadcn-style primitives). Every component here MUST have a `.stories.tsx` file; the web Storybook is the catalog and the owner's verification tool. Always import from `@/components/ui/*`; never recreate lookalike components.
+  - `apps/web/src/sanity` — Sanity client/queries/schemas (server-only token usage).
+  - `apps/web/src/lib` — pure logic and server utilities; pure modules get unit tests.
+  - `packages/ui` — design tokens (CSS variables) imported by `globals.css`. No JS components live here.
+  - `packages/config` — shared ESLint/TS configurations.
 
 - Prefer simple, composable modules. Keep files ≤ 200–300 LOC (refactor once exceeding).
-
-- Co-locate feature utilities and server actions with their route where appropriate.
-
-- Imports:
-  - Use `@/*` alias in the web app (configured via tsconfig).
-  - Keep shared logic in `packages/*` to avoid duplication.
+- Imports: use the `@/*` alias inside the web app.
 
 ### 🧪 Testing & Reliability
 
-- Unit/integration: Vitest + React Testing Library (+ @testing-library/jest-dom, jsdom).
-
-- Component/visual: Storybook with a11y addon; Playwright + Percy (visual) where configured.
-
-- E2E (smoke): Playwright hitting staging/preview URLs (auth, checkout, gated content, health).
-
-- Minimum per module/feature:
-  - 1 happy-path test
-  - 1 edge case
-  - 1 failure case
-
+- Unit: Vitest (`pnpm --filter web test`, or `pnpm test` from the root). Runs in CI on every PR.
+- Keep crypto/business logic in pure modules without `server-only`/`next/headers` imports so it stays unit-testable (see `portfolio-access-crypto.ts`, `mux-signing.ts`).
+- E2E smoke: Playwright against the PR's Vercel preview (`tests/smoke/*`).
+- Minimum per module/feature: 1 happy path, 1 edge case, 1 failure case.
 - Never ship stubs/fakes for dev/prod. Mock only in tests.
 
 ### ✅ Task Completion & Workflow
 
-- Use trunk-based branches (`feat/*`, `fix/*`, `chore/*`), Conventional Commits.
-- Open PR early (draft). Required checks: typecheck, lint, tests, build, Storybook, e2e smoke.
-- Keep scope tight; only change what’s requested or clearly related.
-- Use the PR template sections for Security notes and Env changes.
+- Trunk-based branches (`feat/*`, `fix/*`, `chore/*`) target the `preview` branch; Conventional Commits.
+- Single CI workflow: `.github/workflows/pr.yml` (typecheck, lint, unit tests, build, web Storybook build, Playwright smoke against the Vercel preview URL).
+- Deploys happen via Vercel's git integration (preview branch → staging, main → production). Supabase migrations are applied manually with `scripts/apply-migrations.sh` — there is no automated migration pipeline.
+- Keep scope tight; only change what's requested or clearly related.
 
 ### 📎 Style & Conventions (TypeScript + ESLint 9 + Prettier)
 
-- Language: TypeScript (strict). JSDoc/TSDoc for public APIs and non-trivial functions.
-
-- Linting: ESLint 9 using shared config from `@maicle/config`.
-
-- Formatting: Prettier (per repo config).
-
-- UI: Tailwind CSS with tokens from `@maicle/ui/styles/tokens.css`; Radix UI primitives; shadcn patterns sparingly; Framer Motion only where needed.
-
-- Forms/validation: React Hook Form + Zod (not pydantic).
-
+- TypeScript strict. ESLint 9 flat config shared from `@maicle/config` (run via `eslint .`, not the deprecated `next lint`).
+- Prettier per repo config (enforced on commit via lint-staged).
+- UI: Tailwind CSS v4 with tokens from `@maicle/ui/styles/*.css`; Radix UI primitives; shadcn patterns; Framer Motion only where needed.
+- Forms/validation: React Hook Form + Zod. API route inputs MUST be validated with Zod (`safeParse`, fail closed).
 - Data fetching:
-  - Sanity: `next-sanity` + GROQ; server-only token; prevent draft leaks without preview.
-  - Supabase: Server utilities with RLS; avoid exposing service keys to client.
+  - Sanity: `next-sanity` + GROQ; server-only token; `sanityFetch` (tagged ISR) for content, `sanityNoStoreFetch` for access checks.
+  - Supabase: server utilities with RLS; service keys server-only.
+- Comments: explain non-obvious decisions with `// Reason:`. JSDoc for public APIs.
 
-- APIs: Next.js Route Handlers under `apps/web/src/app/api/*/route.ts`. Use server-side helpers. Validate input with Zod.
+### 🔐 Security & Access Model
 
-- Comments and docs:
+- Recruiter-gated case studies protect **confidential client work**; teasers are intentionally public.
+  - Access grants: HMAC-signed httpOnly cookies (`src/lib/portfolio-access.ts`), re-validated against Sanity per request. Missing `PORTFOLIO_ACCESS_SECRET` fails closed.
+  - Share links: `/{slug}?k=<linkToken>` — the secret token is required; bare slugs 404.
+  - Gated video: signed Mux playback via `src/lib/mux-signing.ts` (see ENVIRONMENT.md runbook). Covers/teasers stay public by design.
+- Envs via Vercel. No secrets in repo. Client-exposed vars must be prefixed `NEXT_PUBLIC_`.
+- Supabase: RLS deny-by-default; service keys server-only.
+- Sanity: server token only; plan is to make the dataset private (see ENVIRONMENT.md).
 
-  ```ts
-  /**
-   * Brief summary (what/why).
-   * @param arg - Description (type inferred).
-   * @returns Description.
-   */
-  export function example(arg: string) {
-    // Reason: explain non-obvious decisions or constraints.
-    return arg.toUpperCase()
-  }
-  ```
+### 🎥/💳/✉️/📈 Provider Integrations — STATUS
 
-### 📚 Documentation & Explainability
+- **Integrated:** Sanity (CMS + embedded studio at `/studio`), Supabase (auth + Postgres), Mux (video, signed playback for gated content), Vercel Analytics/Speed Insights.
+- **NOT integrated yet (planned):** Stripe, Resend, MailerLite, PostHog. The `entitlements`/`subscriptions` tables exist for future Stripe work. Note: the "Resend magic link" button is Supabase auth email, not the Resend service.
+- When integrating later: Stripe webhooks update entitlements (verify signatures, raw body); Resend would slot in as Supabase custom SMTP first; PostHog must be consent-gated, EU residency.
 
-- Update `README.md` and `ENVIRONMENT.md` when setup, dependencies, or steps change.
-- Keep `docs/logs/phase-0-log.md` aligned with actual progress (for Phase 0 and beyond logs).
-- For complex logic, add inline comments with “Reason:” to capture intent.
+### 🤖 Agents
 
-### 🔐 Environment & Secrets
-
-- Envs via Vercel (Development/Preview/Production). No secrets in repo.
-
-- Local: `vercel env pull` → `.env.local` (never overwrite without explicit confirmation).
-
-- Client-exposed vars must be prefixed `NEXT_PUBLIC_`.
-
-- Vendor guidelines:
-  - Supabase: service keys server-only; RLS deny-by-default; test policies.
-  - Sanity: server token only; verify webhooks; no draft leak without preview token.
-  - Stripe: verify webhook signatures with raw body; grant/revoke entitlements only via webhook.
-  - Mux: signed playback; never expose raw IDs unauth’d.
-  - MailerLite: sync consent; verify signatures.
-  - PostHog: consent-gated; EU residency; no PII.
-
-### 🚀 CI/CD (GitHub Actions + Vercel)
-
-- PR pipeline (per repo PRD):
-  - Install (pnpm), typecheck (tsc --noEmit), lint (ESLint), tests (Vitest), build (Next.js), Storybook build, Playwright smoke on preview where configured.
-- Main pipeline:
-  - Apply Supabase migrations to staging (guarded), deploy to Vercel staging, run e2e smoke, manual approval to promote to prod (promote previous deployment to rollback).
-- Keep builds green; do not merge with failing checks.
-
-### 📦 Design System (packages/ui)
-
-- Tokens as CSS variables; Tailwind maps to tokens.
-- Component tiers: Primitives → Patterns → Layouts. Minimal `"use client"`.
-- Storybook a11y checks enabled; maintain docs and examples.
-- Introduce Changesets versioning for `@maicle/ui` when publishing.
-
-### 🎥/💳/✉️/📈 Provider Integrations (Phase per PRD)
-
-- Sanity: ISR and `revalidateTag`; PortableText → design system typography; preview mode UX.
-- Mux: direct uploads, webhooks, signed playback; lazy-load player; analytics events gated by consent.
-- Stripe: Checkout + Billing Portal; webhooks update entitlements; cache products/prices.
-- Resend: lightweight transactional emails; templates; preview in Storybook.
-- MailerLite: consent sync via webhooks; batching where possible.
-- PostHog: client + server events; gate by consent; exclude sensitive routes from replays.
-
-### 🧠 AI Behavior Rules (TS/Next.js context)
-
-- Never assume missing context; read PRD/logs/ENVIRONMENT.md/README and confirm file paths before edits.
-- Never hallucinate libraries or functions; only use the stack defined above.
-- Avoid new tech/patterns for fixes unless necessary; if introduced, remove old code in the same change (no duplication).
-- Do not delete or overwrite existing code unless explicitly required and within the task scope.
-- Mock only in tests; never add stubs/fakes affecting dev or prod behavior.
-
-### 🤖 Ralph Agent
-
-- The Ralph agent is an autonomous agent that works on this codebase. See `scripts/ralph/` for its configuration and `ralph-loop` for the execution script.
+- `AGENTS.md` is the agent-maintained memory file; keep it under ~60 lines.
+- Ralph (autonomous loop): `scripts/ralph/`, default tool is Claude Code.
 
 ### 🧰 Commands (reference)
 
 - Install deps: `pnpm install`
-- Dev app: `pnpm --filter apps/web dev`
+- Dev app: `pnpm dev`
 - Lint/typecheck: `pnpm lint && pnpm typecheck`
+- Unit tests: `pnpm test` (watch: `pnpm --filter web test:watch`)
 - Build: `pnpm build`
-- Tests: `pnpm test` (and package-level equivalents)
-- Storybook (ui): `pnpm --filter @maicle/ui storybook` or `build-storybook`
-- Supabase local: `pnpm db:start | db:stop | db:reset | db:diff`
+- Storybook: `pnpm storybook:web` (build: `pnpm --filter web build-storybook`)
+- E2E smoke: `pnpm e2e:smoke`
+- Supabase local: `pnpm db:start | db:stop | db:reset | db:diff` (CLI v2)
+- Sanity studio (CLI): `pnpm sanity:dev | sanity:build | sanity:deploy`
+- Mux admin: `scripts/mux-rotate-gated-to-signed.ts` (dry-run by default), `scripts/mux-enable-static-renditions.ts`
