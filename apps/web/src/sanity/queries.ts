@@ -8,47 +8,6 @@ export const IMAGE_PROJECTION = groq`{..., asset->${IMAGE_ASSET_PROJECTION}}`
 export const MUX_VIDEO_PROJECTION = groq`{ asset->{ playbackId, "aspectRatio": data.aspect_ratio } }`
 export const COVER_PROJECTION = groq`{ type, image${IMAGE_PROJECTION}, video${MUX_VIDEO_PROJECTION} }`
 
-export const ALL_CASE_STUDY_SLUGS_QUERY = groq`
-  *[_type == "caseStudy" && defined(slug.current)]{
-    "slug": slug.current
-  }
-`
-
-export const CASE_STUDY_BY_SLUG_QUERY = groq`
-  *[_type == "caseStudy" && slug.current == $slug][0]{
-    _id,
-    title,
-    summary,
-    "visibility": coalesce(visibility, "public"),
-    publishedAt,
-    seoSettings,
-    slug,
-    cover${COVER_PROJECTION},
-    coverImage${IMAGE_PROJECTION},
-    projectInfo,
-
-    content[]{
-      ...,
-      _type == 'imageBlock' => {
-        ...,
-        image${IMAGE_PROJECTION}
-      },
-      _type == 'videoBlock' => {
-        ...,
-        video${MUX_VIDEO_PROJECTION}
-      },
-      _type == 'carouselBlock' => {
-        ...,
-        items[]{
-          kind,
-          image${IMAGE_PROJECTION},
-          video{asset->{playbackId}}
-        }
-      }
-    }
-  }
-`
-
 export type SanityImage = {
   _type: 'image'
   asset?: {

@@ -66,8 +66,8 @@ export async function logPortfolioAccessEvent(event: PortfolioAccessEvent) {
   if (!supabase) return
 
   try {
-    const cutoff = new Date(Date.now() - 1000 * 60 * 60 * 24 * 180).toISOString()
-    await supabase.from('portfolio_access_events').delete().lt('created_at', cutoff)
+    // Retention is handled by a scheduled pg_cron job (see the
+    // portfolio_access_events_retention migration), not on the request path.
     await supabase.from('portfolio_access_events').insert({
       event_type: event.eventType,
       company_slug: event.companySlug ?? null,

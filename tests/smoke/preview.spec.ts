@@ -6,25 +6,8 @@ test.skip(
   'VERCEL_AUTOMATION_BYPASS_SECRET is not set',
 )
 
-// Set the Vercel bypass secret as a cookie before each test
-test.beforeEach(async ({ page }) => {
-  const bypassSecret = process.env.VERCEL_AUTOMATION_BYPASS_SECRET
-  if (bypassSecret) {
-    // Get the base URL from Playwright config
-    const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'https://mikeiu.com'
-    const domain = new URL(baseURL).hostname
-
-    // The correct cookie name is `__vercel_bypass` for Vercel deployment protection
-    await page.context().addCookies([
-      {
-        name: '__vercel_bypass',
-        value: bypassSecret,
-        domain: domain,
-        path: '/',
-      },
-    ])
-  }
-})
+// Deployment-protection bypass is handled by the x-vercel-protection-bypass
+// header configured in playwright.config.ts; no cookie setup is needed here.
 
 test.describe('Preview Smoke', () => {
   test('Health API returns 200 and expected body', async ({ request }) => {

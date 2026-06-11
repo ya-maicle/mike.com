@@ -1,6 +1,5 @@
 import 'server-only'
 
-import crypto from 'node:crypto'
 import { cookies } from 'next/headers'
 import type { NextResponse } from 'next/server'
 
@@ -10,13 +9,17 @@ import {
   type PortfolioAccessProfile,
 } from '@/sanity/queries/portfolio-access-queries'
 import { getEmailDomain, isProfileActive, normalizeEmailDomain } from '@/lib/portfolio-access-model'
+import {
+  COOKIE_VERSION,
+  signAccessPayload,
+  verifyAccessPayload,
+} from '@/lib/portfolio-access-crypto'
 
 export const PORTFOLIO_LINK_ACCESS_COOKIE = 'portfolio_link_access'
 export const PORTFOLIO_LOGIN_ACCESS_COOKIE = 'portfolio_login_access'
 export const PORTFOLIO_BLOCKED_IDENTITY_COOKIE = 'portfolio_blocked_identity'
 
 const COOKIE_TTL_SECONDS = 60 * 60 * 24 * 30
-const COOKIE_VERSION = 1
 
 type GrantPayload = {
   v: typeof COOKIE_VERSION
@@ -49,56 +52,19 @@ export type PortfolioAccessState =
 export { getEmailDomain, isProfileActive, normalizeEmailDomain }
 
 function getSecret() {
-  const secret = process.env.PORTFOLIO_ACCESS_SECRET?.trim()
-  return secret || null
-}
-
-function toBase64Url(value: string) {
-  return Buffer.from(value, 'utf8').toString('base64url')
-}
-
-function fromBase64Url(value: string) {
-  return Buffer.from(value, 'base64url').toString('utf8')
+  // Reason: missing secret must fail closed — sign/verify both return null.
+  return process.env.PORTFOLIO_ACCESS_SECRET?.trim() || ''
 }
 
 function signPayload(payload: GrantPayload | BlockedPayload) {
-  const secret = getSecret()
-  if (!secret) return null
-
-  const encodedPayload = toBase64Url(JSON.stringify(payload))
-  const signature = crypto.createHmac('sha256', secret).update(encodedPayload).digest('base64url')
-  return `${encodedPayload}.${signature}`
+  return signAccessPayload(payload, getSecret())
 }
 
 function verifyPayload<T extends GrantPayload | BlockedPayload>(
   value: string | undefined,
   kind: T['kind'],
 ) {
-  const secret = getSecret()
-  if (!secret || !value) return null
-
-  const [encodedPayload, signature] = value.split('.')
-  if (!encodedPayload || !signature) return null
-
-  const expected = crypto.createHmac('sha256', secret).update(encodedPayload).digest('base64url')
-  const signatureBuffer = Buffer.from(signature)
-  const expectedBuffer = Buffer.from(expected)
-
-  if (
-    signatureBuffer.length !== expectedBuffer.length ||
-    !crypto.timingSafeEqual(signatureBuffer, expectedBuffer)
-  ) {
-    return null
-  }
-
-  try {
-    const payload = JSON.parse(fromBase64Url(encodedPayload)) as T
-    if (payload.v !== COOKIE_VERSION || payload.kind !== kind) return null
-    if (!payload.exp || payload.exp <= Math.floor(Date.now() / 1000)) return null
-    return payload
-  } catch {
-    return null
-  }
+  return verifyAccessPayload<T>(value, kind, getSecret())
 }
 
 function maxAgeForProfile(profile?: PortfolioAccessProfile | null) {

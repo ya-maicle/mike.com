@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
         'Cache-Control': 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400',
       },
     })
-  } catch (e) {
+  } catch {
     return new Response('Avatar proxy error', { status: 500 })
   }
 }

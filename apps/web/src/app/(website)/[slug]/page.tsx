@@ -28,10 +28,13 @@ type PageData = {
   }
 }
 
-type PageProps = { params: Promise<{ slug: string }> }
+type PageProps = {
+  params: Promise<{ slug: string }>
+  searchParams?: Promise<{ k?: string }>
+}
 
 // Reserved slugs that have their own routes
-const RESERVED_SLUGS = ['work', 'login', 'privacy', 'terms', 'stories']
+const RESERVED_SLUGS = ['work', 'login', 'privacy', 'terms', 'stories', 'strengths']
 
 export async function generateStaticParams() {
   const pages = await sanityFetch<{ slug: string }[]>(
@@ -72,12 +75,19 @@ export default async function DynamicPage(props: PageProps) {
     return notFound()
   }
 
-  const accessProfile = await sanityNoStoreFetch<PortfolioAccessProfile | null>(
-    ACTIVE_PORTFOLIO_ACCESS_PROFILE_BY_SLUG,
-    { slug },
-  )
-  if (accessProfile) {
-    redirect(`/api/portfolio-access/link?slug=${encodeURIComponent(slug)}`)
+  // Reason: access links require the secret ?k= token; without it the slug
+  // behaves like any unknown page (404) so company profiles stay undiscoverable.
+  const linkToken = (await props.searchParams)?.k
+  if (linkToken) {
+    const accessProfile = await sanityNoStoreFetch<PortfolioAccessProfile | null>(
+      ACTIVE_PORTFOLIO_ACCESS_PROFILE_BY_SLUG,
+      { slug },
+    )
+    if (accessProfile) {
+      redirect(
+        `/api/portfolio-access/link?slug=${encodeURIComponent(slug)}&k=${encodeURIComponent(linkToken)}`,
+      )
+    }
   }
 
   const page = await sanityFetch<PageData | null>(

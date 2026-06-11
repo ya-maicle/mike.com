@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
 
 import { sanityNoStoreFetch } from '@/sanity/client'
 import {
@@ -16,10 +17,10 @@ import {
 } from '@/lib/portfolio-access'
 import { logPortfolioAccessEvent } from '@/lib/portfolio-access-events'
 
-type ClaimBody = {
-  accessToken?: string
-  path?: string
-}
+const claimBodySchema = z.object({
+  accessToken: z.string().min(1).max(4096),
+  path: z.string().max(2048).nullish(),
+})
 
 function getSupabaseAuthClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -49,15 +50,12 @@ export async function POST(request: NextRequest) {
     return response
   }
 
-  let body: ClaimBody = {}
-  try {
-    body = (await request.json()) as ClaimBody
-  } catch {}
-
-  if (!body.accessToken) {
+  const parsed = claimBodySchema.safeParse(await request.json().catch(() => null))
+  if (!parsed.success) {
     clearPortfolioLoginCookies(response)
     return response
   }
+  const body = parsed.data
 
   const { data, error } = await supabase.auth.getUser(body.accessToken)
   if (error || !data.user) {

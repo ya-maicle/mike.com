@@ -6,6 +6,7 @@ const RESERVED_ROOT_SLUGS = new Set([
   'login',
   'privacy',
   'stories',
+  'strengths',
   'studio',
   'terms',
   'work',
@@ -13,6 +14,16 @@ const RESERVED_ROOT_SLUGS = new Set([
 
 function normalizeDomain(value?: string) {
   return value?.trim().toLowerCase().replace(/^@/, '') ?? ''
+}
+
+function generateLinkToken() {
+  // Reason: company slugs are guessable; the shared link needs an unguessable secret.
+  const bytes = new Uint8Array(18)
+  crypto.getRandomValues(bytes)
+  return btoa(String.fromCharCode(...bytes))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '')
 }
 
 export const portfolioAccessProfile = defineType({
@@ -66,6 +77,21 @@ export const portfolioAccessProfile = defineType({
           if (conflict.pageCount > 0) return `/${slug} is already used by a CMS page.`
           if (conflict.profileCount > 0)
             return `/${slug} is already used by another access profile.`
+          return true
+        }),
+    }),
+    defineField({
+      name: 'linkToken',
+      title: 'Link Token',
+      type: 'string',
+      description:
+        'Secret token required in the shared link: /<slug>?k=<token>. Auto-generated for new profiles; clear and re-enter a new value to revoke previously shared links.',
+      initialValue: generateLinkToken,
+      validation: (Rule) =>
+        Rule.required().custom((value) => {
+          if (typeof value !== 'string' || !/^[A-Za-z0-9_-]{12,}$/.test(value)) {
+            return 'Token must be at least 12 characters of letters, digits, "-" or "_".'
+          }
           return true
         }),
     }),

@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils'
 
 interface DecorativeVideoPlayerProps {
   playbackId: string
+  tokens?: import('@/components/mux-content-player').MuxPlaybackTokens
   className?: string
   aspectRatio?: string
 }
@@ -21,6 +22,7 @@ function toCssAspectRatio(ratio?: string): string {
 
 export function DecorativeVideoPlayer({
   playbackId,
+  tokens,
   className,
   aspectRatio,
 }: DecorativeVideoPlayerProps) {
@@ -47,6 +49,7 @@ export function DecorativeVideoPlayer({
       <DecorativeVideo
         ref={videoRef}
         playbackId={playbackId}
+        tokens={tokens}
         className="absolute inset-0 h-full w-full"
         videoClassName="block h-full w-full object-cover"
       />

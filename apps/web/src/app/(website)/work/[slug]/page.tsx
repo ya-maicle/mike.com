@@ -13,6 +13,7 @@ import type { CaseStudy } from '@/sanity/queries'
 import { CaseStudyLayout } from '@/components/case-study-layout'
 import { CaseStudyAccessGate } from '@/components/case-study-access-gate'
 import { getPortfolioAccessState } from '@/lib/portfolio-access'
+import { attachMuxTokens } from '@/lib/mux-signing'
 
 export const dynamic = 'force-dynamic'
 
@@ -62,7 +63,7 @@ export default async function CaseStudyPage(props: PageProps) {
 
   return (
     <CaseStudyLayout
-      data={data}
+      data={attachMuxTokens(data)}
       otherStudies={otherStudies}
       hasRecruiterAccess={accessState.hasRecruiterAccess}
     />

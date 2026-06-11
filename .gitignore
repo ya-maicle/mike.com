@@ -28,3 +28,6 @@ blob-report/
 .playwright-cache/
 
 # Ralph
+
+# Sanity runtime artifacts
+.sanity/

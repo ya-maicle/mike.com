@@ -90,6 +90,7 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
         <div className={widthClass}>
           <DecorativeVideoBlock
             playbackId={playbackId}
+            tokens={block.video?.asset?.tokens}
             aspectRatio={block.video?.asset?.aspectRatio}
             title={block.title}
             description={block.description}
@@ -102,6 +103,7 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
       <section className={cn(widthClass, 'space-y-3')}>
         <MuxContentPlayer
           playbackId={playbackId}
+          tokens={block.video?.asset?.tokens}
           title={block.title}
           className="w-full h-auto rounded-[8px] overflow-hidden"
         />
@@ -137,7 +139,11 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
         const playbackId: string | undefined = video?.asset?.playbackId
         if (!playbackId) return null
         return (
-          <DecorativeVideoPlayer playbackId={playbackId} aspectRatio={video?.asset?.aspectRatio} />
+          <DecorativeVideoPlayer
+            playbackId={playbackId}
+            tokens={video?.asset?.tokens}
+            aspectRatio={video?.asset?.aspectRatio}
+          />
         )
       }
       if (!image) return null

@@ -6,14 +6,14 @@
 # Adapted for maicle.co.uk monorepo (pnpm + Next.js)
 #
 # Tools:
-#   gemini  - Google Gemini CLI (default, requires GEMINI_API_KEY)
-#   claude  - Anthropic Claude Code CLI
+#   gemini  - Google Gemini CLI (requires GEMINI_API_KEY)
+#   claude  - Anthropic Claude Code CLI (default)
 #   amp     - Amp AI CLI
 
 set -e
 
 # Parse arguments
-TOOL="gemini"  # Default to Gemini CLI
+TOOL="claude"  # Default to Claude Code CLI
 MAX_ITERATIONS=10
 
 while [[ $# -gt 0 ]]; do
