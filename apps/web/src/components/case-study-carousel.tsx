@@ -55,6 +55,7 @@ export function CaseStudyCarousel({ items, title, description }: CaseStudyCarous
                   ) : (
                     <DecorativeVideo
                       playbackId={item.video?.asset?.playbackId}
+                      tokens={item.video?.asset?.tokens}
                       className="w-full h-full"
                       videoClassName="object-cover"
                     />

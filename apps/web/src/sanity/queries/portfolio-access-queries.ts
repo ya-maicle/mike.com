@@ -45,7 +45,8 @@ export const ACTIVE_PORTFOLIO_ACCESS_PROFILE_BY_SLUG = groq`
     "slug": slug.current,
     accessStatus,
     allowedEmailDomains,
-    expiresAt
+    expiresAt,
+    linkToken
   }
 `
 
@@ -56,4 +57,5 @@ export type PortfolioAccessProfile = {
   accessStatus?: 'enabled' | 'blocked' | 'disabled'
   allowedEmailDomains?: string[]
   expiresAt?: string
+  linkToken?: string
 }

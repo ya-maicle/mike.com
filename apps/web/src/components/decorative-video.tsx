@@ -10,6 +10,7 @@ const MuxContentPlayer = dynamic(
 
 export interface DecorativeVideoProps {
   playbackId: string
+  tokens?: import('@/components/mux-content-player').MuxPlaybackTokens
   poster?: string
   className?: string
   videoClassName?: string
@@ -18,7 +19,7 @@ export interface DecorativeVideoProps {
 
 export const DecorativeVideo = React.forwardRef<HTMLVideoElement | null, DecorativeVideoProps>(
   function DecorativeVideo(
-    { playbackId, poster, className, videoClassName, maxResolution = '1080p' },
+    { playbackId, tokens, poster, className, videoClassName, maxResolution = '1080p' },
     ref,
   ) {
     const containerRef = React.useRef<HTMLDivElement>(null)
@@ -47,6 +48,7 @@ export const DecorativeVideo = React.forwardRef<HTMLVideoElement | null, Decorat
           <MuxContentPlayer
             ref={ref}
             playbackId={playbackId}
+            tokens={tokens}
             poster={poster}
             autoPlay
             muted
