@@ -62,6 +62,8 @@ export function CaseStudyCarousel({ items, title, description }: CaseStudyCarous
                       tokens={item.video?.asset?.tokens}
                       className="w-full h-full"
                       videoClassName="object-cover"
+                      maxResolution="2160p"
+                      minResolution="1080p"
                     />
                   )}
                 </div>

@@ -14,19 +14,36 @@ export interface DecorativeVideoProps {
   poster?: string
   className?: string
   videoClassName?: string
-  maxResolution?: '720p' | '1080p' | '1440p' | '2160p'
+  maxResolution?: import('@/components/mux-content-player').MuxMaxResolution
+  minResolution?: import('@/components/mux-content-player').MuxMinResolution
+  /**
+   * Mount the player immediately instead of waiting for the
+   * IntersectionObserver — for above-the-fold heroes, where waiting for
+   * hydration + intersection delays the poster→video swap.
+   */
+  eager?: boolean
 }
 
 export const DecorativeVideo = React.forwardRef<HTMLVideoElement | null, DecorativeVideoProps>(
   function DecorativeVideo(
-    { playbackId, tokens, poster, className, videoClassName, maxResolution = '1080p' },
+    {
+      playbackId,
+      tokens,
+      poster,
+      className,
+      videoClassName,
+      maxResolution = '1080p',
+      minResolution,
+      eager = false,
+    },
     ref,
   ) {
     const containerRef = React.useRef<HTMLDivElement>(null)
 
-    const [hasBeenVisible, setHasBeenVisible] = React.useState(false)
+    const [hasBeenVisible, setHasBeenVisible] = React.useState(eager)
 
     React.useEffect(() => {
+      if (eager) return
       const container = containerRef.current
       if (!container) return
       const observer = new IntersectionObserver(
@@ -40,7 +57,7 @@ export const DecorativeVideo = React.forwardRef<HTMLVideoElement | null, Decorat
       )
       observer.observe(container)
       return () => observer.disconnect()
-    }, [])
+    }, [eager])
 
     return (
       <div ref={containerRef} className={className}>
@@ -55,6 +72,7 @@ export const DecorativeVideo = React.forwardRef<HTMLVideoElement | null, Decorat
             loop
             controls={false}
             maxResolution={maxResolution}
+            minResolution={minResolution}
             className={videoClassName}
           />
         ) : null}

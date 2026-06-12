@@ -85,6 +85,9 @@ export function PageTemplate({
               <DecorativeVideoPlayer
                 playbackId={coverMedia.video.asset.playbackId}
                 aspectRatio={coverMedia.video.asset.aspectRatio}
+                maxResolution="2160p"
+                minResolution="1080p"
+                eager
               />
             ) : coverMedia.type === 'image' && coverMedia.image ? (
               <SanityImage

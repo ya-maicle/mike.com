@@ -1,11 +1,16 @@
 # Media Quality Audit & Implementation Plan
 
-> Status: **image-side code changes implemented** (quality floor 90, hero
-> `sizes` fix, carousel eager-loading, dev upscale warning — see git history);
-> **video work and asset re-exports still pending.** Written 2026-06-12 against
-> branch `refactor/code-cleanup`. Goal: every image and video on the site feels
-> sharp, clear, and premium by default (Apple.com benchmark), with a pipeline
-> that makes that the default rather than something to fight for per-asset.
+> Status: **image and video code changes implemented** (image quality floor 90,
+> hero `sizes` fix, carousel eager-loading, dev upscale warning; per-surface
+> video resolution ceilings up to 2160p, `minResolution` ABR floor on
+> decorative loops, eager hero mounting, Studio upload pinned to
+> 2160p/smart-tier — see git history). **Still pending:** re-exporting
+> low-resolution source images (run `pnpm dev` and watch for `[SanityImage]`
+> upscale warnings) and re-uploading pre-2160p Mux assets (run
+> `scripts/mux-audit-quality.ts`). Written 2026-06-12. Goal: every image and
+> video on the site feels sharp, clear, and premium by default (Apple.com
+> benchmark), with a pipeline that makes that the default rather than
+> something to fight for per-asset.
 
 ---
 
@@ -188,10 +193,13 @@ call site for gated assets without adding it to the claims.
 6. **Correct `sizes` on capped heroes**: `100vw` →
    `(min-width: 1376px) 1376px, 100vw` for the homepage cover and
    `PageTemplate` cover (saves bytes → faster blur-up swap, P5).
-7. **Posters**: for public assets append `width=<2× rendered>` (and consider
-   `format=webp`) to `thumbnail.jpg` URLs; for signed assets add `width` to the
-   thumbnail token claims in `mux-signing.ts` (`signMuxToken(..., 't', config,
-{ fit_mode: 'preserve', width: … })`).
+7. **Posters — decided: leave as-is.** Without a `width` param Mux serves the
+   poster frame at the asset's stored resolution, which is the sharpest
+   available variant (and self-heals when low-res assets are re-uploaded at
+   2160p). Adding a `width` cap would only _reduce_ sharpness for 4K assets on
+   retina, and Mux's max thumbnail dimensions would need verifying first.
+   Heavier-than-necessary posters on small tiles are an accepted crisp-first
+   tradeoff; revisit only if poster payload shows up as a real problem.
 
 ### Phase 3 — pipeline guardrails (make quality the default)
 
@@ -234,7 +242,7 @@ is the reference target for anything full-bleed.
 | Text-dense UI screenshots                            | 2× rendered, exported PNG                                         | WebP q95 (or PNG if artifacts visible)                                                   |
 | Hero/full-bleed video                                | **2160p master** (min 1440p), high-bitrate export (see checklist) | Mux `max_resolution_tier: 2160p`, playback `maxResolution ≥1440p`, `minResolution 1080p` |
 | Tile/inline video                                    | 1440p master                                                      | playback `maxResolution 1440p`                                                           |
-| Posters                                              | from ≥1440p stored asset                                          | `width` ≥2× rendered, `fit_mode=preserve`                                                |
+| Posters                                              | from ≥1440p stored asset                                          | served at stored resolution, `fit_mode=preserve`                                         |
 
 **Principles:** crisp first, bytes second (portfolio priority); never let the
 browser upscale (source ≥ requested width); above-the-fold media is eager +

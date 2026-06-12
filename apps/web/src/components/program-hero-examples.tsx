@@ -44,6 +44,9 @@ export function ProgramHeroExamples({ examples }: ProgramHeroExamplesProps) {
             playbackId={study.headerMedia!.video!.asset.playbackId}
             className="absolute inset-0 w-full h-full"
             videoClassName="object-cover"
+            maxResolution="2160p"
+            minResolution="1080p"
+            eager={index === 0}
           />
         ) : image?.asset ? (
           <SanityImage

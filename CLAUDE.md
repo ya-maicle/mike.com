@@ -83,4 +83,4 @@
 - E2E smoke: `pnpm e2e:smoke`
 - Supabase local: `pnpm db:start | db:stop | db:reset | db:diff` (CLI v2)
 - Sanity studio (CLI): `pnpm sanity:dev | sanity:build | sanity:deploy`
-- Mux admin: `scripts/mux-rotate-gated-to-signed.ts` (dry-run by default), `scripts/mux-enable-static-renditions.ts`
+- Mux admin: `scripts/mux-rotate-gated-to-signed.ts` (dry-run by default), `scripts/mux-enable-static-renditions.ts`, `scripts/mux-audit-quality.ts` (read-only resolution/tier audit)

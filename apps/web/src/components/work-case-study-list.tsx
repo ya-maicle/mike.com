@@ -86,6 +86,8 @@ export function WorkCaseStudyList({
                     <DecorativeVideo
                       playbackId={heroVideoId}
                       className="pointer-events-none absolute inset-0 transition-transform duration-300 ease-out group-hover:scale-[1.025]"
+                      // ~793 CSS px tile = ~1600 device px on retina
+                      maxResolution="1440p"
                     />
                   ) : heroImage ? (
                     <SanityImage

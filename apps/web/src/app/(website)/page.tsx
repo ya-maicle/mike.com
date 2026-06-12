@@ -89,7 +89,12 @@ export default async function Home() {
               priority
             />
           ) : data.coverMedia.type === 'video' && data.coverMedia.video?.asset?.playbackId ? (
-            <DecorativeVideoBlock playbackId={data.coverMedia.video.asset.playbackId} />
+            <DecorativeVideoBlock
+              playbackId={data.coverMedia.video.asset.playbackId}
+              maxResolution="2160p"
+              minResolution="1080p"
+              eager
+            />
           ) : (
             // Fallback placeholder if media type is selected but no asset uploaded
             <div className="w-full h-full bg-secondary" />
