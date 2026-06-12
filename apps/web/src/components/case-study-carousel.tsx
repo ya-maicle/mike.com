@@ -51,6 +51,7 @@ export function CaseStudyCarousel({ items, title, description }: CaseStudyCarous
                       className="w-full h-full object-cover"
                       sizes="(min-width: 1376px) 1376px, 100vw"
                       aspectRatio="16/9"
+                      loading="eager"
                     />
                   ) : (
                     <DecorativeVideo
@@ -58,6 +59,8 @@ export function CaseStudyCarousel({ items, title, description }: CaseStudyCarous
                       tokens={item.video?.asset?.tokens}
                       className="w-full h-full"
                       videoClassName="object-cover"
+                      maxResolution="2160p"
+                      minResolution="1080p"
                     />
                   )}
                 </div>

@@ -86,6 +86,7 @@ export function WorkCaseStudyList({
                     <DecorativeVideo
                       playbackId={heroVideoId}
                       className="pointer-events-none absolute inset-0 transition-transform duration-300 ease-out group-hover:scale-[1.025]"
+                      maxResolution="1440p"
                     />
                   ) : heroImage ? (
                     <SanityImage

@@ -53,6 +53,7 @@ function MoveCardMedia({ move }: { move: ProgramMove }) {
             playbackId={media.video!.asset.playbackId}
             className="absolute inset-0 w-full h-full"
             videoClassName="object-cover"
+            maxResolution="720p"
           />
         ) : (
           <SanityImage
@@ -60,7 +61,7 @@ function MoveCardMedia({ move }: { move: ProgramMove }) {
             className="absolute inset-0 w-full h-full object-cover"
             sizes="(min-width: 768px) 152px, 120px"
             aspectRatio="1/1"
-            quality={80}
+            quality={85}
           />
         )}
       </div>

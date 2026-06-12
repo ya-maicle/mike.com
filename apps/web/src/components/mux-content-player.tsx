@@ -10,6 +10,9 @@ export interface MuxPlaybackTokens {
   storyboard?: string
 }
 
+export type MuxMaxResolution = '720p' | '1080p' | '1440p' | '2160p'
+export type MuxMinResolution = '480p' | '540p' | '720p' | '1080p' | '1440p' | '2160p'
+
 export interface MuxContentPlayerProps {
   playbackId: string
   /** Required for assets with a signed playback policy; omit for public assets. */
@@ -21,7 +24,13 @@ export interface MuxContentPlayerProps {
   muted?: boolean
   loop?: boolean
   controls?: boolean
-  maxResolution?: '720p' | '1080p' | '1440p' | '2160p'
+  maxResolution?: MuxMaxResolution
+  /**
+   * ABR floor — keeps Mux from starting on a soft low rendition. Only set this
+   * on decorative loops; the gated content player must stay adaptive so it
+   * never stalls behind user-initiated playback.
+   */
+  minResolution?: MuxMinResolution
 }
 
 export const MuxContentPlayer = React.forwardRef<HTMLVideoElement | null, MuxContentPlayerProps>(
@@ -36,7 +45,10 @@ export const MuxContentPlayer = React.forwardRef<HTMLVideoElement | null, MuxCon
       muted = false,
       loop = false,
       controls = true,
-      maxResolution = '1440p',
+      // Reason: content videos render in the 1376px canvas = 2752 device px on
+      // retina; a 1440p ceiling leaves them permanently soft there.
+      maxResolution = '2160p',
+      minResolution,
     },
     ref,
   ) {
@@ -57,6 +69,7 @@ export const MuxContentPlayer = React.forwardRef<HTMLVideoElement | null, MuxCon
         title={title}
         streamType="on-demand"
         maxResolution={maxResolution}
+        minResolution={minResolution}
         autoPlay={autoPlay ? 'muted' : false}
         muted={muted}
         loop={loop}

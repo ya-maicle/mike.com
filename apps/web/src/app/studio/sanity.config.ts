@@ -52,7 +52,11 @@ export default defineConfig({
           ]),
     }),
 
-    muxInput({ mp4_support: 'standard', max_resolution_tier: '2160p' }),
+    // Reason: 2160p storage requires the smart encoding tier — pin it rather
+    // than relying on the Mux account default (basic would cap resolution AND
+    // bitrate). Assets uploaded before these settings stay at their original
+    // tier; audit with scripts/mux-audit-quality.ts.
+    muxInput({ mp4_support: 'standard', max_resolution_tier: '2160p', encoding_tier: 'smart' }),
     media(),
     visionTool({
       defaultApiVersion: '2025-01-01',

@@ -11,6 +11,9 @@ interface DecorativeVideoPlayerProps {
   tokens?: import('@/components/mux-content-player').MuxPlaybackTokens
   className?: string
   aspectRatio?: string
+  maxResolution?: import('@/components/mux-content-player').MuxMaxResolution
+  minResolution?: import('@/components/mux-content-player').MuxMinResolution
+  eager?: boolean
 }
 
 function toCssAspectRatio(ratio?: string): string {
@@ -25,6 +28,9 @@ export function DecorativeVideoPlayer({
   tokens,
   className,
   aspectRatio,
+  maxResolution,
+  minResolution,
+  eager,
 }: DecorativeVideoPlayerProps) {
   const [isPlaying, setIsPlaying] = React.useState(true)
   const videoRef = React.useRef<HTMLVideoElement>(null)
@@ -50,6 +56,9 @@ export function DecorativeVideoPlayer({
         ref={videoRef}
         playbackId={playbackId}
         tokens={tokens}
+        maxResolution={maxResolution}
+        minResolution={minResolution}
+        eager={eager}
         className="absolute inset-0 h-full w-full"
         videoClassName="block h-full w-full object-cover"
       />

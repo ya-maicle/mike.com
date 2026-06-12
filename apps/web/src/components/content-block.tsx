@@ -94,6 +94,8 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
             aspectRatio={block.video?.asset?.aspectRatio}
             title={block.title}
             description={block.description}
+            maxResolution="2160p"
+            minResolution="1080p"
           />
         </div>
       )

@@ -84,13 +84,17 @@ export default async function Home() {
             <SanityImage
               image={data.coverMedia.image}
               className="w-full h-full object-cover"
-              sizes="100vw"
+              sizes="(min-width: 1376px) 1376px, 100vw"
               aspectRatio="16/9"
               priority
-              quality={90}
             />
           ) : data.coverMedia.type === 'video' && data.coverMedia.video?.asset?.playbackId ? (
-            <DecorativeVideoBlock playbackId={data.coverMedia.video.asset.playbackId} />
+            <DecorativeVideoBlock
+              playbackId={data.coverMedia.video.asset.playbackId}
+              maxResolution="2160p"
+              minResolution="1080p"
+              eager
+            />
           ) : (
             // Fallback placeholder if media type is selected but no asset uploaded
             <div className="w-full h-full bg-secondary" />

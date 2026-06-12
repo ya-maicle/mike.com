@@ -26,7 +26,7 @@ export function ProgramHeroExamples({ examples }: ProgramHeroExamplesProps) {
     ) ?? []
   if (validExamples.length === 0) return null
 
-  const slideInner = (example: ValidProgramHeroExample) => {
+  const slideInner = (example: ValidProgramHeroExample, index: number) => {
     const { study } = example
     const isVideo =
       study.headerMedia?.type === 'video' && study.headerMedia.video?.asset?.playbackId
@@ -44,6 +44,9 @@ export function ProgramHeroExamples({ examples }: ProgramHeroExamplesProps) {
             playbackId={study.headerMedia!.video!.asset.playbackId}
             className="absolute inset-0 w-full h-full"
             videoClassName="object-cover"
+            maxResolution="2160p"
+            minResolution="1080p"
+            eager={index === 0}
           />
         ) : image?.asset ? (
           <SanityImage
@@ -51,8 +54,8 @@ export function ProgramHeroExamples({ examples }: ProgramHeroExamplesProps) {
             className="absolute inset-0 w-full h-full object-cover"
             sizes="(min-width: 1376px) 1376px, 100vw"
             aspectRatio="16/9"
-            priority
-            quality={90}
+            priority={index === 0}
+            loading="eager"
           />
         ) : null}
 
@@ -68,16 +71,16 @@ export function ProgramHeroExamples({ examples }: ProgramHeroExamplesProps) {
   }
 
   if (validExamples.length === 1) {
-    return <div className="rounded-[8px] overflow-hidden">{slideInner(validExamples[0])}</div>
+    return <div className="rounded-[8px] overflow-hidden">{slideInner(validExamples[0], 0)}</div>
   }
 
   return (
     <div className="relative rounded-[8px] overflow-hidden">
       <Carousel setApi={setApi} opts={{ loop: true, align: 'start' }} className="w-full">
         <CarouselContent className="-ml-0">
-          {validExamples.map((example) => (
+          {validExamples.map((example, index) => (
             <CarouselItem key={example.study._id} className="pl-0 basis-full">
-              {slideInner(example)}
+              {slideInner(example, index)}
             </CarouselItem>
           ))}
         </CarouselContent>
