@@ -1,6 +1,8 @@
 # Media Quality Audit & Implementation Plan
 
-> Status: **audit only — nothing implemented yet.** Written 2026-06-12 against
+> Status: **image-side code changes implemented** (quality floor 90, hero
+> `sizes` fix, carousel eager-loading, dev upscale warning — see git history);
+> **video work and asset re-exports still pending.** Written 2026-06-12 against
 > branch `refactor/code-cleanup`. Goal: every image and video on the site feels
 > sharp, clear, and premium by default (Apple.com benchmark), with a pipeline
 > that makes that the default rather than something to fight for per-asset.

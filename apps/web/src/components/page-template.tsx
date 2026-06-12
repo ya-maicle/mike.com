@@ -91,9 +91,8 @@ export function PageTemplate({
                 image={coverMedia.image}
                 className="w-full h-auto object-cover max-h-[90vh] rounded-[8px]"
                 priority
-                sizes="100vw"
+                sizes="(min-width: 1376px) 1376px, 100vw"
                 aspectRatio="auto"
-                quality={90}
               />
             ) : null}
           </section>

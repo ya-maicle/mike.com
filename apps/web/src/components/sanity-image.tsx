@@ -13,10 +13,14 @@ interface SanityImageProps {
   aspectRatio: AspectRatio
   quality?: number
   priority?: boolean
+  /** Eager-load without the preload hint `priority` adds (e.g. carousel slides). */
+  loading?: 'eager' | 'lazy'
   className?: string
 }
 
-const DEFAULT_QUALITY = 85
+// Reason: crisp-first portfolio policy (see MEDIA-QUALITY.md) — WebP below 90
+// shows ringing on fine UI text and gradients in screenshots.
+const DEFAULT_QUALITY = 90
 const BASE_WIDTH = 2000
 
 function parseRatio(aspectRatio: AspectRatio): number | null {
@@ -27,8 +31,30 @@ function parseRatio(aspectRatio: AspectRatio): number | null {
   return w / h
 }
 
+// Reason: the Sanity CDN never upscales — requesting more pixels than the
+// source has silently falls back to the source size and the *browser* does the
+// upscaling, which is the main cause of soft images. Surface it in dev.
+const warnedAssets = new Set<string>()
+
+function warnIfUpscaled(image: SanityImageType, width: number, ratio: number | null) {
+  if (process.env.NODE_ENV === 'production') return
+  const id = image.asset?._id || image.asset?._ref
+  const dims = image.asset?.metadata?.dimensions
+  if (!id || !dims?.width || warnedAssets.has(id)) return
+  const neededHeight = ratio !== null ? Math.round(width / ratio) : 0
+  if (dims.width < width || (dims.height ?? Infinity) < neededHeight) {
+    warnedAssets.add(id)
+    console.warn(
+      `[SanityImage] ${id}: browser requested ${width}px wide but the source is ` +
+        `${dims.width}×${dims.height ?? '?'} — it will be upscaled and look soft. ` +
+        `Re-export at 2× the rendered CSS size (see MEDIA-QUALITY.md).`,
+    )
+  }
+}
+
 function makeLoader(image: SanityImageType, ratio: number | null) {
   return ({ width, quality }: ImageLoaderProps) => {
+    warnIfUpscaled(image, width, ratio)
     let builder = urlFor(image).width(width).auto('format')
     if (ratio !== null) {
       builder = builder.height(Math.round(width / ratio)).fit('crop')
@@ -44,6 +70,7 @@ function SanityImageImpl({
   aspectRatio,
   quality = DEFAULT_QUALITY,
   priority,
+  loading,
   className,
 }: SanityImageProps) {
   // Reason: asset id as src keeps Next.js' loader-width validator happy
@@ -75,6 +102,7 @@ function SanityImageImpl({
       sizes={sizes}
       className={className}
       priority={priority}
+      loading={priority ? undefined : loading}
       quality={quality}
       placeholder={blurDataURL ? 'blur' : 'empty'}
       blurDataURL={blurDataURL}
