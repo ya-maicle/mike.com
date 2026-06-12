@@ -51,9 +51,6 @@ export function CaseStudyCarousel({ items, title, description }: CaseStudyCarous
                       className="w-full h-full object-cover"
                       sizes="(min-width: 1376px) 1376px, 100vw"
                       aspectRatio="16/9"
-                      // Reason: Embla translates slides out of the viewport, so
-                      // native lazy-loading would only fetch them mid-transition
-                      // and every slide change would show a blur-up flash.
                       loading="eager"
                     />
                   ) : (

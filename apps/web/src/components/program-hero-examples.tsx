@@ -54,10 +54,6 @@ export function ProgramHeroExamples({ examples }: ProgramHeroExamplesProps) {
             className="absolute inset-0 w-full h-full object-cover"
             sizes="(min-width: 1376px) 1376px, 100vw"
             aspectRatio="16/9"
-            // Reason: only the visible slide is an LCP candidate — preloading
-            // every slide competes with it. Later slides still load eagerly so
-            // navigation never shows a blur-up (Embla hides them via transform,
-            // which defeats native lazy-loading anyway).
             priority={index === 0}
             loading="eager"
           />

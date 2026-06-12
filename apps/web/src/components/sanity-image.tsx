@@ -18,8 +18,7 @@ interface SanityImageProps {
   className?: string
 }
 
-// Reason: crisp-first portfolio policy (see MEDIA-QUALITY.md) — WebP below 90
-// shows ringing on fine UI text and gradients in screenshots.
+// Reason: WebP below q90 shows ringing on fine UI text and gradients.
 const DEFAULT_QUALITY = 90
 const BASE_WIDTH = 2000
 
@@ -31,9 +30,8 @@ function parseRatio(aspectRatio: AspectRatio): number | null {
   return w / h
 }
 
-// Reason: the Sanity CDN never upscales — requesting more pixels than the
-// source has silently falls back to the source size and the *browser* does the
-// upscaling, which is the main cause of soft images. Surface it in dev.
+// Reason: the CDN silently returns the source size when asked for more pixels;
+// the browser upscales instead. Warn in dev so under-sized assets are caught.
 const warnedAssets = new Set<string>()
 
 function warnIfUpscaled(image: SanityImageType, width: number, ratio: number | null) {

@@ -53,7 +53,6 @@ function MoveCardMedia({ move }: { move: ProgramMove }) {
             playbackId={media.video!.asset.playbackId}
             className="absolute inset-0 w-full h-full"
             videoClassName="object-cover"
-            // 152 CSS px tile — even 3× DPR only needs ~456px
             maxResolution="720p"
           />
         ) : (
