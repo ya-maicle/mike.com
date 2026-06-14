@@ -9,6 +9,7 @@ import { homePage } from './home-page'
 import { legalPage } from './legal-page'
 import { portfolioAccessProfile } from './portfolio-access-profile'
 import { program } from './program'
+import { deck } from './deck'
 
 export const schemaTypes = [
   homePage,
@@ -22,4 +23,5 @@ export const schemaTypes = [
   twoColumnImageBlock,
   legalPage,
   portfolioAccessProfile,
+  deck,
 ]

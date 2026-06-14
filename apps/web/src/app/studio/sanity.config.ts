@@ -49,6 +49,10 @@ export default defineConfig({
               .title('Pages')
               .icon(() => '📄')
               .child(S.documentTypeList('page').title('Pages')),
+            S.listItem()
+              .title('Deck — Short Link')
+              .icon(() => '📎')
+              .child(S.document().schemaType('deck').documentId('deck').title('Deck (Short Link)')),
           ]),
     }),
 
@@ -68,7 +72,9 @@ export default defineConfig({
     types: schemaTypes,
     templates: (templates) =>
       templates.filter(({ schemaType }) =>
-        ['homePage', 'caseStudy', 'program', 'page', 'portfolioAccessProfile'].includes(schemaType),
+        ['homePage', 'caseStudy', 'program', 'page', 'portfolioAccessProfile', 'deck'].includes(
+          schemaType,
+        ),
       ),
   },
 
@@ -82,7 +88,9 @@ export default defineConfig({
     },
     newDocumentOptions: (prev) =>
       prev.filter(({ templateId }) =>
-        ['homePage', 'caseStudy', 'program', 'page', 'portfolioAccessProfile'].includes(templateId),
+        ['homePage', 'caseStudy', 'program', 'page', 'portfolioAccessProfile', 'deck'].includes(
+          templateId,
+        ),
       ),
   },
 
