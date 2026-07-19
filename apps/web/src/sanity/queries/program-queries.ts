@@ -69,6 +69,16 @@ export const PUBLISHED_PROGRAMS = groq`
   }
 `
 
+export const PUBLISHED_PROGRAM_SLUGS = groq`
+  *[_type == "program" && defined(slug.current)]{
+    slug
+  }
+`
+
+export type ProgramSlug = {
+  slug: { current: string }
+}
+
 export type ProgramHeroExample = {
   study?: {
     _id: string

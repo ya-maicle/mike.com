@@ -2,8 +2,13 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 import { sanityFetch } from '@/sanity/client'
-import { PROGRAM_BY_SLUG, programTag } from '@/sanity/queries/program-queries'
-import type { Program } from '@/sanity/queries/program-queries'
+import {
+  PROGRAM_BY_SLUG,
+  PUBLISHED_PROGRAM_SLUGS,
+  programTag,
+  programsTag,
+} from '@/sanity/queries/program-queries'
+import type { Program, ProgramSlug } from '@/sanity/queries/program-queries'
 import {
   HOME_PAGE_PROGRAMS_QUERY,
   homePageTag,
@@ -11,10 +16,21 @@ import {
 } from '@/sanity/queries/home-page-queries'
 import { ProgramLayout } from '@/components/program-layout'
 
-export const dynamic = 'force-dynamic'
+export const dynamic = 'force-static'
+export const revalidate = 300
 
 type PageProps = {
   params: Promise<{ slug: string }>
+}
+
+export async function generateStaticParams() {
+  const programs = await sanityFetch<ProgramSlug[]>(
+    PUBLISHED_PROGRAM_SLUGS,
+    {},
+    { tag: programsTag },
+  )
+
+  return programs.map(({ slug }) => ({ slug: slug.current }))
 }
 
 export async function generateMetadata(props: PageProps): Promise<Metadata> {
