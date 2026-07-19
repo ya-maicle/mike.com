@@ -3,6 +3,7 @@
 import * as React from 'react'
 import MuxPlayerReact from '@mux/mux-player-react/lazy'
 import type { MuxPlayerRefAttributes } from '@mux/mux-player-react'
+import { getMuxPosterUrl } from '@/lib/mux-poster'
 
 export interface MuxPlaybackTokens {
   playback?: string
@@ -54,11 +55,11 @@ export const MuxContentPlayer = React.forwardRef<HTMLVideoElement | null, MuxCon
   ) {
     // Reason: signed thumbnail URLs reject loose query params — render params
     // (fit_mode) are embedded in the token claims instead.
-    const posterUrl =
-      poster ||
-      (tokens?.thumbnail
-        ? `https://image.mux.com/${playbackId}/thumbnail.jpg?token=${tokens.thumbnail}`
-        : `https://image.mux.com/${playbackId}/thumbnail.jpg?fit_mode=preserve`)
+    const posterUrl = getMuxPosterUrl({
+      playbackId,
+      poster,
+      thumbnailToken: tokens?.thumbnail,
+    })
 
     return (
       <MuxPlayerReact
