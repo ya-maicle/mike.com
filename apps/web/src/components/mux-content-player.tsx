@@ -3,6 +3,7 @@
 import * as React from 'react'
 import MuxPlayerReact from '@mux/mux-player-react/lazy'
 import type { MuxPlayerRefAttributes } from '@mux/mux-player-react'
+import { useCookiePreferences } from '@/components/providers/cookie-preferences-provider'
 import { getMuxPosterUrl } from '@/lib/mux-poster'
 
 export interface MuxPlaybackTokens {
@@ -53,6 +54,8 @@ export const MuxContentPlayer = React.forwardRef<HTMLVideoElement | null, MuxCon
     },
     ref,
   ) {
+    const { analyticsEnabled } = useCookiePreferences()
+
     // Reason: signed thumbnail URLs reject loose query params — render params
     // (fit_mode) are embedded in the token claims instead.
     const posterUrl = getMuxPosterUrl({
@@ -63,7 +66,10 @@ export const MuxContentPlayer = React.forwardRef<HTMLVideoElement | null, MuxCon
 
     return (
       <MuxPlayerReact
+        key={analyticsEnabled ? 'analytics-enabled' : 'analytics-disabled'}
         ref={ref as React.Ref<MuxPlayerRefAttributes>}
+        disableCookies
+        disableTracking={!analyticsEnabled}
         playbackId={playbackId}
         tokens={tokens}
         poster={posterUrl}
