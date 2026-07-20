@@ -19,6 +19,9 @@ export const optimistic = localFont({
 })
 
 export const plain = localFont({
+  // Plain remains available as the Optimistic fallback, but its 16 individual
+  // faces should not all compete with the primary variable font at startup.
+  preload: false,
   src: [
     {
       path: '../fonts/Plain/Plain-Hairline.woff2',

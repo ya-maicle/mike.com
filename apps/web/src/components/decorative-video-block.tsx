@@ -11,6 +11,7 @@ interface DecorativeVideoBlockProps {
   maxResolution?: import('@/components/mux-content-player').MuxMaxResolution
   minResolution?: import('@/components/mux-content-player').MuxMinResolution
   eager?: boolean
+  priority?: boolean
 }
 
 export function DecorativeVideoBlock({
@@ -22,6 +23,7 @@ export function DecorativeVideoBlock({
   maxResolution,
   minResolution,
   eager,
+  priority,
 }: DecorativeVideoBlockProps) {
   return (
     <section className="w-full space-y-3 max-w-[var(--content-max-width)] mx-auto">
@@ -32,6 +34,7 @@ export function DecorativeVideoBlock({
         maxResolution={maxResolution}
         minResolution={minResolution}
         eager={eager}
+        priority={priority}
       />
       {(title || description) && (
         <div className="mx-auto max-w-[592px]">

@@ -2,6 +2,8 @@
 
 import * as React from 'react'
 import dynamic from 'next/dynamic'
+import { cn } from '@/lib/utils'
+import { getMuxPosterUrl } from '@/lib/mux-poster'
 
 const MuxContentPlayer = dynamic(
   () => import('@/components/mux-content-player').then((m) => m.MuxContentPlayer),
@@ -16,6 +18,8 @@ export interface DecorativeVideoProps {
   videoClassName?: string
   maxResolution?: import('@/components/mux-content-player').MuxMaxResolution
   minResolution?: import('@/components/mux-content-player').MuxMinResolution
+  /** Expose the hero poster in SSR and load it before mounting the stream. */
+  priority?: boolean
   /**
    * Mount the player immediately instead of waiting for the
    * IntersectionObserver — for above-the-fold heroes, where waiting for
@@ -35,12 +39,25 @@ export const DecorativeVideo = React.forwardRef<HTMLVideoElement | null, Decorat
       maxResolution = '1080p',
       minResolution,
       eager = false,
+      priority = false,
     },
     ref,
   ) {
     const containerRef = React.useRef<HTMLDivElement>(null)
+    const posterRef = React.useRef<HTMLImageElement>(null)
 
     const [hasBeenVisible, setHasBeenVisible] = React.useState(eager)
+    const [isPosterReady, setIsPosterReady] = React.useState(false)
+    const posterUrl = getMuxPosterUrl({
+      playbackId,
+      poster,
+      thumbnailToken: tokens?.thumbnail,
+    })
+
+    React.useEffect(() => {
+      if (!priority) return
+      if (posterRef.current?.complete) setIsPosterReady(true)
+    }, [priority])
 
     React.useEffect(() => {
       if (eager) return
@@ -60,8 +77,25 @@ export const DecorativeVideo = React.forwardRef<HTMLVideoElement | null, Decorat
     }, [eager])
 
     return (
-      <div ref={containerRef} className={className}>
-        {hasBeenVisible ? (
+      <div ref={containerRef} className={cn(priority && 'relative overflow-hidden', className)}>
+        {priority ? (
+          // Keep only true hero LCP candidates in server-rendered HTML. Lazy
+          // videos retain their original player-driven poster behavior.
+          // eslint-disable-next-line @next/next/no-img-element -- Preserve the original Mux asset without a recompression proxy.
+          <img
+            ref={posterRef}
+            src={posterUrl}
+            alt=""
+            aria-hidden="true"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+            className={cn('absolute inset-0 block h-full w-full object-cover', videoClassName)}
+            onLoad={() => setIsPosterReady(true)}
+            onError={() => setIsPosterReady(true)}
+          />
+        ) : null}
+        {hasBeenVisible && (!priority || isPosterReady) ? (
           <MuxContentPlayer
             ref={ref}
             playbackId={playbackId}
@@ -73,7 +107,7 @@ export const DecorativeVideo = React.forwardRef<HTMLVideoElement | null, Decorat
             controls={false}
             maxResolution={maxResolution}
             minResolution={minResolution}
-            className={videoClassName}
+            className={cn(priority && 'absolute inset-0', videoClassName)}
           />
         ) : null}
       </div>

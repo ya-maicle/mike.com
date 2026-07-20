@@ -94,6 +94,7 @@ export default async function Home() {
               maxResolution="2160p"
               minResolution="1080p"
               eager
+              priority
             />
           ) : (
             // Fallback placeholder if media type is selected but no asset uploaded

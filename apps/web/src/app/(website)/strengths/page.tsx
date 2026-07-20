@@ -7,7 +7,8 @@ import { PUBLISHED_PROGRAMS, programsTag } from '@/sanity/queries/program-querie
 import type { Program } from '@/sanity/queries/program-queries'
 import { programPath } from '@/lib/program-display'
 
-export const dynamic = 'force-dynamic'
+export const dynamic = 'force-static'
+export const revalidate = 300
 
 export const metadata: Metadata = {
   title: 'Strengths',
