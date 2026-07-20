@@ -6,11 +6,14 @@ import { usePathname } from 'next/navigation'
 import { SITE_CONFIG } from '@/lib/constants'
 import { isStrengthDetailPath } from '@/lib/program-display'
 import { cn } from '@/lib/utils'
+import { useCookiePreferences } from '@/components/providers/cookie-preferences-provider'
+import { Button } from '@/components/ui/button'
 
 export function Footer() {
   const [year, setYear] = useState<number>(2025)
   const pathname = usePathname()
   const flush = isStrengthDetailPath(pathname)
+  const { openPreferences } = useCookiePreferences()
 
   useEffect(() => {
     setYear(new Date().getFullYear())
@@ -25,12 +28,14 @@ export function Footer() {
               <span>
                 {year} {SITE_CONFIG.name}
               </span>
-              <a
-                href="#"
-                className="font-normal underline decoration-1 underline-offset-4 hover:text-muted-foreground hover:decoration-muted-foreground transition-colors"
+              <Button
+                type="button"
+                variant="link"
+                onClick={openPreferences}
+                className="h-auto rounded-none p-0 font-normal text-foreground underline decoration-1 underline-offset-4 hover:text-muted-foreground hover:decoration-muted-foreground"
               >
                 Manage cookies
-              </a>
+              </Button>
               <Link
                 href="/terms"
                 className="font-normal underline decoration-1 underline-offset-4 hover:text-muted-foreground hover:decoration-muted-foreground transition-colors"
