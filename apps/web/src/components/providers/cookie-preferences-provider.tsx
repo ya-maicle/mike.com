@@ -4,6 +4,7 @@ import * as React from 'react'
 import { ConsentAwareAnalytics } from '@/components/consent-aware-analytics'
 import { CookieConsentPrompt } from '@/components/cookie-consent-prompt'
 import { CookiePreferencesDialog } from '@/components/cookie-preferences-dialog'
+import { useMobileNavigation } from '@/components/providers/mobile-navigation-provider'
 import {
   COOKIE_PREFERENCES_STORAGE_KEY,
   DEFAULT_COOKIE_CHOICES,
@@ -45,6 +46,7 @@ function clearDisabledCategoryData(choices: CookieChoices) {
 }
 
 export function CookiePreferencesProvider({ children }: { children: React.ReactNode }) {
+  const { open: mobileNavigationOpen } = useMobileNavigation()
   const [choices, setChoices] = React.useState<CookieChoices>(DEFAULT_COOKIE_CHOICES)
   const [ready, setReady] = React.useState(false)
   const [hasSavedPreferences, setHasSavedPreferences] = React.useState(false)
@@ -125,7 +127,7 @@ export function CookiePreferencesProvider({ children }: { children: React.ReactN
     <CookiePreferencesContext.Provider value={contextValue}>
       {children}
       {ready && choices.analytics ? <ConsentAwareAnalytics /> : null}
-      {ready && !hasSavedPreferences && !open ? (
+      {ready && !hasSavedPreferences && !open && !mobileNavigationOpen ? (
         <CookieConsentPrompt
           saveError={saveError}
           onAccept={() => savePreferences({ analytics: true })}

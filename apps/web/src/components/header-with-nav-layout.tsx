@@ -16,10 +16,12 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Footer } from '@/components/footer'
 import { isStrengthDetailPath } from '@/lib/program-display'
+import { useMobileNavigation } from '@/components/providers/mobile-navigation-provider'
 
 export function HeaderWithNavLayout({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = React.useState(false)
-  const [navOpen, setNavOpen] = React.useState(false)
+  const [desktopNavOpen, setDesktopNavOpen] = React.useState(false)
+  const { open: mobileNavOpen, setOpen: setMobileNavOpen } = useMobileNavigation()
 
   const { open: loginOpen, setOpen: setLoginOpen, openLogin } = useLoginModal()
   const { user } = useAuth()
@@ -28,6 +30,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
   const [atTop, setAtTop] = React.useState(true)
   const lastYRef = React.useRef(0)
   const [isMobile, setIsMobile] = React.useState(false)
+  const navOpen = isMobile ? mobileNavOpen : desktopNavOpen
   React.useEffect(() => setMounted(true), [])
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -36,15 +39,21 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
 
       const onMobileChange = (e: MediaQueryListEvent) => {
         setIsMobile(!e.matches)
+        if (e.matches) {
+          setMobileNavOpen(false)
+        } else {
+          setDesktopNavOpen(false)
+        }
       }
       mqMobile.addEventListener('change', onMobileChange)
-      setNavOpen(false)
+      setDesktopNavOpen(false)
+      setMobileNavOpen(false)
 
       return () => {
         mqMobile.removeEventListener('change', onMobileChange)
       }
     }
-  }, [])
+  }, [setMobileNavOpen])
 
   // Header show/hide on scroll and transparency at top
   React.useEffect(() => {
@@ -100,7 +109,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
                 variant="ghost"
                 size="icon"
                 className="hidden md:inline-flex pointer-events-auto md:absolute md:left-[148px]"
-                onClick={() => setNavOpen((v) => !v)}
+                onClick={() => setDesktopNavOpen((value) => !value)}
               >
                 {navOpen ? (
                   <SideMenuOpen size={20} className="text-zinc-500" />
@@ -118,8 +127,8 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
                 size="icon"
                 className="md:hidden"
                 onClick={() => {
-                  const willOpen = !navOpen
-                  setNavOpen(willOpen)
+                  const willOpen = !mobileNavOpen
+                  setMobileNavOpen(willOpen)
                   // Dispatch custom event on mobile when opening nav
                   if (willOpen && typeof window !== 'undefined') {
                     window.dispatchEvent(new CustomEvent('mobile-nav-opening'))
@@ -166,10 +175,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
                 <li>
                   <Link
                     href="/work"
-                    onClick={() => {
-                      if (typeof window !== 'undefined' && window.innerWidth < 1000)
-                        setNavOpen(false)
-                    }}
+                    onClick={() => setMobileNavOpen(false)}
                     className={cn(
                       'group flex w-full items-center gap-3 rounded-md px-4 py-3 md:px-3 md:py-2 text-xl md:text-base font-normal [font-family:var(--font-geist-sans)] transition-colors',
                       pathname === '/work'
@@ -183,10 +189,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
                 <li>
                   <Link
                     href="/bio"
-                    onClick={() => {
-                      if (typeof window !== 'undefined' && window.innerWidth < 1000)
-                        setNavOpen(false)
-                    }}
+                    onClick={() => setMobileNavOpen(false)}
                     className={cn(
                       'group flex w-full items-center gap-3 rounded-md px-4 py-3 md:px-3 md:py-2 text-xl md:text-base font-normal [font-family:var(--font-geist-sans)] transition-colors',
                       pathname === '/bio'
@@ -200,10 +203,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
                 <li>
                   <Link
                     href="/stories"
-                    onClick={() => {
-                      if (typeof window !== 'undefined' && window.innerWidth < 1000)
-                        setNavOpen(false)
-                    }}
+                    onClick={() => setMobileNavOpen(false)}
                     className={cn(
                       'group flex w-full items-center gap-3 rounded-md px-4 py-3 md:px-3 md:py-2 text-xl md:text-base font-normal [font-family:var(--font-geist-sans)] transition-colors',
                       pathname === '/stories'
@@ -236,7 +236,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
         <button
           aria-hidden={!navOpen}
           aria-label="Dismiss navigation overlay"
-          onClick={() => setNavOpen(false)}
+          onClick={() => setMobileNavOpen(false)}
           className={cn(
             'md:hidden fixed left-0 right-0 bottom-0 z-30 transition-opacity duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]',
             hidden ? 'top-0' : 'top-14',

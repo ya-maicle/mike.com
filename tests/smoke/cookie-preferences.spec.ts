@@ -264,6 +264,14 @@ test.describe('Cookie preferences', () => {
     await expect(prompt.getByRole('button', { name: 'Accept analytics' })).toBeVisible()
     await expect(prompt.getByRole('button', { name: 'Reject analytics' })).toBeVisible()
 
+    const navigationToggle = page.getByRole('button', { name: 'Toggle navigation' })
+    await navigationToggle.click()
+    await expect(page.getByRole('link', { name: 'Work', exact: true })).toBeVisible()
+    await expect(prompt).toBeHidden()
+
+    await navigationToggle.click()
+    await expect(prompt).toBeVisible()
+
     const dialog = getDialog(page)
     await expect(dialog).toBeHidden()
     await openPreferences(page)
