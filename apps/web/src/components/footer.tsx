@@ -32,7 +32,7 @@ export function Footer() {
                 type="button"
                 variant="link"
                 onClick={openPreferences}
-                className="h-auto rounded-none p-0 font-normal text-foreground underline decoration-1 underline-offset-4 hover:text-muted-foreground hover:decoration-muted-foreground"
+                className="h-auto rounded-none p-0 font-normal text-foreground underline decoration-foreground/50 decoration-1 underline-offset-4 hover:text-muted-foreground hover:decoration-muted-foreground"
               >
                 Manage cookies
               </Button>
