@@ -203,16 +203,14 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
               </ul>
             </nav>
 
-            {/* Mobile-only footer action */}
-            <div className="mt-auto md:hidden flex justify-end">
-              {user ? (
-                <UserMenu />
-              ) : (
+            {/* Mobile-only footer action for logged-out users */}
+            {!user && (
+              <div className="mt-auto flex justify-end md:hidden">
                 <Button variant="secondary" size="default" onClick={() => openLogin()}>
                   Log in
                 </Button>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </aside>
       )}
