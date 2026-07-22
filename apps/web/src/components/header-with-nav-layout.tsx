@@ -200,20 +200,6 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
                     <span>Bio</span>
                   </Link>
                 </li>
-                <li>
-                  <Link
-                    href="/stories"
-                    onClick={() => setMobileNavOpen(false)}
-                    className={cn(
-                      'group flex w-full items-center gap-3 rounded-md px-4 py-3 md:px-3 md:py-2 text-xl md:text-base font-normal [font-family:var(--font-geist-sans)] transition-colors',
-                      pathname === '/stories'
-                        ? 'bg-accent text-accent-foreground'
-                        : 'text-foreground hover:bg-accent hover:text-accent-foreground',
-                    )}
-                  >
-                    <span>Stories</span>
-                  </Link>
-                </li>
               </ul>
             </nav>
 
