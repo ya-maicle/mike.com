@@ -86,14 +86,6 @@ export function HeaderWithNav() {
                 <span>Bio</span>
               </a>
             </li>
-            <li>
-              <a
-                href="#"
-                className="group flex items-center gap-3 rounded-md px-3 py-2 text-base font-normal [font-family:var(--font-geist-sans)] text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
-              >
-                <span>Stories</span>
-              </a>
-            </li>
           </ul>
         </nav>
       </aside>
