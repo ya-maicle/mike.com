@@ -41,7 +41,6 @@ interface LogotypeProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof logotypeVariants> {
   gradient?: boolean
-  gradientMode?: 'auto' | 'dark'
   showText?: boolean
   text?: string
   href?: string
@@ -52,10 +51,9 @@ const LogoMark = React.forwardRef<
   SVGSVGElement,
   React.SVGProps<SVGSVGElement> & {
     gradient?: boolean
-    gradientMode?: 'auto' | 'dark'
     size: keyof typeof logoSizes
   }
->(({ size, gradient = false, gradientMode = 'auto', className, ...props }, ref) => {
+>(({ size, gradient = false, className, ...props }, ref) => {
   const dimensions = logoSizes[size]
   const gradientId = `logo-gradient-${React.useId().replaceAll(':', '')}`
 
@@ -70,9 +68,7 @@ const LogoMark = React.forwardRef<
       className={cn(
         'flex-shrink-0 transition-colors',
         gradient &&
-          (gradientMode === 'dark'
-            ? '[--logo-gradient-end:#FAFAFA] [--logo-gradient-start:#A1A1AA]'
-            : '[--logo-gradient-end:#60606C] [--logo-gradient-start:#09090B] dark:[--logo-gradient-end:#FAFAFA] dark:[--logo-gradient-start:#A1A1AA]'),
+          '[--logo-gradient-end:#60606C] [--logo-gradient-start:#09090B] dark:[--logo-gradient-end:#FAFAFA] dark:[--logo-gradient-start:#A1A1AA]',
         className,
       )}
       {...props}
@@ -110,7 +106,6 @@ const Logotype = React.forwardRef<HTMLDivElement, LogotypeProps>(
       size = 'md',
       variant = 'default',
       gradient = false,
-      gradientMode = 'auto',
       showText = true,
       text = SITE_CONFIG.name,
       href,
@@ -129,7 +124,7 @@ const Logotype = React.forwardRef<HTMLDivElement, LogotypeProps>(
           ref={ref as any} // eslint-disable-line @typescript-eslint/no-explicit-any
           {...(props as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
         >
-          <LogoMark size={size!} gradient={gradient} gradientMode={gradientMode} />
+          <LogoMark size={size!} gradient={gradient} />
           {showText && <span className="font-inherit leading-none">{text}</span>}
         </a>
       )
@@ -142,7 +137,7 @@ const Logotype = React.forwardRef<HTMLDivElement, LogotypeProps>(
           ref={ref as any} // eslint-disable-line @typescript-eslint/no-explicit-any
           {...(props as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
         >
-          <LogoMark size={size!} gradient={gradient} gradientMode={gradientMode} />
+          <LogoMark size={size!} gradient={gradient} />
           {showText && <span className="font-inherit leading-none">{text}</span>}
         </button>
       )
@@ -150,7 +145,7 @@ const Logotype = React.forwardRef<HTMLDivElement, LogotypeProps>(
 
     return (
       <div className={baseClassName} ref={ref} {...props}>
-        <LogoMark size={size!} gradient={gradient} gradientMode={gradientMode} />
+        <LogoMark size={size!} gradient={gradient} />
         {showText && <span className="font-inherit leading-none">{text}</span>}
       </div>
     )

@@ -16,7 +16,6 @@ interface SanityImageProps {
   /** Eager-load without the preload hint `priority` adds (e.g. carousel slides). */
   loading?: 'eager' | 'lazy'
   className?: string
-  objectPosition?: React.CSSProperties['objectPosition']
 }
 
 // Reason: WebP below q90 shows ringing on fine UI text and gradients.
@@ -71,7 +70,6 @@ function SanityImageImpl({
   priority,
   loading,
   className,
-  objectPosition,
 }: SanityImageProps) {
   // Reason: asset id as src keeps Next.js' loader-width validator happy
   // (it compares loader output to src; identical strings trigger a warning).
@@ -101,7 +99,6 @@ function SanityImageImpl({
       height={height}
       sizes={sizes}
       className={className}
-      style={objectPosition ? { objectPosition } : undefined}
       priority={priority}
       loading={priority ? undefined : loading}
       quality={quality}
