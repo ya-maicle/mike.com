@@ -20,10 +20,6 @@ const meta: Meta<typeof Logotype> = {
     showText: {
       control: { type: 'boolean' },
     },
-    gradientMode: {
-      control: { type: 'select' },
-      options: ['auto', 'dark'],
-    },
     text: {
       control: { type: 'text' },
     },
@@ -48,14 +44,6 @@ export const LogoOnly: Story = {
   args: {
     showText: false,
   },
-}
-
-export const DarkModeGradient: Story = {
-  render: () => (
-    <div className="rounded-lg bg-zinc-950 p-6">
-      <Logotype size="2xl" gradient gradientMode="dark" showText={false} />
-    </div>
-  ),
 }
 
 export const Sizes: Story = {

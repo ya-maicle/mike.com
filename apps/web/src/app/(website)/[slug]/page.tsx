@@ -2,7 +2,6 @@ import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
 import { sanityFetch, sanityNoStoreFetch } from '@/sanity/client'
 import { PageTemplate } from '@/components/page-template'
-import { BioPageLayout } from '@/components/bio-page-layout'
 import { LegalPageContent } from '@/components/legal-page-content'
 import type { PortableTextBlock } from '@portabletext/types'
 import { ebGaramond } from '@/lib/fonts'
@@ -147,27 +146,16 @@ export default async function DynamicPage(props: PageProps) {
     />
   )
 
-  if (isBio && page.coverMedia?.type === 'image' && page.coverMedia.image) {
-    return (
-      <BioPageLayout
-        title={page.title}
-        titleClassName={ebGaramond.className}
-        subtitle={page.subtitle}
-        subtitleClassName={ebGaramond.className}
-        image={page.coverMedia.image}
-        metadata={formattedDate}
-      >
-        {pageContent}
-      </BioPageLayout>
-    )
-  }
-
   return (
     <PageTemplate
       title={page.title}
-      titleClassName={isBio ? ebGaramond.className : undefined}
+      titleClassName={
+        isBio
+          ? `${ebGaramond.className} text-[clamp(36px,9vw,72px)] leading-none tracking-[-1px]`
+          : undefined
+      }
       subtitle={page.subtitle}
-      subtitleClassName={isBio ? ebGaramond.className : undefined}
+      subtitleClassName={isBio ? `${ebGaramond.className} [--text-xl:20px]` : undefined}
       coverMedia={page.coverMedia}
       metadata={formattedDate}
     >
