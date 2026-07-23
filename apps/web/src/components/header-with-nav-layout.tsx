@@ -98,8 +98,9 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
               >
                 <Logotype
                   size="2xl"
+                  gradient
                   showText={false}
-                  className="[&_svg]:w-[36px] md:[&_svg]:w-[42px] [&_svg]:h-auto"
+                  className="[&_svg]:w-[36px] [&_svg]:h-auto md:[&_svg]:h-[20px]"
                 />
               </Link>
 
