@@ -4,7 +4,7 @@ import * as React from 'react'
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/ui/carousel'
 import { SanityImage } from '@/components/sanity-image'
 import { DecorativeVideo } from '@/components/decorative-video'
-import { ArrowLeft, ArrowRight, Play, Pause } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Pause, Play } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 interface CaseStudyCarouselProps {
@@ -13,6 +13,11 @@ interface CaseStudyCarouselProps {
   title?: string
   description?: string
 }
+
+const carouselControlClass =
+  'h-7 w-7 rounded-full border border-white/15 bg-background/45 text-foreground/75 shadow-sm shadow-black/10 backdrop-blur-md transition-all duration-200 hover:bg-background/60 hover:text-foreground focus-visible:ring-1 focus-visible:ring-ring/60 focus-visible:ring-offset-0 md:h-8 md:w-8'
+
+const carouselIconClass = 'h-2.5 w-2.5 stroke-[1.75] md:h-3 md:w-3'
 
 export function CaseStudyCarousel({ items, title, description }: CaseStudyCarouselProps) {
   const [api, setApi] = React.useState<CarouselApi>()
@@ -73,36 +78,39 @@ export function CaseStudyCarousel({ items, title, description }: CaseStudyCarous
           <Button
             variant="secondary"
             size="icon"
-            className="rounded-full w-7 h-7 bg-background/80 hover:bg-background backdrop-blur-sm text-foreground border border-border/10"
+            className={carouselControlClass}
             onClick={() => setIsPlaying(!isPlaying)}
+            aria-label={isPlaying ? 'Pause carousel autoplay' : 'Play carousel autoplay'}
           >
             {isPlaying ? (
-              <Pause className="h-3 w-3 fill-current" />
+              <Pause className={carouselIconClass} />
             ) : (
-              <Play className="h-3 w-3 fill-current" />
+              <Play className={carouselIconClass} fill="currentColor" />
             )}
           </Button>
           <Button
             variant="secondary"
             size="icon"
-            className="rounded-full w-7 h-7 bg-background/80 hover:bg-background backdrop-blur-sm text-foreground border border-border/10"
+            className={carouselControlClass}
             onClick={() => {
               onUserInteract()
               api?.scrollPrev()
             }}
+            aria-label="Previous slide"
           >
-            <ArrowLeft className="h-3 w-3" />
+            <ArrowLeft className={carouselIconClass} />
           </Button>
           <Button
             variant="secondary"
             size="icon"
-            className="rounded-full w-7 h-7 bg-background/80 hover:bg-background backdrop-blur-sm text-foreground border border-border/10"
+            className={carouselControlClass}
             onClick={() => {
               onUserInteract()
               api?.scrollNext()
             }}
+            aria-label="Next slide"
           >
-            <ArrowRight className="h-3 w-3" />
+            <ArrowRight className={carouselIconClass} />
           </Button>
         </div>
       </div>
