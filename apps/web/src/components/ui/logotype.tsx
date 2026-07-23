@@ -40,6 +40,7 @@ const logoSizes = {
 interface LogotypeProps
   extends React.HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof logotypeVariants> {
+  gradient?: boolean
   showText?: boolean
   text?: string
   href?: string
@@ -48,9 +49,13 @@ interface LogotypeProps
 
 const LogoMark = React.forwardRef<
   SVGSVGElement,
-  React.SVGProps<SVGSVGElement> & { size: keyof typeof logoSizes }
->(({ size, className, ...props }, ref) => {
+  React.SVGProps<SVGSVGElement> & {
+    gradient?: boolean
+    size: keyof typeof logoSizes
+  }
+>(({ size, gradient = false, className, ...props }, ref) => {
   const dimensions = logoSizes[size]
+  const gradientId = `logo-gradient-${React.useId().replaceAll(':', '')}`
 
   return (
     <svg
@@ -60,14 +65,34 @@ const LogoMark = React.forwardRef<
       viewBox="0 0 60 34"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={cn('flex-shrink-0 transition-colors', className)}
+      className={cn(
+        'flex-shrink-0 transition-colors',
+        gradient &&
+          '[--logo-gradient-end:#60606C] [--logo-gradient-start:#09090B] dark:[--logo-gradient-end:#FAFAFA] dark:[--logo-gradient-start:#A1A1AA]',
+        className,
+      )}
       {...props}
     >
+      {gradient && (
+        <defs>
+          <linearGradient
+            id={gradientId}
+            x1="30"
+            y1="0"
+            x2="30"
+            y2="34"
+            gradientUnits="userSpaceOnUse"
+          >
+            <stop stopColor="var(--logo-gradient-start)" />
+            <stop offset="1" stopColor="var(--logo-gradient-end)" />
+          </linearGradient>
+        </defs>
+      )}
       <path
         fillRule="evenodd"
         clipRule="evenodd"
         d="M0 7.32746L2.62464 10.8128V30.3217L0 34H16.0077V30.273V8.85173C16.0077 8.85173 17.6244 7.32746 20.438 7.32746C23.2505 7.32746 23.2033 10.4492 23.2033 10.4492L23.156 30.3682L20.438 34H39.2346L36.6089 30.2242V8.85173C36.6089 8.85173 37.6641 7.32746 40.8288 7.32746C43.9923 7.32746 43.8516 10.4492 43.8516 10.4492L43.7819 30.273V34H60L57.1414 30.1998V8.7797C57.1414 7.54471 56.6486 0.501896 48.8444 0.501896C41.0391 0.501896 36.2579 6.52814 36.2579 6.52814C36.2579 6.52814 35.6965 0.501896 28.1027 0.501896C20.5089 0.501896 15.4216 6.72216 15.4216 6.72216L15.0931 6.40731L16.1247 0L0 7.32746Z"
-        fill="currentColor"
+        fill={gradient ? `url(#${gradientId})` : 'currentColor'}
       />
     </svg>
   )
@@ -80,6 +105,7 @@ const Logotype = React.forwardRef<HTMLDivElement, LogotypeProps>(
       className,
       size = 'md',
       variant = 'default',
+      gradient = false,
       showText = true,
       text = SITE_CONFIG.name,
       href,
@@ -98,7 +124,7 @@ const Logotype = React.forwardRef<HTMLDivElement, LogotypeProps>(
           ref={ref as any} // eslint-disable-line @typescript-eslint/no-explicit-any
           {...(props as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
         >
-          <LogoMark size={size!} />
+          <LogoMark size={size!} gradient={gradient} />
           {showText && <span className="font-inherit leading-none">{text}</span>}
         </a>
       )
@@ -111,7 +137,7 @@ const Logotype = React.forwardRef<HTMLDivElement, LogotypeProps>(
           ref={ref as any} // eslint-disable-line @typescript-eslint/no-explicit-any
           {...(props as any)} // eslint-disable-line @typescript-eslint/no-explicit-any
         >
-          <LogoMark size={size!} />
+          <LogoMark size={size!} gradient={gradient} />
           {showText && <span className="font-inherit leading-none">{text}</span>}
         </button>
       )
@@ -119,7 +145,7 @@ const Logotype = React.forwardRef<HTMLDivElement, LogotypeProps>(
 
     return (
       <div className={baseClassName} ref={ref} {...props}>
-        <LogoMark size={size!} />
+        <LogoMark size={size!} gradient={gradient} />
         {showText && <span className="font-inherit leading-none">{text}</span>}
       </div>
     )

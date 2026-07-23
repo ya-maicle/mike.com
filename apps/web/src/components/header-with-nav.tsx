@@ -19,8 +19,9 @@ export function HeaderWithNav() {
               as="a"
               href="/"
               size="2xl"
+              gradient
               showText={false}
-              className="[&_svg]:w-[36px] md:[&_svg]:w-[42px] [&_svg]:h-auto text-foreground"
+              className="[&_svg]:w-[36px] [&_svg]:h-auto md:[&_svg]:h-[20px] text-foreground"
             />
             <Button
               aria-label="Open navigation"
