@@ -20,6 +20,10 @@ const meta: Meta<typeof Logotype> = {
     showText: {
       control: { type: 'boolean' },
     },
+    gradientMode: {
+      control: { type: 'select' },
+      options: ['auto', 'dark'],
+    },
     text: {
       control: { type: 'text' },
     },
@@ -44,6 +48,14 @@ export const LogoOnly: Story = {
   args: {
     showText: false,
   },
+}
+
+export const DarkModeGradient: Story = {
+  render: () => (
+    <div className="rounded-lg bg-zinc-950 p-6">
+      <Logotype size="2xl" gradient gradientMode="dark" showText={false} />
+    </div>
+  ),
 }
 
 export const Sizes: Story = {
@@ -228,9 +240,10 @@ export const ThemeShowcase: Story = {
     <div className="space-y-8 p-6">
       <h2 className="text-2xl font-bold">Theme Adaptation</h2>
       <p className="text-muted-foreground">
-        The logo automatically adapts to light and dark themes using `fill=&quot;currentColor&quot;`.
+        The logo automatically adapts to light and dark themes using
+        `fill=&quot;currentColor&quot;`.
       </p>
-      
+
       <div className="grid md:grid-cols-2 gap-6">
         <div className="p-6 bg-background border rounded-lg">
           <h3 className="font-semibold mb-4">Light Theme Simulation</h3>
@@ -239,7 +252,7 @@ export const ThemeShowcase: Story = {
             <Logotype size="md" showText={false} className="text-muted-foreground" />
           </div>
         </div>
-        
+
         <div className="p-6 rounded-lg dark bg-background text-foreground">
           <h3 className="font-semibold mb-4">Dark Theme Simulation</h3>
           <div className="space-y-4">

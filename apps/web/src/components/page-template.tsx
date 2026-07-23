@@ -15,10 +15,14 @@ type CoverMedia =
 interface PageTemplateProps {
   /** Page title (uses h2 styling) */
   title: string
+  /** Optional typography class for the title */
+  titleClassName?: string
   /** Optional metadata (e.g., date, category) - displayed with regular weight */
   metadata?: string | string[]
   /** Optional subtitle/lead text */
   subtitle?: string
+  /** Optional typography class for the subtitle */
+  subtitleClassName?: string
   /** Optional cover media (image or video) */
   coverMedia?: CoverMedia
   /** Optional custom cover content rendered in the cover-media area (takes precedence over coverMedia) */
@@ -33,8 +37,10 @@ interface PageTemplateProps {
 
 export function PageTemplate({
   title,
+  titleClassName,
   metadata,
   subtitle,
+  subtitleClassName,
   coverMedia,
   cover,
   children,
@@ -66,10 +72,17 @@ export function PageTemplate({
             </div>
           )}
 
-          <h1>{title}</h1>
+          <h1 className={titleClassName}>{title}</h1>
 
           {subtitle && (
-            <p className="text-xl text-foreground leading-relaxed max-w-prose mt-2">{subtitle}</p>
+            <p
+              className={cn(
+                'text-xl text-foreground leading-relaxed max-w-prose mt-2',
+                subtitleClassName,
+              )}
+            >
+              {subtitle}
+            </p>
           )}
         </header>
       </div>

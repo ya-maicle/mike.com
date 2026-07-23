@@ -1,4 +1,13 @@
 import localFont from 'next/font/local'
+import { EB_Garamond } from 'next/font/google'
+
+export const ebGaramond = EB_Garamond({
+  weight: 'variable',
+  style: ['normal', 'italic'],
+  subsets: ['latin'],
+  display: 'swap',
+  preload: false,
+})
 
 // VF handles all normal styles; TextRegularIt is used only for italic rendering
 export const optimistic = localFont({
