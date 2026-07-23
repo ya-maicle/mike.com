@@ -2,8 +2,10 @@ import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
 import { sanityFetch, sanityNoStoreFetch } from '@/sanity/client'
 import { PageTemplate } from '@/components/page-template'
+import { BioPageLayout } from '@/components/bio-page-layout'
 import { LegalPageContent } from '@/components/legal-page-content'
 import type { PortableTextBlock } from '@portabletext/types'
+import { ebGaramond } from '@/lib/fonts'
 import { IMAGE_PROJECTION, MUX_VIDEO_PROJECTION, type SanityImage } from '@/sanity/queries'
 import {
   ACTIVE_PORTFOLIO_ACCESS_PROFILE_BY_SLUG,
@@ -137,15 +139,39 @@ export default async function DynamicPage(props: PageProps) {
         day: 'numeric',
       })
     : undefined
+  const isBio = slug === 'bio'
+  const pageContent = (
+    <LegalPageContent
+      content={page.content}
+      className={isBio ? `${ebGaramond.className} [--text-xl:20px]` : undefined}
+    />
+  )
+
+  if (isBio && page.coverMedia?.type === 'image' && page.coverMedia.image) {
+    return (
+      <BioPageLayout
+        title={page.title}
+        titleClassName={ebGaramond.className}
+        subtitle={page.subtitle}
+        subtitleClassName={ebGaramond.className}
+        image={page.coverMedia.image}
+        metadata={formattedDate}
+      >
+        {pageContent}
+      </BioPageLayout>
+    )
+  }
 
   return (
     <PageTemplate
       title={page.title}
+      titleClassName={isBio ? ebGaramond.className : undefined}
       subtitle={page.subtitle}
+      subtitleClassName={isBio ? ebGaramond.className : undefined}
       coverMedia={page.coverMedia}
       metadata={formattedDate}
     >
-      <LegalPageContent content={page.content} />
+      {pageContent}
     </PageTemplate>
   )
 }

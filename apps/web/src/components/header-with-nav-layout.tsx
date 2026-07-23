@@ -31,6 +31,8 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
   const lastYRef = React.useRef(0)
   const [isMobile, setIsMobile] = React.useState(false)
   const navOpen = isMobile ? mobileNavOpen : desktopNavOpen
+  const isBioPage = pathname === '/bio'
+  const invertHeader = isBioPage && atTop && !navOpen
   React.useEffect(() => setMounted(true), [])
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -83,9 +85,10 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
       {mounted && (
         <header
           className={cn(
-            'w-full h-14 md:h-16 sticky top-0 z-50 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform',
+            'w-full h-14 md:h-16 sticky top-0 z-50 transition-[transform,color,background-color] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform',
             hidden ? '-translate-y-full' : 'translate-y-0',
             atTop ? 'bg-transparent' : 'bg-background',
+            invertHeader ? 'text-white' : 'text-foreground',
           )}
         >
           <div className="h-full px-6 md:px-8 flex items-center justify-between">
@@ -94,11 +97,17 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
               <Link
                 href="/"
                 aria-label="Go to home"
-                className="text-foreground hover:text-primary transition-colors"
+                className={cn(
+                  'transition-colors',
+                  invertHeader
+                    ? 'text-white hover:text-white/80'
+                    : 'text-foreground hover:text-primary',
+                )}
               >
                 <Logotype
                   size="2xl"
                   gradient
+                  gradientMode={invertHeader ? 'dark' : 'auto'}
                   showText={false}
                   className="[&_svg]:w-[36px] [&_svg]:h-auto md:[&_svg]:h-[20px]"
                 />
@@ -109,13 +118,22 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
                 aria-label="Toggle navigation"
                 variant="ghost"
                 size="icon"
-                className="hidden md:inline-flex pointer-events-auto md:absolute md:left-[148px]"
+                className={cn(
+                  'hidden md:inline-flex pointer-events-auto md:absolute md:left-[148px]',
+                  invertHeader && 'text-white hover:bg-white/15 hover:text-white',
+                )}
                 onClick={() => setDesktopNavOpen((value) => !value)}
               >
                 {navOpen ? (
-                  <SideMenuOpen size={20} className="text-zinc-500" />
+                  <SideMenuOpen
+                    size={20}
+                    className={invertHeader ? 'text-white' : 'text-zinc-500'}
+                  />
                 ) : (
-                  <SideMenuClosed size={20} className="text-zinc-500" />
+                  <SideMenuClosed
+                    size={20}
+                    className={invertHeader ? 'text-white' : 'text-zinc-500'}
+                  />
                 )}
               </Button>
             </div>
@@ -126,7 +144,10 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
                 aria-label="Toggle navigation"
                 variant="ghost"
                 size="icon"
-                className="md:hidden"
+                className={cn(
+                  'md:hidden',
+                  invertHeader && 'text-white hover:bg-white/15 hover:text-white',
+                )}
                 onClick={() => {
                   const willOpen = !mobileNavOpen
                   setMobileNavOpen(willOpen)
@@ -137,18 +158,27 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
                 }}
               >
                 {navOpen ? (
-                  <SideMenuOpen size={20} className="text-zinc-500" />
+                  <SideMenuOpen
+                    size={20}
+                    className={invertHeader ? 'text-white' : 'text-zinc-500'}
+                  />
                 ) : (
-                  <SideMenuClosed size={20} className="text-zinc-500" />
+                  <SideMenuClosed
+                    size={20}
+                    className={invertHeader ? 'text-white' : 'text-zinc-500'}
+                  />
                 )}
               </Button>
               {user ? (
                 <UserMenu />
               ) : (
                 <Button
-                  className="hidden md:inline-flex"
                   variant="secondary"
                   size="default"
+                  className={cn(
+                    'hidden md:inline-flex',
+                    invertHeader && 'bg-white/15 text-white backdrop-blur-sm hover:bg-white/25',
+                  )}
                   onClick={() => openLogin()}
                 >
                   Log in
@@ -239,17 +269,22 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
           'flex flex-col flex-1',
           isMobile && 'transform-gpu will-change-transform',
           navOpen ? 'md:ml-[230px]' : 'md:ml-0',
+          navOpen && isBioPage && '[&_[data-bio-hero]]:rounded-bl-[8px]',
         )}
         style={isMobile ? { transform: navOpen ? 'translateX(80vw)' : 'translateX(0)' } : undefined}
       >
         {/* Content Area */}
         <main
           className={cn(
-            'px-6 md:px-8 pt-6 md:pt-8',
-            isStrengthDetailPath(pathname) ? 'pb-0' : 'pb-6 md:pb-8',
+            isBioPage
+              ? '-mt-14 px-0 pt-0 pb-6 md:-mt-16 md:pb-8'
+              : 'px-6 pt-6 pb-6 md:px-8 md:pt-8 md:pb-8',
+            isStrengthDetailPath(pathname) && 'pb-0',
           )}
         >
-          <div className="max-w-[var(--content-max-width)] mx-auto">{children}</div>
+          <div className={isBioPage ? 'max-w-none' : 'max-w-[var(--content-max-width)] mx-auto'}>
+            {children}
+          </div>
         </main>
         <Footer />
       </div>
