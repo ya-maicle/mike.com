@@ -261,6 +261,19 @@
       );
     }
   }
+
+  /**
+   * An open case-study panel turns the page into two real columns. Keep
+   * viewport-bleed carousels inside the remaining content column so their
+   * scrollport and slides do not continue underneath or beyond the panel.
+   */
+  @media (min-width: 768px) {
+    .case-study-panel-open .carousel-bleed {
+      --carousel-edge: 0px;
+      --carousel-inset: 0px;
+      width: 100%;
+    }
+  }
 }
 
 /* ============================================

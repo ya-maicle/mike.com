@@ -1,6 +1,7 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
+  ...(process.env.NEXT_DIST_DIR ? { distDir: process.env.NEXT_DIST_DIR } : {}),
   images: {
     // srcset candidate widths for ALL next/image usage, including the custom
     // Sanity loader: exact canvas size (1376) and retina (2752) + standards.
