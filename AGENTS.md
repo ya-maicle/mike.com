@@ -54,4 +54,5 @@ pnpm storybook:web      # Visual checks (the only Storybook)
 - [Sanity]: root `sanity.config.ts` is a re-export of `apps/web/src/app/studio/sanity.config.ts` — edit the embedded one.
 - [Access]: recruiter gating = HMAC cookies + `?k=` link tokens + signed Mux playback; teasers/covers stay public by design.
 - [Testing]: keep crypto/logic in pure modules (no `server-only`/`next/headers`) so Vitest can import them.
+- [Dev]: Dropbox can corrupt `.next` via conflicted copies; set `NEXT_DIST_DIR` to a relative path outside the sync root.
 <!-- Only add genuinely reusable knowledge, not story-specific details -->

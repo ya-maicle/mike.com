@@ -28,7 +28,7 @@ export function CaseStudyLayout({
 }: CaseStudyLayoutProps) {
   const [isPanelOpen, setIsPanelOpen] = React.useState(false)
 
-  const togglePanel = () => setIsPanelOpen(!isPanelOpen)
+  const togglePanel = () => setIsPanelOpen((current) => !current)
 
   React.useEffect(() => {
     const handleNavOpening = () => {
@@ -62,10 +62,18 @@ export function CaseStudyLayout({
   }, [isPanelOpen])
 
   return (
-    <div className="relative min-h-screen flex flex-col md:flex-row">
+    <div
+      data-case-study-layout
+      data-panel-open={isPanelOpen}
+      className={cn(
+        'relative min-h-screen flex flex-col md:flex-row',
+        isPanelOpen && 'case-study-panel-open',
+      )}
+    >
       <div
+        data-case-study-main
         className={cn(
-          'flex-1 transition-all duration-500 ease-in-out w-full',
+          'min-w-0 flex-1 transition-all duration-500 ease-in-out w-full',
           isPanelOpen ? 'md:w-1/2' : 'w-full',
         )}
       >
@@ -91,8 +99,9 @@ export function CaseStudyLayout({
       </div>
 
       <div
+        data-case-study-panel
         className={cn(
-          'hidden md:block transition-all duration-500 ease-in-out bg-background z-50',
+          'hidden md:block transition-all duration-500 ease-in-out bg-background z-30',
           'relative',
           isPanelOpen ? 'min-h-screen w-1/2 opacity-100' : 'w-0 opacity-0 overflow-hidden',
         )}
