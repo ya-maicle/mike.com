@@ -1,12 +1,6 @@
 import { NextRequest } from 'next/server'
 
-const ALLOWED_HOSTS = new Set<string>([
-  'lh3.googleusercontent.com',
-  'avatars.githubusercontent.com',
-  'secure.gravatar.com',
-  'pbs.twimg.com',
-  'platform-lookaside.fbsbx.com',
-])
+import { isAllowedAvatarProxyUrl } from '@/lib/avatar-src'
 
 export async function GET(req: NextRequest) {
   try {
@@ -18,7 +12,7 @@ export async function GET(req: NextRequest) {
     } catch {
       return new Response('Invalid URL', { status: 400 })
     }
-    if (!ALLOWED_HOSTS.has(url.hostname)) {
+    if (!isAllowedAvatarProxyUrl(url)) {
       return new Response('Host not allowed', { status: 400 })
     }
 
