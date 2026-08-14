@@ -67,16 +67,24 @@ describe('attachMuxTokens', () => {
     expect(attachMuxTokens(data).video.asset).not.toHaveProperty('tokens')
   })
 
-  it('attaches tokens to every nested playbackId when configured', () => {
+  it('attaches tokens to every nested signed playbackId when configured', () => {
     process.env.MUX_SIGNING_KEY_ID = config.keyId
     process.env.MUX_SIGNING_PRIVATE_KEY = privateKeyPem
 
     const data = {
       content: [
-        { _type: 'videoBlock', video: { asset: { playbackId: 'one' } } },
+        {
+          _type: 'videoBlock',
+          video: { asset: { playbackId: 'one', playbackPolicy: 'signed' } },
+        },
         {
           _type: 'carouselBlock',
-          items: [{ kind: 'video', video: { asset: { playbackId: 'two' } } }],
+          items: [
+            {
+              kind: 'video',
+              video: { asset: { playbackId: 'two', playbackPolicy: 'signed' } },
+            },
+          ],
         },
         { _type: 'block', children: [{ text: 'hello' }] },
       ],
@@ -94,5 +102,20 @@ describe('attachMuxTokens', () => {
       result.content[1] as { items?: Array<{ video: { asset: { tokens?: unknown } } }> }
     ).items
     expect(items?.[0].video.asset.tokens).toBeTruthy()
+  })
+
+  it('does not attach tokens to public or unspecified playback IDs', () => {
+    process.env.MUX_SIGNING_KEY_ID = config.keyId
+    process.env.MUX_SIGNING_PRIVATE_KEY = privateKeyPem
+
+    const data = {
+      publicVideo: { asset: { playbackId: 'public-id', playbackPolicy: 'public' } },
+      legacyVideo: { asset: { playbackId: 'unspecified-id' } },
+    }
+
+    const result = attachMuxTokens(data)
+
+    expect(result.publicVideo.asset).not.toHaveProperty('tokens')
+    expect(result.legacyVideo.asset).not.toHaveProperty('tokens')
   })
 })
