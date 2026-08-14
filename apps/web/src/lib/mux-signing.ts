@@ -77,9 +77,11 @@ export function getMuxSigningConfigFromEnv(): MuxSigningConfig | null {
 }
 
 /**
- * Deep-walks fetched Sanity data and attaches playback tokens next to every
- * `playbackId` so client components can read `asset.tokens` without each
- * parent threading props. No-op when signing keys are not configured.
+ * Deep-walks fetched Sanity data and attaches playback tokens next to signed
+ * `playbackId` records so client components can read `asset.tokens` without
+ * each parent threading props. Public assets must remain token-free: a token
+ * from another Mux environment makes an otherwise valid public ID fail.
+ * No-op when signing keys are not configured.
  */
 export function attachMuxTokens<T>(value: T): T {
   const config = getMuxSigningConfigFromEnv()
@@ -103,7 +105,11 @@ export function attachMuxTokens<T>(value: T): T {
     if (!node || typeof node !== 'object') return
 
     const record = node as Record<string, unknown>
-    if (typeof record.playbackId === 'string' && record.playbackId) {
+    if (
+      typeof record.playbackId === 'string' &&
+      record.playbackId &&
+      record.playbackPolicy === 'signed'
+    ) {
       record.tokens = tokensFor(record.playbackId)
     }
     for (const child of Object.values(record)) walk(child)
