@@ -3,12 +3,16 @@ import { describe, expect, it } from 'vitest'
 import {
   addAvatarVersion,
   formatFullName,
+  getAuthAvatarUrl,
   getAuthProfileMetadata,
   getAvatarObjectPath,
   getProfileInitials,
+  getProfileAvatarUrl,
   getProfileSaveErrorMessage,
   isCustomAvatarUrl,
   profileNameSchema,
+  resolveEditableProfile,
+  resolveProfileAvatar,
   splitFullName,
   validateAvatarFile,
 } from '@/lib/profile-editing'
@@ -100,7 +104,82 @@ describe('profile avatars', () => {
   it('distinguishes uploaded and generated avatars', () => {
     expect(isCustomAvatarUrl('https://example.supabase.co/avatar')).toBe(true)
     expect(isCustomAvatarUrl('/default-avatars/avatar-1.png')).toBe(false)
+    expect(isCustomAvatarUrl('https://mikeiu.com/default-avatars/avatar-1.png')).toBe(false)
     expect(isCustomAvatarUrl(null)).toBe(false)
+  })
+
+  it('uses an absolute URL for Auth metadata while keeping uploaded URLs unchanged', () => {
+    expect(getAuthAvatarUrl('/default-avatars/avatar-2.png')).toBe(
+      'https://mikeiu.com/default-avatars/avatar-2.png',
+    )
+    expect(getAuthAvatarUrl('https://example.supabase.co/avatar')).toBe(
+      'https://example.supabase.co/avatar',
+    )
+  })
+
+  it('normalizes canonical default metadata back to a local profile path', () => {
+    expect(getProfileAvatarUrl('https://mikeiu.com/default-avatars/avatar-2.png')).toBe(
+      '/default-avatars/avatar-2.png',
+    )
+    expect(getProfileAvatarUrl('https://example.supabase.co/avatar')).toBe(
+      'https://example.supabase.co/avatar',
+    )
+  })
+
+  it('uses one profile avatar across surfaces and rejects a broken source', () => {
+    const sources = {
+      defaultAvatar: '/default-avatars/avatar-3.png',
+      metadataAvatar: 'https://example.supabase.co/stale-avatar',
+      profileAvatar: 'https://example.supabase.co/current-avatar',
+    }
+
+    expect(resolveProfileAvatar(sources)).toBe(sources.profileAvatar)
+    expect(resolveProfileAvatar({ ...sources, rejectedAvatar: sources.profileAvatar })).toBe(
+      sources.metadataAvatar,
+    )
+    expect(
+      resolveProfileAvatar({
+        ...sources,
+        metadataAvatar: sources.profileAvatar,
+        rejectedAvatar: sources.profileAvatar,
+      }),
+    ).toBe(sources.defaultAvatar)
+  })
+
+  it('keeps the editor on the current account and active avatar', () => {
+    const previousAccountProfile = {
+      avatarUrl: 'https://example.supabase.co/previous-avatar',
+      firstName: 'Previous',
+      lastName: 'Account',
+    }
+
+    expect(
+      resolveEditableProfile({
+        activeAvatarUrl: '/default-avatars/avatar-5.png',
+        currentUserId: 'current-user',
+        fallbackFullName: 'Current Account',
+        loadedProfile: previousAccountProfile,
+        profileOwnerId: 'previous-user',
+      }),
+    ).toEqual({
+      avatarUrl: '/default-avatars/avatar-5.png',
+      firstName: 'Current',
+      lastName: 'Account',
+    })
+
+    expect(
+      resolveEditableProfile({
+        activeAvatarUrl: '/default-avatars/avatar-6.png',
+        currentUserId: 'current-user',
+        fallbackFullName: 'Fallback Name',
+        loadedProfile: { ...previousAccountProfile, firstName: 'Loaded', lastName: 'User' },
+        profileOwnerId: 'current-user',
+      }),
+    ).toEqual({
+      avatarUrl: '/default-avatars/avatar-6.png',
+      firstName: 'Loaded',
+      lastName: 'User',
+    })
   })
 
   it('uses both avatar metadata keys for Auth compatibility', () => {
@@ -117,6 +196,19 @@ describe('profile avatars', () => {
       last_name: 'Boy',
       name: 'Mikey Boy',
       picture: 'https://example.supabase.co/avatar',
+    })
+  })
+
+  it('stores generated defaults as absolute Auth metadata URLs', () => {
+    expect(
+      getAuthProfileMetadata({
+        avatarUrl: '/default-avatars/avatar-4.png',
+        firstName: 'Mikey',
+        lastName: 'Boy',
+      }),
+    ).toMatchObject({
+      avatar_url: 'https://mikeiu.com/default-avatars/avatar-4.png',
+      picture: 'https://mikeiu.com/default-avatars/avatar-4.png',
     })
   })
 })

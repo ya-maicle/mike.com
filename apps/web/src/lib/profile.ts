@@ -8,9 +8,10 @@ import {
   addAvatarVersion,
   AVATAR_BUCKET,
   formatFullName,
+  getAuthAvatarUrl,
   getAuthProfileMetadata,
   getAvatarObjectPath,
-  isCustomAvatarUrl,
+  getProfileAvatarUrl,
   profileNameSchema,
   type EditableProfile,
   type ProfileUpdate,
@@ -24,10 +25,10 @@ export async function upsertProfileFromUser(user: User) {
     ''
 
   // Provider data seeds new profiles; an existing profile remains authoritative after edits.
-  const incomingAvatar =
+  const incomingAvatar = getProfileAvatarUrl(
     (user.user_metadata?.avatar_url as string | undefined) ||
-    (user.user_metadata?.picture as string | undefined) ||
-    undefined
+      (user.user_metadata?.picture as string | undefined),
+  )
 
   const email = user.email
 
@@ -52,27 +53,8 @@ export async function upsertProfileFromUser(user: User) {
       : defaultName
   const finalAvatar = existing?.avatar_url || incomingAvatar || pickRandomDefaultAvatar(user.id)
 
-  // Keep provider-facing metadata compatible with both `avatar_url` and `picture`.
-  // Generated defaults remain app-only; uploaded/provider avatars are synchronized.
-  try {
-    const metadata: Record<string, unknown> = {}
-
-    if (!metaName || metaName.trim().length === 0) {
-      metadata.full_name = finalName
-      metadata.name = finalName
-    }
-
-    if (isCustomAvatarUrl(finalAvatar)) {
-      if (user.user_metadata?.avatar_url !== finalAvatar) metadata.avatar_url = finalAvatar
-      if (user.user_metadata?.picture !== finalAvatar) metadata.picture = finalAvatar
-    }
-
-    if (Object.keys(metadata).length > 0) {
-      await supabase.auth.updateUser({ data: metadata })
-    }
-  } catch {}
-
-  // Upsert profile (non-throwing; log for debugging but don't block login)
+  // Persist the profile first. The row is the application source of truth and
+  // the database trigger mirrors it into auth.users for dashboard visibility.
   try {
     const { error } = await supabase
       .from('profiles')
@@ -85,6 +67,28 @@ export async function upsertProfileFromUser(user: User) {
     }
   } catch (e: unknown) {
     console.warn('profiles upsert exception:', e instanceof Error ? e.message : String(e))
+  }
+
+  // Refresh the current Auth session as well, so client components see the
+  // same avatar immediately instead of waiting for a new login.
+  try {
+    const authAvatarUrl = getAuthAvatarUrl(finalAvatar)
+    const metadata: Record<string, unknown> = {}
+
+    if (user.user_metadata?.full_name !== finalName) metadata.full_name = finalName
+    if (user.user_metadata?.name !== finalName) metadata.name = finalName
+    if (user.user_metadata?.avatar_url !== authAvatarUrl) metadata.avatar_url = authAvatarUrl
+    if (user.user_metadata?.picture !== authAvatarUrl) metadata.picture = authAvatarUrl
+
+    if (Object.keys(metadata).length > 0) {
+      const { error } = await supabase.auth.updateUser({ data: metadata })
+      if (error) console.warn('Auth profile metadata update failed:', error.message)
+    }
+  } catch (e: unknown) {
+    console.warn(
+      'Auth profile metadata update exception:',
+      e instanceof Error ? e.message : String(e),
+    )
   }
 }
 
@@ -132,8 +136,8 @@ export async function updateProfile({
 
   if (profileError) throw profileError
 
-  // The profile row is authoritative; metadata is synchronized best-effort for
-  // any Supabase surfaces that still read directly from the Auth user.
+  // The profile row is authoritative; require the current Auth session to
+  // reflect the same data before reporting the save as complete.
   const { error: metadataError } = await supabase.auth.updateUser({
     data: getAuthProfileMetadata({
       ...names,
@@ -142,7 +146,7 @@ export async function updateProfile({
   })
 
   if (metadataError) {
-    console.warn('Auth profile metadata update failed:', metadataError.message)
+    throw metadataError
   }
 
   return { ...names, avatarUrl: nextAvatarUrl }
