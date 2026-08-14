@@ -69,7 +69,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const handleSignedInSession = React.useCallback(
     async (newSession: Session, isOAuthCallback: boolean) => {
-      upsertProfileFromUser(newSession.user).catch(() => {})
+      await upsertProfileFromUser(newSession.user)
 
       let urlReturnUrl: string | null = null
       try {

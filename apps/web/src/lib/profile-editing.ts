@@ -1,5 +1,7 @@
 import { z } from 'zod'
 
+import { DEFAULT_AVATAR_SITE_URL } from './default-avatars'
+
 export const AVATAR_BUCKET = 'avatars'
 export const MAX_AVATAR_BYTES = 5 * 1024 * 1024
 export const SUPPORTED_AVATAR_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const
@@ -86,19 +88,99 @@ export function addAvatarVersion(publicUrl: string, version = Date.now()) {
 }
 
 export function isCustomAvatarUrl(avatarUrl?: string | null) {
-  return Boolean(avatarUrl && !avatarUrl.startsWith('/default-avatars/'))
+  if (!avatarUrl) return false
+
+  try {
+    const url = new URL(avatarUrl, DEFAULT_AVATAR_SITE_URL)
+    const siteOrigin = new URL(DEFAULT_AVATAR_SITE_URL).origin
+
+    return !(url.origin === siteOrigin && url.pathname.startsWith('/default-avatars/'))
+  } catch {
+    return true
+  }
+}
+
+export function getAuthAvatarUrl(
+  avatarUrl?: string | null,
+  siteUrl: string = DEFAULT_AVATAR_SITE_URL,
+) {
+  if (!avatarUrl) return null
+
+  try {
+    return new URL(avatarUrl, siteUrl).toString()
+  } catch {
+    return avatarUrl
+  }
+}
+
+export function getProfileAvatarUrl(avatarUrl?: string | null) {
+  if (!avatarUrl) return null
+
+  try {
+    const url = new URL(avatarUrl, DEFAULT_AVATAR_SITE_URL)
+    const siteOrigin = new URL(DEFAULT_AVATAR_SITE_URL).origin
+
+    if (url.origin === siteOrigin && url.pathname.startsWith('/default-avatars/')) {
+      return `${url.pathname}${url.search}`
+    }
+  } catch {}
+
+  return avatarUrl
+}
+
+type ProfileAvatarSources = {
+  defaultAvatar: string | null
+  metadataAvatar?: string | null
+  profileAvatar?: string | null
+  rejectedAvatar?: string | null
+}
+
+export function resolveProfileAvatar({
+  defaultAvatar,
+  metadataAvatar,
+  profileAvatar,
+  rejectedAvatar,
+}: ProfileAvatarSources) {
+  const rejectedAvatarKey = getAuthAvatarUrl(rejectedAvatar)
+
+  return (
+    [profileAvatar, metadataAvatar, defaultAvatar].find((candidate): candidate is string =>
+      Boolean(candidate && getAuthAvatarUrl(candidate) !== rejectedAvatarKey),
+    ) ?? null
+  )
+}
+
+type EditableProfileSources = {
+  activeAvatarUrl: string | null
+  currentUserId: string
+  fallbackFullName: string
+  loadedProfile: EditableProfile
+  profileOwnerId: string | null
+}
+
+export function resolveEditableProfile({
+  activeAvatarUrl,
+  currentUserId,
+  fallbackFullName,
+  loadedProfile,
+  profileOwnerId,
+}: EditableProfileSources): EditableProfile {
+  const names = profileOwnerId === currentUserId ? loadedProfile : splitFullName(fallbackFullName)
+
+  return { ...names, avatarUrl: activeAvatarUrl }
 }
 
 export function getAuthProfileMetadata({ avatarUrl, firstName, lastName }: EditableProfile) {
   const fullName = formatFullName({ firstName, lastName })
+  const authAvatarUrl = getAuthAvatarUrl(avatarUrl)
 
   return {
-    avatar_url: avatarUrl,
+    avatar_url: authAvatarUrl,
     first_name: firstName,
     full_name: fullName,
     last_name: lastName || null,
     name: fullName,
-    picture: avatarUrl,
+    picture: authAvatarUrl,
   }
 }
 

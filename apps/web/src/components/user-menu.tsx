@@ -11,6 +11,9 @@ import { toAvatarProxy } from '@/lib/avatar-src'
 import {
   formatFullName,
   getProfileInitials,
+  getProfileAvatarUrl,
+  resolveEditableProfile,
+  resolveProfileAvatar,
   splitFullName,
   type EditableProfile,
 } from '@/lib/profile-editing'
@@ -29,14 +32,21 @@ import { LogOut, UserRoundPen } from 'lucide-react'
 export function UserMenu() {
   const { user, signOut } = useAuth()
   const supabase = getSupabaseClient()
+  const userId = user?.id
+  const userEmail = user?.email
   const [pending, setPending] = React.useState(false)
   const [profileEditorOpen, setProfileEditorOpen] = React.useState(false)
-  const initialMetaAvatar =
+  const initialMetaAvatar = getProfileAvatarUrl(
     (user?.user_metadata?.avatar_url as string | undefined) ||
-    (user?.user_metadata?.picture as string | undefined) ||
-    undefined
-  const [avatarUrl, setAvatarUrl] = React.useState<string | undefined>(initialMetaAvatar)
-  const [avatarBroken, setAvatarBroken] = React.useState(false)
+      (user?.user_metadata?.picture as string | undefined),
+  )
+  const [avatarUrl, setAvatarUrl] = React.useState<string | undefined>(
+    initialMetaAvatar ?? undefined,
+  )
+  const [brokenAvatar, setBrokenAvatar] = React.useState<{
+    ownerId: string
+    url: string
+  } | null>(null)
 
   const initialName =
     (user?.user_metadata?.full_name as string | undefined) ||
@@ -50,34 +60,30 @@ export function UserMenu() {
   const [profileOwnerId, setProfileOwnerId] = React.useState<string | null>(null)
 
   const metaAvatar = initialMetaAvatar
+  const brokenAvatarUrl = brokenAvatar && brokenAvatar.ownerId === userId ? brokenAvatar.url : null
 
   // Seed avatar from metadata first, else pull from profile and name from profiles as fallback
   React.useEffect(() => {
-    if (!user) return
+    if (!userId) return
     let cancelled = false
     ;(async () => {
       const { data, error } = await supabase
         .from('profiles')
         .select('avatar_url, first_name, last_name, full_name')
-        .eq('id', user.id)
+        .eq('id', userId)
         .maybeSingle()
       if (!cancelled) {
-        let resolvedAvatar = metaAvatar || pickRandomDefaultAvatar(user.id)
-        if (!error && data?.avatar_url) {
-          const dbAvatar = data.avatar_url as string
-          // If we've marked the meta avatar as broken, avoid switching back to it
-          if (!(avatarBroken && dbAvatar === metaAvatar)) {
-            setAvatarUrl(dbAvatar)
-            resolvedAvatar = dbAvatar
-          }
-        } else if (!metaAvatar) {
-          // As a safe fallback (e.g., before profile upsert completes), use a deterministic default
-          setAvatarUrl((prev) => prev ?? resolvedAvatar)
-        }
+        const resolvedAvatar = resolveProfileAvatar({
+          defaultAvatar: pickRandomDefaultAvatar(userId),
+          metadataAvatar: metaAvatar,
+          profileAvatar: !error ? (data?.avatar_url as string | null | undefined) : null,
+          rejectedAvatar: brokenAvatarUrl,
+        })
+        setAvatarUrl(resolvedAvatar ?? undefined)
 
         const dbName = (data?.full_name as string | undefined)?.trim() || ''
         const resolvedName =
-          dbName || initialName.trim() || pickRandomDefaultName(user.id || user.email || undefined)
+          dbName || initialName.trim() || pickRandomDefaultName(userId || userEmail || undefined)
         const fallbackParts = splitFullName(resolvedName)
         const resolvedProfile = {
           firstName:
@@ -89,31 +95,37 @@ export function UserMenu() {
 
         setDisplayName(formatFullName(resolvedProfile))
         setEditableProfile(resolvedProfile)
-        setProfileOwnerId(user.id)
+        setProfileOwnerId(userId)
       }
     })()
     return () => {
       cancelled = true
     }
-  }, [user, supabase, avatarBroken, metaAvatar, initialName])
+  }, [userId, userEmail, supabase, brokenAvatarUrl, metaAvatar, initialName])
 
   if (!user) {
     return null
   }
 
   const seededDefault = pickRandomDefaultAvatar(user.id)
-  const resolvedAvatar = avatarUrl || seededDefault
+  const resolvedAvatar = resolveProfileAvatar({
+    defaultAvatar: seededDefault,
+    metadataAvatar: initialMetaAvatar,
+    profileAvatar: profileOwnerId === user.id ? avatarUrl : null,
+    rejectedAvatar: brokenAvatarUrl,
+  })
   const proxiedSrc = resolvedAvatar ? toAvatarProxy(resolvedAvatar) : undefined
   const fallbackDisplayName =
     initialName.trim() || pickRandomDefaultName(user.id || user.email || undefined)
-  const resolvedDisplayName = displayName.trim() || fallbackDisplayName
-  const profileForEditor =
-    profileOwnerId === user.id
-      ? editableProfile
-      : {
-          ...splitFullName(resolvedDisplayName),
-          avatarUrl: resolvedAvatar,
-        }
+  const resolvedDisplayName =
+    profileOwnerId === user.id ? displayName.trim() || fallbackDisplayName : fallbackDisplayName
+  const editorProfile = resolveEditableProfile({
+    activeAvatarUrl: resolvedAvatar,
+    currentUserId: user.id,
+    fallbackFullName: resolvedDisplayName,
+    loadedProfile: editableProfile,
+    profileOwnerId,
+  })
 
   return (
     <>
@@ -132,7 +144,9 @@ export function UserMenu() {
                   loading="lazy"
                   referrerPolicy="no-referrer"
                   onError={() => {
-                    setAvatarBroken(true)
+                    if (resolvedAvatar) {
+                      setBrokenAvatar({ ownerId: user.id, url: resolvedAvatar })
+                    }
                     setAvatarUrl(seededDefault)
                   }}
                 />
@@ -152,7 +166,9 @@ export function UserMenu() {
                   loading="lazy"
                   referrerPolicy="no-referrer"
                   onError={() => {
-                    setAvatarBroken(true)
+                    if (resolvedAvatar) {
+                      setBrokenAvatar({ ownerId: user.id, url: resolvedAvatar })
+                    }
                     setAvatarUrl(seededDefault)
                   }}
                 />
@@ -197,13 +213,13 @@ export function UserMenu() {
         onOpenChange={setProfileEditorOpen}
         userId={user.id}
         email={user.email ?? ''}
-        profile={profileForEditor}
+        profile={editorProfile}
         onSaved={(profile) => {
           setEditableProfile(profile)
           setProfileOwnerId(user.id)
           setDisplayName(formatFullName(profile))
           setAvatarUrl(profile.avatarUrl ?? undefined)
-          setAvatarBroken(false)
+          setBrokenAvatar(null)
         }}
       />
     </>

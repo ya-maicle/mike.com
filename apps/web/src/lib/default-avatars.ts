@@ -1,5 +1,7 @@
 'use client'
 
+export const DEFAULT_AVATAR_SITE_URL = 'https://mikeiu.com'
+
 // Public paths for default avatars. These are served from `apps/web/public`.
 export const DEFAULT_AVATARS = [
   '/default-avatars/avatar-1.png',
