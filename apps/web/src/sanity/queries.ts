@@ -5,7 +5,13 @@ import { groq } from 'next-sanity'
 export const IMAGE_ASSET_PROJECTION = groq`{ _id, url, metadata { lqip, dimensions } }`
 export const IMAGE_PROJECTION = groq`{..., asset->${IMAGE_ASSET_PROJECTION}}`
 
-export const MUX_VIDEO_PROJECTION = groq`{ asset->{ playbackId, "aspectRatio": data.aspect_ratio } }`
+export const MUX_VIDEO_PROJECTION = groq`{
+  asset->{
+    playbackId,
+    "playbackPolicy": coalesce(data.playback_ids[0].policy, "public"),
+    "aspectRatio": data.aspect_ratio
+  }
+}`
 export const COVER_PROJECTION = groq`{ type, image${IMAGE_PROJECTION}, video${MUX_VIDEO_PROJECTION} }`
 
 export type SanityImage = {
@@ -40,7 +46,13 @@ export type ImageBlock = {
 export type VideoBlock = {
   _type: 'videoBlock'
   _key?: string
-  video: { asset: { playbackId: string; aspectRatio?: string } }
+  video: {
+    asset: {
+      playbackId: string
+      playbackPolicy?: 'public' | 'signed'
+      aspectRatio?: string
+    }
+  }
   title?: string
   description?: string
 }
@@ -50,7 +62,10 @@ export type CarouselBlock = {
   _key?: string
   items: (
     | { kind: 'image'; image: SanityImage }
-    | { kind: 'video'; video: { asset: { playbackId: string } } }
+    | {
+        kind: 'video'
+        video: { asset: { playbackId: string; playbackPolicy?: 'public' | 'signed' } }
+      }
   )[]
   title?: string
   description?: string
@@ -63,14 +78,32 @@ export type TwoColumnImageBlock = {
   rightKind?: 'image' | 'video'
   leftImage?: SanityImage
   rightImage?: SanityImage
-  leftVideo?: { asset?: { playbackId?: string; aspectRatio?: string } }
-  rightVideo?: { asset?: { playbackId?: string; aspectRatio?: string } }
+  leftVideo?: {
+    asset?: {
+      playbackId?: string
+      playbackPolicy?: 'public' | 'signed'
+      aspectRatio?: string
+    }
+  }
+  rightVideo?: {
+    asset?: {
+      playbackId?: string
+      playbackPolicy?: 'public' | 'signed'
+      aspectRatio?: string
+    }
+  }
 }
 
 export type CoverMedia = {
   type?: 'image' | 'video'
   image?: SanityImage
-  video?: { asset?: { playbackId?: string; aspectRatio?: string } }
+  video?: {
+    asset?: {
+      playbackId?: string
+      playbackPolicy?: 'public' | 'signed'
+      aspectRatio?: string
+    }
+  }
 }
 
 export type CaseStudy = {
@@ -87,7 +120,13 @@ export type CaseStudy = {
   headerMedia?: {
     type: 'image' | 'video'
     image?: SanityImage
-    video?: { asset: { playbackId: string; aspectRatio?: string } }
+    video?: {
+      asset: {
+        playbackId: string
+        playbackPolicy?: 'public' | 'signed'
+        aspectRatio?: string
+      }
+    }
   }
   projectInfo?: {
     client?: string
