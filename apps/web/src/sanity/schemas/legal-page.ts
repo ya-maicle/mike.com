@@ -6,6 +6,7 @@ import {
   fontWeightAnnotation,
   linkAnnotation,
 } from './objects/block-styles'
+import { SEO_PAGE_TITLE_MAX_LENGTH } from '../../lib/constants'
 
 export const legalPage = defineType({
   name: 'legalPage',
@@ -63,7 +64,11 @@ export const legalPage = defineType({
           name: 'metaTitle',
           title: 'Meta Title',
           type: 'string',
-          description: 'Override the page title for search engines',
+          description: `Page title before the site name is appended. Keep to ${SEO_PAGE_TITLE_MAX_LENGTH} characters.`,
+          validation: (Rule) =>
+            Rule.max(SEO_PAGE_TITLE_MAX_LENGTH).warning(
+              `Use at most ${SEO_PAGE_TITLE_MAX_LENGTH} characters so the final branded title stays concise.`,
+            ),
         }),
         defineField({
           name: 'metaDescription',

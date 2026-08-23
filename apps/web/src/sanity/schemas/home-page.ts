@@ -1,4 +1,5 @@
 import { defineField, defineType } from 'sanity'
+import { SEO_TITLE_MAX_LENGTH } from '../../lib/constants'
 
 export const homePage = defineType({
   name: 'homePage',
@@ -235,7 +236,9 @@ export const homePage = defineType({
           name: 'metaTitle',
           title: 'Meta Title',
           type: 'string',
-          description: 'Override the page title for search engines',
+          description: 'Complete homepage title. No site-name suffix is added on this page.',
+          validation: (Rule) =>
+            Rule.max(SEO_TITLE_MAX_LENGTH).warning('Search results may truncate this title.'),
         }),
         defineField({
           name: 'metaDescription',
@@ -243,6 +246,42 @@ export const homePage = defineType({
           type: 'text',
           rows: 3,
           description: 'Description for search engine results',
+          validation: (Rule) =>
+            Rule.max(160).warning('Search results may truncate this description.'),
+        }),
+        defineField({
+          name: 'shareImage',
+          title: 'Homepage Social Share Image',
+          type: 'image',
+          options: { hotspot: true },
+          description:
+            'Optional homepage-only 1200 × 630 override. It does not change the site-wide fallback card.',
+        }),
+        defineField({
+          name: 'profileImages',
+          title: 'Search Profile Images',
+          type: 'object',
+          description: 'Public portraits used to identify Mike in search-engine structured data.',
+          fields: [
+            defineField({
+              name: 'square',
+              title: 'Square (1:1)',
+              type: 'image',
+              description: 'Recommended size: 1200 × 1200.',
+            }),
+            defineField({
+              name: 'fourByThree',
+              title: 'Landscape (4:3)',
+              type: 'image',
+              description: 'Recommended size: 1200 × 900.',
+            }),
+            defineField({
+              name: 'sixteenByNine',
+              title: 'Landscape (16:9)',
+              type: 'image',
+              description: 'Recommended size: 1200 × 675.',
+            }),
+          ],
         }),
       ],
     }),

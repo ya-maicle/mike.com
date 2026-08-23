@@ -53,7 +53,11 @@ export const PROGRAM_BY_SLUG = groq`
         slug
       }
     },
-    seoSettings
+    seoSettings{
+      metaTitle,
+      metaDescription,
+      shareImage${IMAGE_PROJECTION}
+    }
   }
 `
 
@@ -134,5 +138,6 @@ export type Program = {
   seoSettings?: {
     metaTitle?: string
     metaDescription?: string
+    shareImage?: SanityImage
   }
 }

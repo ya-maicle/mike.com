@@ -1,15 +1,20 @@
 import { NextResponse } from 'next/server'
-import { sanityFetch } from '@/sanity/client'
+import { sanityNoStoreFetch } from '@/sanity/client'
 import { DECK_QUERY, type DeckResult } from '@/sanity/queries/deck-queries'
 
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
+
+const noStoreHeaders = {
+  'Cache-Control': 'private, no-store, max-age=0',
+  'X-Robots-Tag': 'noindex, nofollow',
+}
 
 export async function GET() {
-  const deck = await sanityFetch<DeckResult>(DECK_QUERY, {}, { tag: 'deck', revalidate: 60 })
+  const deck = await sanityNoStoreFetch<DeckResult>(DECK_QUERY)
 
   if (!deck?.url) {
-    return new NextResponse('Deck not found', { status: 404 })
+    return new NextResponse('Deck not found', { status: 404, headers: noStoreHeaders })
   }
 
-  return NextResponse.redirect(deck.url, { status: 302 })
+  return NextResponse.redirect(deck.url, { status: 302, headers: noStoreHeaders })
 }

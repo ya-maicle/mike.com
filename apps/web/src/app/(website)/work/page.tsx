@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { absoluteUrl, createPageMetadata } from '@/lib/seo'
 import { sanityFetch } from '@/sanity/client'
 import { PUBLISHED_CASE_STUDIES } from '@/sanity/queries/case-study-queries'
 import type { CaseStudy } from '@/sanity/queries'
@@ -8,10 +9,18 @@ import { getPortfolioAccessState } from '@/lib/portfolio-access'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'Work',
-  description: 'Portfolio of work and projects',
-}
+export const metadata: Metadata = createPageMetadata({
+  title: 'Case Studies',
+  description:
+    'Selected product design case studies spanning agentic AI, strategy, systems, and complex digital products.',
+  path: '/work',
+  image: {
+    url: absoluteUrl('/social/work.jpg'),
+    width: 1200,
+    height: 630,
+    alt: 'Selected product design case studies by Mike Iukhtenko',
+  },
+})
 
 export default async function WorkPage() {
   const [caseStudies, accessState] = await Promise.all([

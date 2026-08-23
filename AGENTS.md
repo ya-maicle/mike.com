@@ -55,4 +55,5 @@ pnpm storybook:web      # Visual checks (the only Storybook)
 - [Access]: recruiter gating = HMAC cookies + `?k=` link tokens + signed Mux playback; teasers/covers stay public by design.
 - [Testing]: keep crypto/logic in pure modules (no `server-only`/`next/headers`) so Vitest can import them.
 - [Dev]: Dropbox can corrupt `.next` via conflicted copies; set `NEXT_DIST_DIR` to a relative path outside the sync root.
+- [SEO]: `src/lib/constants.ts` is the canonical public-identity source; `src/lib/seo.ts` builds canonical/search/social metadata for every indexable page.
 <!-- Only add genuinely reusable knowledge, not story-specific details -->

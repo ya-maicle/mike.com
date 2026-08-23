@@ -54,7 +54,16 @@ export const HOME_PAGE_QUERY = groq`
         publishedAt
       }
     },
-    seoSettings
+    seoSettings{
+      metaTitle,
+      metaDescription,
+      shareImage${IMAGE_PROJECTION},
+      profileImages{
+        square${IMAGE_PROJECTION},
+        fourByThree${IMAGE_PROJECTION},
+        sixteenByNine${IMAGE_PROJECTION}
+      }
+    }
   }
 `
 
@@ -117,5 +126,13 @@ export type HomePage = {
   seoSettings?: {
     metaTitle?: string
     metaDescription?: string
+    shareImage?: SanityImage
+    profileImages?: ProfileImages
   }
+}
+
+export type ProfileImages = {
+  square?: SanityImage
+  fourByThree?: SanityImage
+  sixteenByNine?: SanityImage
 }

@@ -10,6 +10,9 @@ import {
   ACTIVE_PORTFOLIO_ACCESS_PROFILE_BY_SLUG,
   type PortfolioAccessProfile,
 } from '@/sanity/queries/portfolio-access-queries'
+import { SITE_CONFIG } from '@/lib/constants'
+import { createPageMetadata, firstMetadataText } from '@/lib/seo'
+import { socialImageFromSanity } from '@/lib/sanity-social-image'
 
 type CoverMedia =
   | { type: 'image'; image: SanityImage }
@@ -26,6 +29,7 @@ type PageData = {
   seoSettings?: {
     metaTitle?: string
     metaDescription?: string
+    shareImage?: SanityImage
   }
 }
 
@@ -36,6 +40,7 @@ type PageProps = {
 
 // Reserved slugs that have their own routes
 const RESERVED_SLUGS = ['work', 'login', 'privacy', 'terms', 'stories', 'strengths']
+const NO_INDEX_SLUGS = new Set(['cookie-policy'])
 
 export async function generateStaticParams() {
   const pages = await sanityFetch<{ slug: string }[]>(
@@ -55,17 +60,43 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
   }
 
   const page = await sanityFetch<PageData | null>(
-    `*[_type == "page" && slug.current == $slug][0]{ title, seoSettings }`,
+    `*[_type == "page" && slug.current == $slug][0]{
+      title,
+      subtitle,
+      publishedAt,
+      coverMedia { type, image${IMAGE_PROJECTION} },
+      seoSettings {
+        metaTitle,
+        metaDescription,
+        shareImage${IMAGE_PROJECTION}
+      }
+    }`,
     { slug },
     { tag: `page:${slug}` },
   )
 
-  if (!page) return { title: 'Page not found' }
+  if (!page) return { title: 'Page not found', robots: { index: false, follow: false } }
 
-  return {
-    title: page.seoSettings?.metaTitle || page.title,
-    description: page.seoSettings?.metaDescription || undefined,
-  }
+  const title = firstMetadataText(page.seoSettings?.metaTitle, page.title) ?? SITE_CONFIG.name
+  const description =
+    firstMetadataText(
+      page.seoSettings?.metaDescription,
+      page.subtitle,
+      `${page.title} — ${SITE_CONFIG.name}, ${SITE_CONFIG.role}.`,
+    ) ?? SITE_CONFIG.description
+  const shareImage =
+    page.seoSettings?.shareImage ||
+    (page.coverMedia?.type === 'image' ? page.coverMedia.image : undefined)
+
+  return createPageMetadata({
+    title,
+    description,
+    path: `/${slug}`,
+    type: 'article',
+    publishedTime: page.publishedAt,
+    image: socialImageFromSanity(shareImage, title),
+    noIndex: NO_INDEX_SLUGS.has(slug),
+  })
 }
 
 export default async function DynamicPage(props: PageProps) {

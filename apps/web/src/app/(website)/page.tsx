@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import { SITE_CONFIG } from '@/lib/constants'
+import { createPageMetadata, firstMetadataText } from '@/lib/seo'
+import { socialImageFromSanity } from '@/lib/sanity-social-image'
 import { ContentGrid } from '@/components/content-grid'
 import { gridCols } from '@/lib/grid-columns'
 import { sanityFetch } from '@/sanity/client'
@@ -12,12 +14,27 @@ import { HomeLogoStrip } from '@/components/home-logo-strip'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { getPortfolioAccessState } from '@/lib/portfolio-access'
+import { SiteStructuredData } from '@/components/site-structured-data'
+import { profileImageUrlsFromSanity } from '@/lib/sanity-social-image'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
-  title: 'Home',
-  description: SITE_CONFIG.description,
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await sanityFetch<HomePage>(HOME_PAGE_QUERY, {}, { tag: homePageTag })
+  const title =
+    firstMetadataText(data?.seoSettings?.metaTitle, `${SITE_CONFIG.name} — ${SITE_CONFIG.role}`) ??
+    SITE_CONFIG.name
+  const description =
+    firstMetadataText(data?.seoSettings?.metaDescription, SITE_CONFIG.description) ??
+    SITE_CONFIG.description
+
+  return createPageMetadata({
+    title,
+    description,
+    path: '/',
+    absoluteTitle: true,
+    image: socialImageFromSanity(data?.seoSettings?.shareImage, title),
+  })
 }
 
 export default async function Home() {
@@ -35,6 +52,9 @@ export default async function Home() {
 
   return (
     <ContentGrid>
+      <SiteStructuredData
+        profileImages={profileImageUrlsFromSanity(data?.seoSettings?.profileImages)}
+      />
       <section
         className={`${gridCols.wide} min-h-[calc(80dvh-112px)] md:min-h-[calc(80dvh-128px)] pt-4 md:pt-6 pb-12 md:pb-16 flex flex-col items-center justify-center text-center`}
       >

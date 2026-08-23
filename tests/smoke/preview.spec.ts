@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { registerSeoSmokeTests } from './seo-assertions'
 
 // Skip tests if the bypass secret is not provided
 test.skip(
@@ -10,6 +11,8 @@ test.skip(
 // header configured in playwright.config.ts; no cookie setup is needed here.
 
 test.describe('Preview Smoke', () => {
+  registerSeoSmokeTests()
+
   test('Health API returns 200 and expected body', async ({ request }) => {
     const res = await request.get('/api/health')
     expect(res.status()).toBe(200)

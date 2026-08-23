@@ -11,6 +11,8 @@ Production). Never commit secrets. Only `NEXT_PUBLIC_*` vars are exposed to the 
 | `NEXT_PUBLIC_SUPABASE_URL`      | client                 | `src/lib/supabase.ts`, API routes    | Supabase project URL                                                            |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | client                 | same                                 | Supabase anon key (RLS enforced)                                                |
 | `NEXT_PUBLIC_SITE_URL`          | client                 | auth redirects                       | Canonical site origin; no trailing whitespace                                   |
+| `GOOGLE_SITE_VERIFICATION`      | server                 | root metadata                        | Optional Google Search Console HTML-tag verification token                      |
+| `YANDEX_SITE_VERIFICATION`      | server                 | root metadata                        | Optional Yandex Webmaster HTML-tag verification token                           |
 | `NEXT_PUBLIC_SANITY_PROJECT_ID` | client                 | `src/sanity/client.ts`               | Sanity project id                                                               |
 | `NEXT_PUBLIC_SANITY_DATASET`    | client                 | same                                 | Sanity dataset name                                                             |
 | `NEXT_PUBLIC_AUTH_DEBUG`        | client                 | `auth-provider.tsx`                  | Set `1` to enable `[AUTH]` console logging                                      |

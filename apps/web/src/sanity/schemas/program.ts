@@ -1,4 +1,5 @@
 import { defineType, defineField } from 'sanity'
+import { SEO_PAGE_TITLE_MAX_LENGTH } from '../../lib/constants'
 
 export const program = defineType({
   name: 'program',
@@ -277,7 +278,11 @@ export const program = defineType({
           name: 'metaTitle',
           title: 'Meta Title',
           type: 'string',
-          description: 'Override the page title for search engines',
+          description: `Page title before the site name is appended. Keep to ${SEO_PAGE_TITLE_MAX_LENGTH} characters.`,
+          validation: (Rule) =>
+            Rule.max(SEO_PAGE_TITLE_MAX_LENGTH).warning(
+              `Use at most ${SEO_PAGE_TITLE_MAX_LENGTH} characters so the final branded title stays concise.`,
+            ),
         }),
         defineField({
           name: 'metaDescription',
@@ -285,6 +290,15 @@ export const program = defineType({
           type: 'text',
           rows: 3,
           description: 'Description for search engine results',
+          validation: (Rule) =>
+            Rule.max(160).warning('Search results may truncate this description.'),
+        }),
+        defineField({
+          name: 'shareImage',
+          title: 'Social Share Image',
+          type: 'image',
+          options: { hotspot: true },
+          description: 'Optional 1200 × 630 page override. Uses the site card by default.',
         }),
       ],
     }),
