@@ -52,6 +52,7 @@ export function ProjectCard({ project, hasRecruiterAccess = false }: ProjectCard
           sizes="(max-width: 768px) 85vw, (max-width: 1200px) 33vw, 450px"
           imageAspectRatio="1/1"
         />
+        <div className="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-border" />
       </div>
 
       <div className="space-y-2">
