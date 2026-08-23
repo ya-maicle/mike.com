@@ -15,6 +15,9 @@ import {
   type HomePageProgram,
 } from '@/sanity/queries/home-page-queries'
 import { ProgramLayout } from '@/components/program-layout'
+import { SITE_CONFIG } from '@/lib/constants'
+import { createPageMetadata, firstMetadataText } from '@/lib/seo'
+import { socialImageFromSanity } from '@/lib/sanity-social-image'
 
 export const dynamic = 'force-static'
 export const revalidate = 300
@@ -40,11 +43,22 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
     { slug },
     { tag: programTag(slug) },
   )
-  if (!data) return { title: 'Strength not found' }
-  return {
-    title: data.seoSettings?.metaTitle || data.title,
-    description: data.seoSettings?.metaDescription || data.summary,
-  }
+  if (!data) return { title: 'Strength not found', robots: { index: false, follow: false } }
+
+  const title = firstMetadataText(data.seoSettings?.metaTitle, data.title) ?? SITE_CONFIG.name
+  const description =
+    firstMetadataText(
+      data.seoSettings?.metaDescription,
+      data.summary,
+      `${data.title}, one of ${SITE_CONFIG.name}'s core product design strengths.`,
+    ) ?? SITE_CONFIG.description
+
+  return createPageMetadata({
+    title,
+    description,
+    path: `/strengths/${slug}`,
+    image: socialImageFromSanity(data.seoSettings?.shareImage, title),
+  })
 }
 
 export default async function StrengthPage(props: PageProps) {

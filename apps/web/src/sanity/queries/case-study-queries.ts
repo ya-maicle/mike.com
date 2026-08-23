@@ -64,6 +64,11 @@ export const CASE_STUDY_TEASER_BY_SLUG = groq`
     summary,
     "visibility": coalesce(visibility, "public"),
     publishedAt,
+    seoSettings{
+      metaTitle,
+      metaDescription,
+      shareImage${IMAGE_PROJECTION}
+    },
     slug,
     cover${COVER_PROJECTION},
     coverImage${IMAGE_PROJECTION},

@@ -3,10 +3,14 @@ import { notFound } from 'next/navigation'
 import { PageTemplate } from '@/components/page-template'
 import { LegalPageContent } from '@/components/legal-page-content'
 import type { PortableTextBlock } from '@portabletext/types'
+import { createPageMetadata } from '@/lib/seo'
 
-export const metadata = {
+export const metadata = createPageMetadata({
   title: 'Terms of Service',
-}
+  description: 'Terms of use for mikeiu.com.',
+  path: '/terms',
+  noIndex: true,
+})
 
 export default async function TermsPage() {
   const page = await sanityFetch<{

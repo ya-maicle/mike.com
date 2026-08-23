@@ -9,11 +9,14 @@ import {
   caseStudiesTag,
 } from '@/sanity/queries/case-study-queries'
 import type { CaseStudy } from '@/sanity/queries'
+import { SITE_CONFIG } from '@/lib/constants'
 
 import { CaseStudyLayout } from '@/components/case-study-layout'
 import { CaseStudyAccessGate } from '@/components/case-study-access-gate'
 import { getPortfolioAccessState } from '@/lib/portfolio-access'
 import { attachMuxTokens } from '@/lib/mux-signing'
+import { createPageMetadata, firstMetadataText } from '@/lib/seo'
+import { socialImageFromSanity } from '@/lib/sanity-social-image'
 
 export const dynamic = 'force-dynamic'
 
@@ -29,11 +32,30 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
     { slug },
     { tag: `caseStudy:${slug}` },
   )
-  if (!data) return { title: 'Case Study not found' }
-  return {
-    title: data.title,
-    description: data.summary || undefined,
-  }
+  if (!data) return { title: 'Case Study not found', robots: { index: false, follow: false } }
+
+  const title = firstMetadataText(data.seoSettings?.metaTitle, data.title) ?? SITE_CONFIG.name
+  const description =
+    firstMetadataText(
+      data.seoSettings?.metaDescription,
+      data.summary,
+      `A product design case study by ${SITE_CONFIG.name}.`,
+    ) ?? SITE_CONFIG.description
+  const shareImage =
+    data.seoSettings?.shareImage ||
+    (data.headerMedia?.type === 'image' ? data.headerMedia.image : undefined) ||
+    (data.cover?.type === 'image' ? data.cover.image : undefined) ||
+    data.coverImage
+
+  return createPageMetadata({
+    title,
+    absoluteTitle: true,
+    description,
+    path: `/work/${slug}`,
+    type: 'article',
+    publishedTime: data.publishedAt,
+    image: socialImageFromSanity(shareImage, title),
+  })
 }
 
 export default async function CaseStudyPage(props: PageProps) {

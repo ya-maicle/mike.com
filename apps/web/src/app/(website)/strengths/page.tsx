@@ -6,14 +6,17 @@ import { sanityFetch } from '@/sanity/client'
 import { PUBLISHED_PROGRAMS, programsTag } from '@/sanity/queries/program-queries'
 import type { Program } from '@/sanity/queries/program-queries'
 import { programPath } from '@/lib/program-display'
+import { createPageMetadata } from '@/lib/seo'
 
 export const dynamic = 'force-static'
 export const revalidate = 300
 
-export const metadata: Metadata = {
-  title: 'Strengths',
-  description: 'What I bring to a team.',
-}
+export const metadata: Metadata = createPageMetadata({
+  title: 'What I Bring',
+  description:
+    'Five product design leadership strengths, each grounded in a clear purpose and real examples.',
+  path: '/strengths',
+})
 
 export default async function StrengthsPage() {
   const programs = await sanityFetch<Program[]>(PUBLISHED_PROGRAMS, {}, { tag: programsTag })

@@ -1,9 +1,19 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 import { ProfileDebugClient } from './profile-debug-client'
+import { createPageMetadata } from '@/lib/seo'
 
 // Force dynamic rendering to prevent static generation issues with Supabase
 export const dynamic = 'force-dynamic'
+
+export const metadata: Metadata = createPageMetadata({
+  title: 'Profile Debug',
+  description: 'Internal profile diagnostics.',
+  path: '/debug/profile',
+  noIndex: true,
+  noFollow: true,
+})
 
 export default function ProfileDebugPage() {
   // Reason: debug tooling stays available locally and on preview deployments,

@@ -2,11 +2,15 @@ import type { Metadata } from 'next'
 import { GalleryVerticalEnd } from 'lucide-react'
 import { LoginForm } from '@/components/login-form'
 import { SITE_CONFIG } from '@/lib/constants'
+import { createPageMetadata } from '@/lib/seo'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = createPageMetadata({
   title: 'Login',
-  description: 'Login to access your account',
-}
+  description: 'Sign in to access recruiter-only portfolio content.',
+  path: '/login',
+  noIndex: true,
+  noFollow: true,
+})
 
 export default function LoginPage() {
   return (

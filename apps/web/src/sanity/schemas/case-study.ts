@@ -1,5 +1,6 @@
 import { defineType, defineField } from 'sanity'
 import { blockStyles } from './objects/block-styles'
+import { SEO_TITLE_MAX_LENGTH } from '../../lib/constants'
 
 export const caseStudy = defineType({
   name: 'caseStudy',
@@ -257,6 +258,41 @@ export const caseStudy = defineType({
       name: 'publishedAt',
       title: 'Published At',
       type: 'datetime',
+    }),
+    defineField({
+      name: 'seoSettings',
+      title: 'SEO & Social Sharing',
+      type: 'object',
+      options: { collapsible: true, collapsed: true },
+      fields: [
+        defineField({
+          name: 'metaTitle',
+          title: 'Meta Title',
+          type: 'string',
+          description: `Complete case-study title shown in browser tabs and search results. No site-name suffix is added. Keep to ${SEO_TITLE_MAX_LENGTH} characters.`,
+          validation: (Rule) =>
+            Rule.max(SEO_TITLE_MAX_LENGTH).warning(
+              `Use at most ${SEO_TITLE_MAX_LENGTH} characters so browser tabs and search results stay concise.`,
+            ),
+        }),
+        defineField({
+          name: 'metaDescription',
+          title: 'Meta Description',
+          type: 'text',
+          rows: 3,
+          description: 'Description for search results and social previews',
+          validation: (Rule) =>
+            Rule.max(160).warning('Search results may truncate this description.'),
+        }),
+        defineField({
+          name: 'shareImage',
+          title: 'Social Share Image',
+          type: 'image',
+          options: { hotspot: true },
+          description:
+            'Optional 1200 × 630 image. Uses an image cover, then the site card. Video covers need a dedicated social image.',
+        }),
+      ],
     }),
   ],
 
