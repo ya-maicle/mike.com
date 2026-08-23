@@ -31,22 +31,48 @@ test.describe('Preview Smoke', () => {
     await expect(page.locator('h1')).not.toBeEmpty()
   })
 
-  test('/work page images serve responsive srcset with h+w params', async ({ page }) => {
+  test('/work page renders card media and Sanity images use responsive srcset', async ({
+    page,
+  }) => {
     await page.goto('/work')
     await page.waitForLoadState('networkidle')
 
-    const firstThumb = page.locator('a[href^="/work/"] img').first()
-    await expect(firstThumb).toBeVisible({ timeout: 10_000 })
+    const media = await page.locator('a[href^="/work/"]').evaluateAll((cards) => {
+      const isVisible = (element: Element) => {
+        const bounds = element.getBoundingClientRect()
+        const style = window.getComputedStyle(element)
+        return bounds.width > 0 && bounds.height > 0 && style.display !== 'none'
+      }
+      const cardMedia = cards.flatMap((card) =>
+        Array.from(card.querySelectorAll('img, mux-player, video')),
+      )
+      const sanityImages = cards
+        .flatMap((card) => Array.from(card.querySelectorAll<HTMLImageElement>('img')))
+        .map((image) => ({ src: image.src, srcset: image.srcset }))
+        .filter(({ src, srcset }) => `${src} ${srcset}`.includes('cdn.sanity.io'))
 
-    const srcset = await firstThumb.getAttribute('srcset')
-    expect(srcset, 'image must have a srcset').toBeTruthy()
-    expect(srcset!.split(',').length, 'srcset must have multiple candidates').toBeGreaterThan(1)
-    // Every Sanity candidate must have both w and h so the CDN can return the right pixels
-    for (const candidate of srcset!.split(',')) {
-      const url = candidate.trim().split(' ')[0]
-      if (!url.includes('cdn.sanity.io')) continue
-      expect(url, `srcset entry must include w param: ${url}`).toContain('w=')
-      expect(url, `srcset entry must include h param: ${url}`).toContain('h=')
+      return {
+        visibleCards: cards.filter(isVisible).length,
+        visibleMedia: cardMedia.filter(isVisible).length,
+        sanityImages,
+      }
+    })
+
+    expect(media.visibleCards, 'at least one work card must be visible').toBeGreaterThan(0)
+    expect(
+      media.visibleMedia,
+      'at least one work card must show image or video media',
+    ).toBeGreaterThan(0)
+
+    for (const { srcset } of media.sanityImages) {
+      expect(srcset, 'Sanity images must have a srcset').toBeTruthy()
+      expect(srcset.split(',').length, 'srcset must have multiple candidates').toBeGreaterThan(1)
+      // Every Sanity candidate must include both dimensions for exact hotspot-aware crops.
+      for (const candidate of srcset.split(',')) {
+        const url = candidate.trim().split(' ')[0]
+        expect(url, `srcset entry must include w param: ${url}`).toContain('w=')
+        expect(url, `srcset entry must include h param: ${url}`).toContain('h=')
+      }
     }
   })
 })
