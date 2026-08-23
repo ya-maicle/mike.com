@@ -46,3 +46,10 @@ function ProfileEditDialogStory() {
 export const Default: Story = {
   render: () => <ProfileEditDialogStory />,
 }
+
+export const Mobile: Story = {
+  render: () => <ProfileEditDialogStory />,
+  parameters: {
+    viewport: { defaultViewport: 'mobile1' },
+  },
+}
