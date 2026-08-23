@@ -207,7 +207,9 @@ function CTASection() {
         <h4 className="mb-0 mt-0 text-balance text-foreground">Working on this in your team?</h4>
         <div className="flex items-center gap-2 sm:gap-3">
           <Button asChild size="lg">
-            <Link href="mailto:ya@maicle.co.uk">Let&apos;s talk</Link>
+            <Link href="mailto:ya@maicle.co.uk" data-analytics-contact-placement="strength_cta">
+              Let&apos;s talk
+            </Link>
           </Button>
           <Button asChild variant="ghost" size="lg">
             <Link href="/work">

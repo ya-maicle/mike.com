@@ -14,17 +14,23 @@ import type { CaseStudy } from '@/sanity/queries'
 import { resolveStudyCoverMedia } from '@/lib/cover-media'
 import { cn } from '@/lib/utils'
 import { createPortal } from 'react-dom'
+import { CaseStudyAnalytics } from '@/components/case-study-analytics'
+import type { StudyAccessSource } from '@/lib/analytics/events'
 
 interface CaseStudyLayoutProps {
   data: CaseStudy
   otherStudies?: ProjectCardData[]
   hasRecruiterAccess?: boolean
+  accessSource?: StudyAccessSource
+  companySlug?: string
 }
 
 export function CaseStudyLayout({
   data,
   otherStudies,
   hasRecruiterAccess = false,
+  accessSource = 'none',
+  companySlug,
 }: CaseStudyLayoutProps) {
   const [isPanelOpen, setIsPanelOpen] = React.useState(false)
 
@@ -62,114 +68,125 @@ export function CaseStudyLayout({
   }, [isPanelOpen])
 
   return (
-    <div
-      data-case-study-layout
-      data-panel-open={isPanelOpen}
-      className={cn(
-        'relative min-h-screen flex flex-col md:flex-row',
-        isPanelOpen && 'case-study-panel-open',
-      )}
+    <CaseStudyAnalytics
+      studySlug={data.slug.current}
+      studyVisibility={data.visibility ?? 'public'}
+      viewState="unlocked"
+      accessSource={accessSource}
+      companySlug={companySlug}
     >
       <div
-        data-case-study-main
+        data-case-study-layout
+        data-panel-open={isPanelOpen}
         className={cn(
-          'min-w-0 flex-1 transition-all duration-500 ease-in-out w-full',
-          isPanelOpen ? 'md:w-1/2' : 'w-full',
+          'relative min-h-screen flex flex-col md:flex-row',
+          isPanelOpen && 'case-study-panel-open',
         )}
       >
-        <PageTemplate
-          title={data.title}
-          metadata={
-            [
-              data.projectInfo?.year,
-              ...(Array.isArray(data.projectInfo?.sector)
-                ? data.projectInfo.sector
-                : [data.projectInfo?.sector]),
-            ].filter(Boolean) as string[]
-          }
-          subtitle={data.summary}
-          className="pb-0"
-          coverMedia={resolveStudyCoverMedia(data.headerMedia, data.cover, data.coverImage)}
-        >
-          {data.content && <PortableText value={data.content} components={gridComponents} />}
-          {otherStudies && (
-            <KeepExploringSection projects={otherStudies} hasRecruiterAccess={hasRecruiterAccess} />
+        <div
+          data-case-study-main
+          className={cn(
+            'min-w-0 flex-1 transition-all duration-500 ease-in-out w-full',
+            isPanelOpen ? 'md:w-1/2' : 'w-full',
           )}
-        </PageTemplate>
-      </div>
+        >
+          <PageTemplate
+            title={data.title}
+            metadata={
+              [
+                data.projectInfo?.year,
+                ...(Array.isArray(data.projectInfo?.sector)
+                  ? data.projectInfo.sector
+                  : [data.projectInfo?.sector]),
+              ].filter(Boolean) as string[]
+            }
+            subtitle={data.summary}
+            className="pb-0"
+            coverMedia={resolveStudyCoverMedia(data.headerMedia, data.cover, data.coverImage)}
+          >
+            {data.content && <PortableText value={data.content} components={gridComponents} />}
+            {otherStudies && (
+              <KeepExploringSection
+                projects={otherStudies}
+                hasRecruiterAccess={hasRecruiterAccess}
+              />
+            )}
+          </PageTemplate>
+        </div>
 
-      <div
-        data-case-study-panel
-        className={cn(
-          'hidden md:block transition-all duration-500 ease-in-out bg-background z-30',
-          'relative',
-          isPanelOpen ? 'min-h-screen w-1/2 opacity-100' : 'w-0 opacity-0 overflow-hidden',
-        )}
-      >
-        {isPanelOpen && (
-          <div className="sticky top-16 p-8 flex flex-col">
-            <PanelContent data={data} />
-          </div>
-        )}
-      </div>
-
-      {isPanelOpen &&
-        typeof document !== 'undefined' &&
-        createPortal(
-          <div className="md:hidden fixed top-0 right-0 w-full h-[100dvh] z-[45] bg-background overflow-y-auto animate-in slide-in-from-right duration-300">
-            <div className="p-8 pt-14 pb-32 min-h-full flex flex-col">
+        <div
+          data-case-study-panel
+          className={cn(
+            'hidden md:block transition-all duration-500 ease-in-out bg-background z-30',
+            'relative',
+            isPanelOpen ? 'min-h-screen w-1/2 opacity-100' : 'w-0 opacity-0 overflow-hidden',
+          )}
+        >
+          {isPanelOpen && (
+            <div className="sticky top-16 p-8 flex flex-col">
               <PanelContent data={data} />
             </div>
-          </div>,
-          document.body,
-        )}
+          )}
+        </div>
 
-      {isPanelOpen && typeof document !== 'undefined'
-        ? createPortal(
-            <div className="md:hidden fixed left-0 right-0 bottom-0 pointer-events-none z-[70]">
-              <div className="flex flex-col justify-end pb-8 items-center">
-                <div className="pointer-events-auto">
-                  <Button
-                    variant="secondary"
-                    size="lg"
-                    onClick={togglePanel}
-                    className="shadow-none bg-border/90 backdrop-blur-md hover:bg-border/95 hover:scale-105 transition-all duration-300 cursor-pointer"
-                  >
-                    <Plus className="size-4 transition-transform duration-300 ease-in-out rotate-45" />
-                    About the project
-                  </Button>
-                </div>
+        {isPanelOpen &&
+          typeof document !== 'undefined' &&
+          createPortal(
+            <div className="md:hidden fixed top-0 right-0 w-full h-[100dvh] z-[45] bg-background overflow-y-auto animate-in slide-in-from-right duration-300">
+              <div className="p-8 pt-14 pb-32 min-h-full flex flex-col">
+                <PanelContent data={data} />
               </div>
             </div>,
             document.body,
-          )
-        : null}
-      <div
-        className={cn(
-          'absolute left-0 right-0 bottom-0 top-[-5rem] md:top-[-6rem] pointer-events-none z-[70]',
-          isPanelOpen && 'max-md:hidden',
-        )}
-      >
-        <div className="sticky top-0 h-[100dvh] flex flex-col justify-end pb-8 items-center">
-          <div className="pointer-events-auto">
-            <Button
-              variant="secondary"
-              size="lg"
-              onClick={togglePanel}
-              className="shadow-none bg-border/90 backdrop-blur-md hover:bg-border/95 hover:scale-105 transition-all duration-300 cursor-pointer"
-            >
-              <Plus
-                className={cn(
-                  'size-4 transition-transform duration-300 ease-in-out',
-                  isPanelOpen ? 'rotate-45' : 'rotate-0',
-                )}
-              />
-              About the project
-            </Button>
+          )}
+
+        {isPanelOpen && typeof document !== 'undefined'
+          ? createPortal(
+              <div className="md:hidden fixed left-0 right-0 bottom-0 pointer-events-none z-[70]">
+                <div className="flex flex-col justify-end pb-8 items-center">
+                  <div className="pointer-events-auto">
+                    <Button
+                      variant="secondary"
+                      size="lg"
+                      onClick={togglePanel}
+                      className="shadow-none bg-border/90 backdrop-blur-md hover:bg-border/95 hover:scale-105 transition-all duration-300 cursor-pointer"
+                    >
+                      <Plus className="size-4 transition-transform duration-300 ease-in-out rotate-45" />
+                      About the project
+                    </Button>
+                  </div>
+                </div>
+              </div>,
+              document.body,
+            )
+          : null}
+        <div
+          className={cn(
+            'absolute left-0 right-0 bottom-0 top-[-5rem] md:top-[-6rem] pointer-events-none z-[70]',
+            isPanelOpen && 'max-md:hidden',
+          )}
+        >
+          <div className="sticky top-0 h-[100dvh] flex flex-col justify-end pb-8 items-center">
+            <div className="pointer-events-auto">
+              <Button
+                variant="secondary"
+                size="lg"
+                onClick={togglePanel}
+                className="shadow-none bg-border/90 backdrop-blur-md hover:bg-border/95 hover:scale-105 transition-all duration-300 cursor-pointer"
+              >
+                <Plus
+                  className={cn(
+                    'size-4 transition-transform duration-300 ease-in-out',
+                    isPanelOpen ? 'rotate-45' : 'rotate-0',
+                  )}
+                />
+                About the project
+              </Button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </CaseStudyAnalytics>
   )
 }
 

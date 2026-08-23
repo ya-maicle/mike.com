@@ -43,8 +43,8 @@ export function CookiePreferencesDialog({
           <DialogTitle>Cookie preferences</DialogTitle>
           <DialogDescription className="pt-2 leading-6 text-foreground">
             This website uses cookies and similar technologies to provide essential features and,
-            with your permission, understand site performance. You can change your choice at any
-            time.{' '}
+            with your permission, understand how visitors use its content and how well pages and
+            videos perform. You can change your choice at any time.{' '}
             <Link
               href="/cookie-policy"
               onClick={() => onOpenChange(false)}

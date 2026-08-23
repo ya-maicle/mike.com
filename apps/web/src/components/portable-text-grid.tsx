@@ -224,6 +224,9 @@ export const gridComponents: PortableTextComponents = {
           href={value?.href}
           target={isExternal ? '_blank' : undefined}
           rel={isExternal ? 'noreferrer' : undefined}
+          data-analytics-contact-placement={
+            value?.href?.toLowerCase().startsWith('mailto:') ? 'portable_text' : undefined
+          }
           className="text-foreground underline decoration-1 underline-offset-4 hover:text-muted-foreground hover:decoration-muted-foreground transition-colors"
         >
           {children}

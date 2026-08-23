@@ -149,7 +149,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
                   className="hidden md:inline-flex"
                   variant="secondary"
                   size="default"
-                  onClick={() => openLogin()}
+                  onClick={() => openLogin({ entryPoint: 'header' })}
                 >
                   Log in
                 </Button>
@@ -207,7 +207,11 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
             {/* Mobile-only footer action for logged-out users */}
             {!user && (
               <div className="mt-auto flex justify-end md:hidden">
-                <Button variant="secondary" size="default" onClick={() => openLogin()}>
+                <Button
+                  variant="secondary"
+                  size="default"
+                  onClick={() => openLogin({ entryPoint: 'header' })}
+                >
                   Log in
                 </Button>
               </div>

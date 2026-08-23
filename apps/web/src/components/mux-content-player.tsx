@@ -5,6 +5,7 @@ import MuxPlayerReact from '@mux/mux-player-react/lazy'
 import type { MuxPlayerRefAttributes } from '@mux/mux-player-react'
 import { useCookiePreferences } from '@/components/providers/cookie-preferences-provider'
 import { getMuxPosterUrl } from '@/lib/mux-poster'
+import { useCaseStudyAnalytics } from '@/components/case-study-analytics'
 
 export interface MuxPlaybackTokens {
   playback?: string
@@ -17,6 +18,8 @@ export type MuxMinResolution = '480p' | '540p' | '720p' | '1080p' | '1440p' | '2
 
 export interface MuxContentPlayerProps {
   playbackId: string
+  /** Stable Sanity block key used for privacy-safe content analytics. */
+  contentId?: string
   /** Required for assets with a signed playback policy; omit for public assets. */
   tokens?: MuxPlaybackTokens
   title?: string
@@ -39,6 +42,7 @@ export const MuxContentPlayer = React.forwardRef<HTMLVideoElement | null, MuxCon
   function MuxContentPlayer(
     {
       playbackId,
+      contentId,
       tokens,
       title,
       poster,
@@ -55,6 +59,33 @@ export const MuxContentPlayer = React.forwardRef<HTMLVideoElement | null, MuxCon
     ref,
   ) {
     const { analyticsEnabled } = useCookiePreferences()
+    const caseStudyAnalytics = useCaseStudyAnalytics()
+    const milestonesRef = React.useRef(new Set<string>())
+
+    React.useEffect(() => {
+      milestonesRef.current.clear()
+    }, [contentId, playbackId])
+
+    const trackMilestone = React.useCallback(
+      (milestone: 'started' | '25' | '50' | 'completed') => {
+        if (!analyticsEnabled || !controls || !contentId || !caseStudyAnalytics) return
+        if (milestonesRef.current.has(milestone)) return
+        milestonesRef.current.add(milestone)
+        caseStudyAnalytics.trackVideoProgress(contentId, milestone)
+      },
+      [analyticsEnabled, caseStudyAnalytics, contentId, controls],
+    )
+
+    const handleTimeUpdate = React.useCallback(
+      (event: CustomEvent) => {
+        const { currentTime, duration } = event.currentTarget as MuxPlayerRefAttributes
+        if (!Number.isFinite(duration) || duration <= 0) return
+        const progress = currentTime / duration
+        if (progress >= 0.5) trackMilestone('50')
+        else if (progress >= 0.25) trackMilestone('25')
+      },
+      [trackMilestone],
+    )
 
     // Reason: signed thumbnail URLs reject loose query params — render params
     // (fit_mode) are embedded in the token claims instead.
@@ -81,6 +112,9 @@ export const MuxContentPlayer = React.forwardRef<HTMLVideoElement | null, MuxCon
         muted={muted}
         loop={loop}
         nohotkeys={!controls}
+        onPlay={() => trackMilestone('started')}
+        onTimeUpdate={handleTimeUpdate}
+        onEnded={() => trackMilestone('completed')}
         playsInline
         className={className}
         style={{

@@ -6,6 +6,14 @@ import type { Session, User } from '@supabase/supabase-js'
 import { upsertProfileFromUser } from '@/lib/profile'
 import { isValidReturnPath } from '@/lib/url-validation'
 import { isCaseStudyPath, withAccessDenied } from '@/lib/portfolio-access-client'
+import { captureAnalyticsEvent, resetAnalyticsIdentity } from '@/lib/analytics/client'
+import { consumePortfolioAccessContext } from '@/lib/analytics/portfolio-access'
+import { requestedStudySlugFromPath, type PortfolioAuthMethod } from '@/lib/analytics/events'
+
+type PortfolioClaimResult = {
+  status: 'granted' | 'denied' | 'blocked'
+  companySlug?: string
+}
 
 type AuthContextValue = {
   user: User | null
@@ -20,6 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = React.useState<User | null>(null)
   const [session, setSession] = React.useState<Session | null>(null)
   const [loading, setLoading] = React.useState(true)
+  const capturedCompletionsRef = React.useRef(new Set<string>())
 
   const isDebug = React.useMemo(() => {
     if (typeof window === 'undefined') return process.env.NEXT_PUBLIC_AUTH_DEBUG === '1'
@@ -55,13 +64,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             path,
           }),
         })
-        if (!res.ok) return 'denied'
-        const payload = (await res.json()) as { status?: 'granted' | 'denied' | 'blocked' }
+        if (!res.ok) return { status: 'denied' } satisfies PortfolioClaimResult
+        const payload = (await res.json()) as Partial<PortfolioClaimResult>
         dlog('Portfolio access claim:', payload.status)
-        return payload.status ?? 'denied'
+        return {
+          status: payload.status ?? 'denied',
+          ...(payload.companySlug ? { companySlug: payload.companySlug } : {}),
+        } satisfies PortfolioClaimResult
       } catch (error) {
         dlog('Portfolio access claim failed:', error)
-        return 'denied'
+        return { status: 'denied' } satisfies PortfolioClaimResult
       }
     },
     [dlog],
@@ -90,10 +102,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const returnUrl = localStorage.getItem('auth-return-url')
       const safeReturnUrl = urlReturnUrl || (isValidReturnPath(returnUrl) ? returnUrl : null)
-      const claimStatus = await claimPortfolioAccess(
+      const claim = await claimPortfolioAccess(
         newSession,
         safeReturnUrl || window.location.pathname,
       )
+      const claimStatus = claim.status
+
+      const analyticsContext = consumePortfolioAccessContext()
+      if (analyticsContext || isOAuthCallback) {
+        const authMethod: PortfolioAuthMethod =
+          analyticsContext?.authMethod ??
+          (newSession.user.app_metadata?.provider === 'google' ? 'google' : 'magic_link')
+        const completionKey = [
+          newSession.user.id,
+          claimStatus,
+          newSession.expires_at ?? 'session',
+          safeReturnUrl ?? window.location.pathname,
+        ].join(':')
+
+        if (!capturedCompletionsRef.current.has(completionKey)) {
+          capturedCompletionsRef.current.add(completionKey)
+          captureAnalyticsEvent('portfolio_access_completed', {
+            outcome: claimStatus,
+            auth_method: authMethod,
+            entry_point: analyticsContext?.entryPoint ?? 'login_page',
+            requested_study_slug:
+              analyticsContext?.requestedStudySlug ?? requestedStudySlugFromPath(safeReturnUrl),
+            company_slug: claim.companySlug,
+          })
+        }
+      }
 
       if (!safeReturnUrl || (!isOAuthCallback && claimStatus !== 'granted')) return
 
@@ -205,6 +243,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = React.useCallback(async () => {
     const supabase = getSupabaseClient()
+    resetAnalyticsIdentity()
 
     try {
       await Promise.race([

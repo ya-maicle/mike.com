@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { isValidReturnPath } from '@/lib/url-validation'
+import { capturePortfolioAccessStarted } from '@/lib/analytics/portfolio-access'
 import * as React from 'react'
 
 export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) {
@@ -87,6 +88,8 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
         localStorage.setItem('auth-return-url', returnPath)
       }
 
+      await capturePortfolioAccessStarted('google', returnPath)
+
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: { redirectTo },
@@ -124,6 +127,7 @@ export function LoginForm({ className, ...props }: React.ComponentProps<'div'>) 
         setErrorMsg(error.message || 'Unable to send magic link. Please try again.')
         console.error('[AUTH] Magic link error:', error)
       } else {
+        await capturePortfolioAccessStarted('magic_link', returnPath)
         setSent(true)
         setInfoMsg('Check your email for a magic link to sign in.')
         const expires = Date.now() + 60000
