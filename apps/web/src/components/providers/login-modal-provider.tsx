@@ -3,9 +3,11 @@
 import * as React from 'react'
 import getSupabaseClient from '@/lib/supabase'
 import { isValidReturnPath } from '@/lib/url-validation'
+import { rememberPortfolioAccessEntryPoint } from '@/lib/analytics/portfolio-access'
+import type { PortfolioAccessEntryPoint } from '@/lib/analytics/events'
 
 type Mode = 'login' | 'signup'
-type OpenLoginOptions = { returnTo?: string }
+type OpenLoginOptions = { returnTo?: string; entryPoint?: PortfolioAccessEntryPoint }
 
 type LoginModalContextValue = {
   open: boolean
@@ -26,6 +28,7 @@ export function LoginModalProvider({ children }: { children: React.ReactNode }) 
     if (typeof window !== 'undefined' && isValidReturnPath(options?.returnTo ?? null)) {
       localStorage.setItem('auth-return-url', options!.returnTo!)
     }
+    rememberPortfolioAccessEntryPoint(options?.entryPoint ?? 'header', options?.returnTo)
     setMode('login')
     setOpen(true)
   }, [])

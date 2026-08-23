@@ -5,6 +5,7 @@ import { ConsentAwareAnalytics } from '@/components/consent-aware-analytics'
 import { CookieConsentPrompt } from '@/components/cookie-consent-prompt'
 import { CookiePreferencesDialog } from '@/components/cookie-preferences-dialog'
 import { useMobileNavigation } from '@/components/providers/mobile-navigation-provider'
+import { clearPostHogPersistence, isDoNotTrackEnabled } from '@/lib/analytics/client'
 import {
   COOKIE_PREFERENCES_STORAGE_KEY,
   DEFAULT_COOKIE_CHOICES,
@@ -25,6 +26,8 @@ const CookiePreferencesContext = React.createContext<CookiePreferencesContextVal
 )
 
 function clearDisabledCategoryData(choices: CookieChoices) {
+  if (!choices.analytics) clearPostHogPersistence()
+
   for (const [category, storage] of Object.entries(OPTIONAL_STORAGE_MANIFEST)) {
     if (choices[category as keyof CookieChoices]) continue
 
@@ -45,9 +48,14 @@ function clearDisabledCategoryData(choices: CookieChoices) {
   }
 }
 
+function effectiveTrackingChoices(choices: CookieChoices): CookieChoices {
+  return isDoNotTrackEnabled() ? { ...choices, analytics: false } : choices
+}
+
 export function CookiePreferencesProvider({ children }: { children: React.ReactNode }) {
   const { open: mobileNavigationOpen } = useMobileNavigation()
   const [choices, setChoices] = React.useState<CookieChoices>(DEFAULT_COOKIE_CHOICES)
+  const [dntEnabled, setDntEnabled] = React.useState(false)
   const [ready, setReady] = React.useState(false)
   const [hasSavedPreferences, setHasSavedPreferences] = React.useState(false)
   const [open, setOpen] = React.useState(false)
@@ -63,9 +71,11 @@ export function CookiePreferencesProvider({ children }: { children: React.ReactN
     }
 
     const initialChoices = saved?.choices ?? DEFAULT_COOKIE_CHOICES
-    clearDisabledCategoryData(initialChoices)
+    const initialDntEnabled = isDoNotTrackEnabled()
+    clearDisabledCategoryData(effectiveTrackingChoices(initialChoices))
     choicesRef.current = initialChoices
     setChoices(initialChoices)
+    setDntEnabled(initialDntEnabled)
     setHasSavedPreferences(saved !== null)
     setReady(true)
 
@@ -74,7 +84,9 @@ export function CookiePreferencesProvider({ children }: { children: React.ReactN
 
       const nextPreferences = parseCookiePreferences(event.newValue)
       const nextChoices = nextPreferences?.choices ?? DEFAULT_COOKIE_CHOICES
-      clearDisabledCategoryData(nextChoices)
+      const nextDntEnabled = isDoNotTrackEnabled()
+      clearDisabledCategoryData(effectiveTrackingChoices(nextChoices))
+      setDntEnabled(nextDntEnabled)
 
       if (hasRevokedConsent(choicesRef.current, nextChoices)) {
         window.location.reload()
@@ -106,9 +118,11 @@ export function CookiePreferencesProvider({ children }: { children: React.ReactN
     }
 
     const consentWasRevoked = hasRevokedConsent(choicesRef.current, nextChoices)
-    clearDisabledCategoryData(nextChoices)
+    const nextDntEnabled = isDoNotTrackEnabled()
+    clearDisabledCategoryData(effectiveTrackingChoices(nextChoices))
     choicesRef.current = nextChoices
     setChoices(nextChoices)
+    setDntEnabled(nextDntEnabled)
     setHasSavedPreferences(true)
     setSaveError(undefined)
     setOpen(false)
@@ -119,14 +133,16 @@ export function CookiePreferencesProvider({ children }: { children: React.ReactN
   }, [])
 
   const contextValue = React.useMemo(
-    () => ({ analyticsEnabled: ready && choices.analytics, openPreferences }),
-    [choices.analytics, openPreferences, ready],
+    () => ({ analyticsEnabled: ready && choices.analytics && !dntEnabled, openPreferences }),
+    [choices.analytics, dntEnabled, openPreferences, ready],
   )
+
+  const analyticsEnabled = contextValue.analyticsEnabled
 
   return (
     <CookiePreferencesContext.Provider value={contextValue}>
       {children}
-      {ready && choices.analytics ? <ConsentAwareAnalytics /> : null}
+      {analyticsEnabled ? <ConsentAwareAnalytics /> : null}
       {ready && !hasSavedPreferences && !open && !mobileNavigationOpen ? (
         <CookieConsentPrompt
           saveError={saveError}

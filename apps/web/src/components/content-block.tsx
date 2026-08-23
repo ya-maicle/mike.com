@@ -105,6 +105,7 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
       <section className={cn(widthClass, 'space-y-3')}>
         <MuxContentPlayer
           playbackId={playbackId}
+          contentId={block._key || 'content-video'}
           tokens={block.video?.asset?.tokens}
           title={block.title}
           className="w-full h-auto rounded-[8px] overflow-hidden"

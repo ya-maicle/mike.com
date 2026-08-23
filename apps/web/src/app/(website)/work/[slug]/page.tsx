@@ -50,7 +50,13 @@ export default async function CaseStudyPage(props: PageProps) {
   if (!teaser) return notFound()
 
   if (teaser.visibility === 'recruiter' && !accessState.hasRecruiterAccess) {
-    return <CaseStudyAccessGate study={teaser} denied={searchParams?.access === 'denied'} />
+    return (
+      <CaseStudyAccessGate
+        study={teaser}
+        denied={searchParams?.access === 'denied'}
+        accessSource="none"
+      />
+    )
   }
 
   const [data, allStudies] = await Promise.all([
@@ -66,6 +72,8 @@ export default async function CaseStudyPage(props: PageProps) {
       data={attachMuxTokens(data)}
       otherStudies={otherStudies}
       hasRecruiterAccess={accessState.hasRecruiterAccess}
+      accessSource={accessState.hasRecruiterAccess ? accessState.source : 'none'}
+      companySlug={accessState.hasRecruiterAccess ? accessState.companySlug : undefined}
     />
   )
 }

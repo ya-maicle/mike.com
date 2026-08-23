@@ -26,7 +26,7 @@ export function CookieConsentPrompt({
       <CardContent className="space-y-3 px-4">
         <p className="text-sm leading-5">
           We use necessary cookies to make this site work. With your permission, we use analytics to
-          improve performance.
+          understand how visitors use the site and improve its content and performance.
         </p>
 
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">

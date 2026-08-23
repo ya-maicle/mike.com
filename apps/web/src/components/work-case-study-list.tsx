@@ -119,7 +119,7 @@ export function WorkCaseStudyList({
             href={href}
             onClick={(event) => {
               event.preventDefault()
-              openLogin({ returnTo: href })
+              openLogin({ returnTo: href, entryPoint: 'work_card' })
             }}
           >
             {article}

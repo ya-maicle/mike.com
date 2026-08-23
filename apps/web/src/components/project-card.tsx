@@ -90,7 +90,7 @@ export function ProjectCard({ project, hasRecruiterAccess = false }: ProjectCard
           isLocked
             ? (event) => {
                 event.preventDefault()
-                openLogin({ returnTo: href })
+                openLogin({ returnTo: href, entryPoint: 'work_card' })
               }
             : undefined
         }

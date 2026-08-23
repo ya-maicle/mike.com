@@ -21,7 +21,7 @@ export function Protected({ children, fallback, onUnauthed = 'modal' }: Protecte
 
   React.useEffect(() => {
     if (!loading && !user && onUnauthed === 'modal') {
-      openLogin()
+      openLogin({ entryPoint: 'header' })
     }
   }, [loading, user, onUnauthed, openLogin])
 
