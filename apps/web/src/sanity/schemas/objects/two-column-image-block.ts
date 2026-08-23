@@ -39,6 +39,22 @@ export const twoColumnImageBlock = defineType({
       ],
     }),
     defineField({
+      name: 'leftMobileImage',
+      title: 'Left Mobile Image (Optional)',
+      type: 'image',
+      description: 'An art-directed version for screens below 768px.',
+      options: { hotspot: true },
+      hidden: ({ parent }) => parent?.leftKind === 'video',
+      fields: [
+        {
+          name: 'alt',
+          type: 'string',
+          title: 'Alt text',
+          validation: (Rule) => Rule.required(),
+        },
+      ],
+    }),
+    defineField({
       name: 'leftVideo',
       title: 'Left Video',
       type: 'mux.video',
@@ -74,6 +90,22 @@ export const twoColumnImageBlock = defineType({
           name: 'caption',
           type: 'string',
           title: 'Caption',
+        },
+      ],
+    }),
+    defineField({
+      name: 'rightMobileImage',
+      title: 'Right Mobile Image (Optional)',
+      type: 'image',
+      description: 'An art-directed version for screens below 768px.',
+      options: { hotspot: true },
+      hidden: ({ parent }) => parent?.rightKind === 'video',
+      fields: [
+        {
+          name: 'alt',
+          type: 'string',
+          title: 'Alt text',
+          validation: (Rule) => Rule.required(),
         },
       ],
     }),

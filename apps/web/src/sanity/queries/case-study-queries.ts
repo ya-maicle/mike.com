@@ -8,7 +8,8 @@ const CASE_STUDY_BLOCKS_PROJECTION = groq`{
   ...,
   _type == 'imageBlock' => {
     ...,
-    image${IMAGE_PROJECTION}
+    image${IMAGE_PROJECTION},
+    mobileImage${IMAGE_PROJECTION}
   },
   _type == 'videoBlock' => {
     ...,
@@ -20,13 +21,16 @@ const CASE_STUDY_BLOCKS_PROJECTION = groq`{
     items[]{
       kind,
       image${IMAGE_PROJECTION},
+      mobileImage${IMAGE_PROJECTION},
       video${MUX_VIDEO_PROJECTION}
     }
   },
   _type == 'twoColumnImageBlock' => {
     ...,
     leftImage${IMAGE_PROJECTION},
+    leftMobileImage${IMAGE_PROJECTION},
     rightImage${IMAGE_PROJECTION},
+    rightMobileImage${IMAGE_PROJECTION},
     leftVideo${MUX_VIDEO_PROJECTION},
     rightVideo${MUX_VIDEO_PROJECTION}
   }

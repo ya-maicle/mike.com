@@ -3,7 +3,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { cn } from '@/lib/utils'
 import { gridCols } from '@/lib/grid-columns'
-import { SanityImage } from '@/components/sanity-image'
+import { CaseStudyImage } from '@/components/case-study-image'
 import { MuxContentPlayer } from '@/components/mux-content-player'
 import { DecorativeVideoBlock } from '@/components/decorative-video-block'
 import { DecorativeVideoPlayer } from '@/components/decorative-video-player'
@@ -52,8 +52,10 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
 
     return (
       <section className={cn(widthClass, 'space-y-3')}>
-        <SanityImage
+        <CaseStudyImage
           image={block.image}
+          mobileImage={block.mobileImage}
+          caption={block.image?.caption}
           className="w-full h-auto rounded-[8px]"
           sizes="(min-width: 1376px) 1376px, 100vw"
           aspectRatio="auto"
@@ -137,7 +139,7 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
   }
 
   if (block._type === 'twoColumnImageBlock') {
-    const renderColumn = (kind: string | undefined, image: any, video: any) => {
+    const renderColumn = (kind: string | undefined, image: any, mobileImage: any, video: any) => {
       if (kind === 'video') {
         const playbackId: string | undefined = video?.asset?.playbackId
         if (!playbackId) return null
@@ -152,8 +154,10 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
       if (!image) return null
       return (
         <>
-          <SanityImage
+          <CaseStudyImage
             image={image}
+            mobileImage={mobileImage}
+            caption={image?.caption}
             className="w-full h-auto rounded-[8px]"
             sizes="(max-width: 768px) 100vw, 50vw"
             aspectRatio="auto"
@@ -167,10 +171,15 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
       <section className="w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            {renderColumn(block.leftKind, block.leftImage, block.leftVideo)}
+            {renderColumn(block.leftKind, block.leftImage, block.leftMobileImage, block.leftVideo)}
           </div>
           <div className="space-y-2">
-            {renderColumn(block.rightKind, block.rightImage, block.rightVideo)}
+            {renderColumn(
+              block.rightKind,
+              block.rightImage,
+              block.rightMobileImage,
+              block.rightVideo,
+            )}
           </div>
         </div>
       </section>

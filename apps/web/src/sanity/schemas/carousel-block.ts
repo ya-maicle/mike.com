@@ -56,6 +56,22 @@ export const carouselBlock = defineType({
               hidden: ({ parent }) => parent?.kind !== 'image',
             }),
             defineField({
+              name: 'mobileImage',
+              title: 'Mobile Image (Optional)',
+              type: 'image',
+              description: 'An art-directed version for screens below 768px.',
+              options: { hotspot: true },
+              fields: [
+                {
+                  name: 'alt',
+                  type: 'string',
+                  title: 'Alt text',
+                  validation: (Rule) => Rule.required(),
+                },
+              ],
+              hidden: ({ parent }) => parent?.kind !== 'image',
+            }),
+            defineField({
               name: 'video',
               title: 'Video',
               type: 'mux.video',

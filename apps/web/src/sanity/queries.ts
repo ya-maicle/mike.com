@@ -39,6 +39,7 @@ export type ImageBlock = {
   _type: 'imageBlock'
   _key?: string
   image: SanityImage
+  mobileImage?: SanityImage
   title?: string
   description?: string
 }
@@ -61,7 +62,7 @@ export type CarouselBlock = {
   _type: 'carouselBlock'
   _key?: string
   items: (
-    | { kind: 'image'; image: SanityImage }
+    | { kind: 'image'; image: SanityImage; mobileImage?: SanityImage }
     | {
         kind: 'video'
         video: { asset: { playbackId: string; playbackPolicy?: 'public' | 'signed' } }
@@ -77,7 +78,9 @@ export type TwoColumnImageBlock = {
   leftKind?: 'image' | 'video'
   rightKind?: 'image' | 'video'
   leftImage?: SanityImage
+  leftMobileImage?: SanityImage
   rightImage?: SanityImage
+  rightMobileImage?: SanityImage
   leftVideo?: {
     asset?: {
       playbackId?: string

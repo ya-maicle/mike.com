@@ -27,6 +27,23 @@ export const imageBlock = defineType({
     }),
 
     defineField({
+      name: 'mobileImage',
+      title: 'Mobile Image (Optional)',
+      type: 'image',
+      description:
+        'An art-directed version for screens below 768px. Use a composition that makes important details easier to read; any aspect ratio is supported.',
+      options: { hotspot: true },
+      fields: [
+        {
+          name: 'alt',
+          type: 'string',
+          title: 'Alt text',
+          validation: (Rule) => Rule.required(),
+        },
+      ],
+    }),
+
+    defineField({
       name: 'description',
       title: 'Description',
       type: 'text',

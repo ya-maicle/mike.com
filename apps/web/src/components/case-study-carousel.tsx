@@ -2,10 +2,11 @@
 
 import * as React from 'react'
 import { Carousel, CarouselContent, CarouselItem, type CarouselApi } from '@/components/ui/carousel'
-import { SanityImage } from '@/components/sanity-image'
+import { CaseStudyImage } from '@/components/case-study-image'
 import { DecorativeVideo } from '@/components/decorative-video'
 import { ArrowLeft, ArrowRight, Pause, Play } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 interface CaseStudyCarouselProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -49,14 +50,25 @@ export function CaseStudyCarousel({ items, title, description }: CaseStudyCarous
           <CarouselContent className="-ml-0">
             {items.map((item, i) => (
               <CarouselItem key={i} className="pl-0 basis-full">
-                <div className="relative w-full aspect-video bg-muted">
+                <div
+                  className={cn(
+                    'relative w-full bg-muted',
+                    item.kind !== 'image' || !item.mobileImage ? 'aspect-video' : 'md:aspect-video',
+                  )}
+                >
                   {item.kind === 'image' ? (
-                    <SanityImage
+                    <CaseStudyImage
                       image={item.image}
-                      className="w-full h-full object-cover"
+                      mobileImage={item.mobileImage}
+                      caption={item.image?.caption}
+                      className={cn(
+                        'w-full object-cover',
+                        item.mobileImage ? 'h-auto md:h-full' : 'h-full',
+                      )}
                       sizes="(min-width: 1376px) 1376px, 100vw"
                       aspectRatio="16/9"
                       loading="eager"
+                      triggerMode="control"
                     />
                   ) : (
                     <DecorativeVideo

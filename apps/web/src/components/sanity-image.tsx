@@ -1,13 +1,13 @@
 'use client'
 
 import * as React from 'react'
-import Image, { type ImageLoaderProps } from 'next/image'
+import Image, { type ImageLoaderProps, type ImageProps } from 'next/image'
 import { urlFor } from '@/sanity/image-builder'
 import type { SanityImage as SanityImageType } from '@/sanity/queries'
 
 type AspectRatio = number | `${number}/${number}` | 'auto'
 
-interface SanityImageProps {
+export interface SanityImageProps {
   image: SanityImageType
   sizes: string
   aspectRatio: AspectRatio
@@ -17,6 +17,8 @@ interface SanityImageProps {
   loading?: 'eager' | 'lazy'
   className?: string
 }
+
+export type ResolvedSanityImageProps = ImageProps & { src: string }
 
 // Reason: WebP below q90 shows ringing on fine UI text and gradients.
 const DEFAULT_QUALITY = 90
@@ -62,7 +64,7 @@ function makeLoader(image: SanityImageType, ratio: number | null) {
   }
 }
 
-function SanityImageImpl({
+export function getSanityImageProps({
   image,
   sizes,
   aspectRatio,
@@ -70,9 +72,7 @@ function SanityImageImpl({
   priority,
   loading,
   className,
-}: SanityImageProps) {
-  // Reason: asset id as src keeps Next.js' loader-width validator happy
-  // (it compares loader output to src; identical strings trigger a warning).
+}: SanityImageProps): ResolvedSanityImageProps | null {
   const src = image?.asset?._id || image?.asset?._ref
   if (!src) return null
 
@@ -90,22 +90,44 @@ function SanityImageImpl({
     height = image.asset?.metadata?.dimensions?.height ?? Math.round(BASE_WIDTH * 0.75)
   }
 
-  return (
-    <Image
-      loader={loader}
-      src={src}
-      alt={image.alt || ''}
-      width={width}
-      height={height}
-      sizes={sizes}
-      className={className}
-      priority={priority}
-      loading={priority ? undefined : loading}
-      quality={quality}
-      placeholder={blurDataURL ? 'blur' : 'empty'}
-      blurDataURL={blurDataURL}
-    />
-  )
+  return {
+    loader,
+    src,
+    alt: image.alt || '',
+    width,
+    height,
+    sizes,
+    className,
+    priority,
+    loading: priority ? undefined : loading,
+    quality,
+    placeholder: blurDataURL ? 'blur' : 'empty',
+    blurDataURL,
+  }
+}
+
+function SanityImageImpl({
+  image,
+  sizes,
+  aspectRatio,
+  quality = DEFAULT_QUALITY,
+  priority,
+  loading,
+  className,
+}: SanityImageProps) {
+  const imageProps = getSanityImageProps({
+    image,
+    sizes,
+    aspectRatio,
+    quality,
+    priority,
+    loading,
+    className,
+  })
+  if (!imageProps) return null
+
+  const { alt, ...resolvedImageProps } = imageProps
+  return <Image {...resolvedImageProps} alt={alt} />
 }
 
 export const SanityImage = React.memo(SanityImageImpl)
