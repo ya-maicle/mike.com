@@ -37,6 +37,8 @@
     "e2e:smoke": "playwright test --config=playwright.config.ts",
     "e2e:smoke:debug": "PWDEBUG=1 playwright test --config=playwright.config.ts",
     "e2e:smoke:ci": "playwright test --config=playwright.config.ts --reporter=html",
+    "email:templates": "node scripts/render-auth-email-templates.mjs",
+    "email:templates:check": "node scripts/render-auth-email-templates.mjs --check",
     "db:start": "pnpm exec supabase start",
     "db:stop": "pnpm exec supabase stop",
     "db:reset": "pnpm exec supabase db reset --local",
