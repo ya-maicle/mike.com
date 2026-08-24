@@ -117,6 +117,73 @@ export const blogPost = defineType({
       validation: (Rule) => Rule.required().min(1),
     }),
     defineField({
+      name: 'narration',
+      title: 'Article narration',
+      type: 'object',
+      description:
+        'Pre-generated article audio. Run pnpm blog:narrate -- --slug <slug> to refresh it after editing the article.',
+      options: { collapsible: true, collapsed: true },
+      fields: [
+        defineField({
+          name: 'scriptOverride',
+          title: 'Narration script override',
+          type: 'text',
+          rows: 10,
+          description:
+            'Optional. Leave blank to narrate the title, excerpt, and text blocks from the article.',
+        }),
+        defineField({
+          name: 'audioFile',
+          title: 'MP3 file',
+          type: 'file',
+          options: { accept: 'audio/mpeg' },
+        }),
+        defineField({
+          name: 'durationSeconds',
+          title: 'Duration in seconds',
+          type: 'number',
+          readOnly: true,
+        }),
+        defineField({
+          name: 'provider',
+          title: 'Provider',
+          type: 'string',
+          readOnly: true,
+        }),
+        defineField({
+          name: 'model',
+          title: 'Model',
+          type: 'string',
+          readOnly: true,
+        }),
+        defineField({
+          name: 'voiceId',
+          title: 'Voice ID',
+          type: 'string',
+          readOnly: true,
+        }),
+        defineField({
+          name: 'voiceName',
+          title: 'Voice name',
+          type: 'string',
+          readOnly: true,
+        }),
+        defineField({
+          name: 'sourceHash',
+          title: 'Source hash',
+          type: 'string',
+          readOnly: true,
+          description: 'Used to detect when the written article has changed.',
+        }),
+        defineField({
+          name: 'generatedAt',
+          title: 'Generated at',
+          type: 'datetime',
+          readOnly: true,
+        }),
+      ],
+    }),
+    defineField({
       name: 'publishedAt',
       title: 'Published at',
       type: 'datetime',

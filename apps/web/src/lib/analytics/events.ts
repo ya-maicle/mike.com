@@ -64,6 +64,21 @@ export type AnalyticsEventMap = {
     post_slug: string
     engagement_basis: 'scroll_and_time'
   }
+  blog_audio_started: {
+    post_slug: string
+  }
+  blog_audio_progressed: {
+    post_slug: string
+    milestone: '25' | '50' | 'completed'
+  }
+  blog_audio_speed_changed: {
+    post_slug: string
+    playback_rate: 0.5 | 1 | 1.5 | 2
+  }
+  blog_article_shared: {
+    post_slug: string
+    method: 'copy'
+  }
   contact_clicked: {
     channel: 'email'
     placement: 'strength_cta' | 'portable_text' | 'site'

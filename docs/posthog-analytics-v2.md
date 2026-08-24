@@ -23,12 +23,16 @@ dashboard contains the four blog insights below. Use the dashboard's
 Every event includes `schema_version=2`, `app_environment`, `page_type`, and a pathname
 without query strings or fragments. Existing V1 events retain their property contracts.
 
-| Event               | Trigger                                                                | Allowed event properties                                    |
-| ------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------- |
-| `$pageview`         | Initial consented page and pathname changes                            | Common properties; blog routes use `blog_index`/`blog_post` |
-| `blog_card_clicked` | A blog-index card is activated                                         | `post_slug`, `card_placement`, `card_position`              |
-| `blog_post_viewed`  | A blog post is rendered after analytics consent                        | `post_slug`                                                 |
-| `blog_post_engaged` | A post reaches 30 visible seconds and at least 50% document depth once | `post_slug`, `engagement_basis=scroll_and_time`             |
+| Event                      | Trigger                                                                | Allowed event properties                                    |
+| -------------------------- | ---------------------------------------------------------------------- | ----------------------------------------------------------- |
+| `$pageview`                | Initial consented page and pathname changes                            | Common properties; blog routes use `blog_index`/`blog_post` |
+| `blog_card_clicked`        | A blog-index card is activated                                         | `post_slug`, `card_placement`, `card_position`              |
+| `blog_post_viewed`         | A blog post is rendered after analytics consent                        | `post_slug`                                                 |
+| `blog_post_engaged`        | A post reaches 30 visible seconds and at least 50% document depth once | `post_slug`, `engagement_basis=scroll_and_time`             |
+| `blog_audio_started`       | Narration begins playing for the first time                            | `post_slug`                                                 |
+| `blog_audio_progressed`    | Narration first reaches 25%, 50%, or its end                           | `post_slug`, `milestone`                                    |
+| `blog_audio_speed_changed` | A reader selects the next narration speed                              | `post_slug`, `playback_rate`                                |
+| `blog_article_shared`      | The canonical article URL is copied                                    | `post_slug`, `method=copy`                                  |
 
 `card_placement` is constrained to `featured`, `rail`, or `archive`. `card_position` is
 the one-based position in the ordered post collection. Decorative autoplaying card media
@@ -43,6 +47,8 @@ does not create engagement events.
 - Click capture is delegated by the global consent-aware lifecycle, so blog cards remain
   server-rendered links and no duplicate PostHog client is introduced.
 - A post view or engagement event is emitted at most once per rendered post.
+- Narration milestones are emitted at most once per player instance. Audio URLs, voice
+  identifiers, playback time, clipboard contents, and article text are never captured.
 
 ## Dashboard specification
 

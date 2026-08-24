@@ -49,6 +49,18 @@ export const BLOG_POST_BY_SLUG = groq`
     cover${COVER_PROJECTION},
     coverImage${IMAGE_PROJECTION},
     content[]${BLOG_POST_BLOCKS_PROJECTION},
+    narration{
+      durationSeconds,
+      provider,
+      model,
+      voiceId,
+      voiceName,
+      generatedAt,
+      sourceHash,
+      audioFile{
+        asset->{ _id, url, mimeType, size, originalFilename }
+      }
+    },
     seoSettings{
       metaTitle,
       metaDescription,
@@ -70,6 +82,24 @@ export type BlogPostSummary = {
 
 export type BlogPost = BlogPostSummary & {
   content: (PortableTextBlock | ImageBlock | VideoBlock | CarouselBlock)[]
+  narration?: {
+    durationSeconds?: number
+    provider?: string
+    model?: string
+    voiceId?: string
+    voiceName?: string
+    generatedAt?: string
+    sourceHash?: string
+    audioFile?: {
+      asset?: {
+        _id: string
+        url: string
+        mimeType?: string
+        size?: number
+        originalFilename?: string
+      }
+    }
+  }
   seoSettings?: {
     metaTitle?: string
     metaDescription?: string

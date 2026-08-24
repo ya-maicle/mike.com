@@ -33,6 +33,8 @@ export {
   RefreshCw as Refresh,
   RotateCcw as Undo,
   RotateCw as Redo,
+  Play,
+  Pause,
 } from 'lucide-react'
 
 // Status & Feedback

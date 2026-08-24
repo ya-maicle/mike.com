@@ -29,6 +29,8 @@ interface PageTemplateProps {
   frameCoverMedia?: boolean
   /** Optional custom cover content rendered in the cover-media area (takes precedence over coverMedia) */
   cover?: ReactNode
+  /** Optional article actions rendered between the header copy and cover media */
+  headerActions?: ReactNode
   /** Page content */
   children: ReactNode
   /** Header text alignment */
@@ -46,6 +48,7 @@ export function PageTemplate({
   coverMedia,
   frameCoverMedia = false,
   cover,
+  headerActions,
   children,
   headerAlign = 'center',
   className,
@@ -61,7 +64,7 @@ export function PageTemplate({
             'max-w-[592px] mx-auto',
             'pt-4 md:pt-6 space-y-4 md:space-y-6',
             // Finalized spacing
-            hasCover ? 'pb-12 md:pb-16' : 'pb-20 md:pb-32',
+            !headerActions && (hasCover ? 'pb-12 md:pb-16' : 'pb-20 md:pb-32'),
             headerAlign === 'center' && 'text-center flex flex-col items-center',
           )}
         >
@@ -88,6 +91,17 @@ export function PageTemplate({
             </p>
           )}
         </header>
+
+        {headerActions ? (
+          <div
+            className={cn(
+              'mx-auto mt-20 max-w-[596px]',
+              hasCover ? 'pb-12 md:pb-7' : 'pb-20 md:pb-32',
+            )}
+          >
+            {headerActions}
+          </div>
+        ) : null}
       </div>
 
       {cover ? (

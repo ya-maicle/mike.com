@@ -1,4 +1,5 @@
 import { SITE_CONFIG } from '@/lib/constants'
+import { secondsToIsoDuration } from '@/lib/blog-narration'
 
 const personId = `${SITE_CONFIG.url}/#person`
 const websiteId = `${SITE_CONFIG.url}/#website`
@@ -72,6 +73,10 @@ type BlogPostStructuredDataProps = {
   path: string
   publishedAt: string
   imageUrl?: string
+  audio?: {
+    url: string
+    durationSeconds: number
+  }
 }
 
 export function getBlogPostStructuredData({
@@ -80,6 +85,7 @@ export function getBlogPostStructuredData({
   path,
   publishedAt,
   imageUrl,
+  audio,
 }: BlogPostStructuredDataProps) {
   const url = new URL(path, SITE_CONFIG.url).toString()
 
@@ -94,6 +100,16 @@ export function getBlogPostStructuredData({
     datePublished: publishedAt,
     inLanguage: 'en-GB',
     ...(imageUrl ? { image: imageUrl } : {}),
+    ...(audio
+      ? {
+          audio: {
+            '@type': 'AudioObject',
+            contentUrl: audio.url,
+            encodingFormat: 'audio/mpeg',
+            duration: secondsToIsoDuration(audio.durationSeconds),
+          },
+        }
+      : {}),
     author: { '@id': personId },
     publisher: { '@id': personId },
     isPartOf: { '@id': websiteId },

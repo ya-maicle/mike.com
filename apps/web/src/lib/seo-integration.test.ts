@@ -51,6 +51,7 @@ describe('SEO surface contracts', () => {
       path: '/blog/designing-with-agents',
       publishedAt: '2026-08-24T12:00:00.000Z',
       imageUrl: 'https://example.com/cover.jpg',
+      audio: { url: 'https://example.com/article.mp3', durationSeconds: 62 },
     })
 
     expect(data).toMatchObject({
@@ -60,6 +61,11 @@ describe('SEO surface contracts', () => {
       publisher: { '@id': `${SITE_CONFIG.url}/#person` },
       isPartOf: { '@id': `${SITE_CONFIG.url}/#website` },
       image: 'https://example.com/cover.jpg',
+      audio: {
+        '@type': 'AudioObject',
+        contentUrl: 'https://example.com/article.mp3',
+        duration: 'PT1M2S',
+      },
     })
   })
 })

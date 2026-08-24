@@ -5,6 +5,7 @@ import { cache } from 'react'
 
 import { LegalPageContent } from '@/components/legal-page-content'
 import { BlogPostAnalytics } from '@/components/blog-post-analytics'
+import { BlogArticleActions } from '@/components/blog-article-actions'
 import { PageTemplate } from '@/components/page-template'
 import { BlogPostStructuredData } from '@/components/site-structured-data'
 import { formatBlogDate } from '@/lib/blog'
@@ -70,6 +71,13 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   const coverImage = post.cover?.type === 'image' ? post.cover.image : post.coverImage
   const socialImage = socialImageFromSanity(post.seoSettings?.shareImage ?? coverImage, post.title)
+  const narrationAsset = post.narration?.audioFile?.asset
+  const narrationDuration = post.narration?.durationSeconds
+  const hasNarration =
+    narrationAsset?.url &&
+    narrationAsset.mimeType === 'audio/mpeg' &&
+    typeof narrationDuration === 'number' &&
+    narrationDuration > 0
 
   return (
     <>
@@ -80,13 +88,29 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         path={`/blog/${slug}`}
         publishedAt={post.publishedAt}
         imageUrl={socialImage?.url}
+        audio={
+          hasNarration ? { url: narrationAsset.url, durationSeconds: narrationDuration } : undefined
+        }
       />
       <PageTemplate
         title={post.title}
         subtitle={post.excerpt}
-        metadata={formatBlogDate(post.publishedAt)}
+        metadata={
+          hasNarration
+            ? [formatBlogDate(post.publishedAt), 'AI narration']
+            : formatBlogDate(post.publishedAt)
+        }
         coverMedia={coverToHeroMedia(post.cover, post.coverImage)}
         frameCoverMedia
+        headerActions={
+          hasNarration ? (
+            <BlogArticleActions
+              postSlug={post.slug.current}
+              audioUrl={narrationAsset.url}
+              durationSeconds={narrationDuration}
+            />
+          ) : undefined
+        }
       >
         <LegalPageContent content={post.content as PortableTextBlock[]} />
       </PageTemplate>
