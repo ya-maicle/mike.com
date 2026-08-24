@@ -77,7 +77,7 @@ export type AnalyticsEventMap = {
   }
   blog_article_shared: {
     post_slug: string
-    method: 'copy'
+    method: 'copy' | 'linkedin' | 'x'
   }
   contact_clicked: {
     channel: 'email'

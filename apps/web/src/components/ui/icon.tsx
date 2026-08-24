@@ -94,3 +94,36 @@ export function ArticleShareIcon(props: SvgIconProps) {
     </svg>
   )
 }
+
+export function ArticleXIcon(props: SvgIconProps) {
+  return (
+    <svg aria-hidden width="18" fill="none" viewBox="0 0 16 16" {...props}>
+      <path
+        fill="currentColor"
+        d="M11.819 2h2.035L9.407 7.083 14.639 14h-4.097L7.334 9.805 3.662 14H1.625l4.757-5.437L1.363 2h4.2l2.901 3.834zm-.715 10.782h1.128L4.951 3.153h-1.21z"
+      />
+    </svg>
+  )
+}
+
+export function ArticleLinkedInIcon(props: SvgIconProps) {
+  return (
+    <svg aria-hidden width="18" fill="none" viewBox="0 0 16 16" {...props}>
+      <path
+        fill="currentColor"
+        d="M13.1 2H2.9a.9.9 0 0 0-.9.9v10.2a.9.9 0 0 0 .9.9h10.2a.9.9 0 0 0 .9-.9V2.9a.9.9 0 0 0-.9-.9M5.6 12.2H3.8V6.8h1.8zm-.9-6.45A1.05 1.05 0 1 1 5.78 4.7 1.07 1.07 0 0 1 4.7 5.75m7.5 6.45h-1.8V9.356c0-.852-.36-1.158-.828-1.158A1.044 1.044 0 0 0 8.6 9.314a.4.4 0 0 0 0 .084V12.2H6.8V6.8h1.74v.78a1.87 1.87 0 0 1 1.62-.84c.93 0 2.016.516 2.016 2.196z"
+      />
+    </svg>
+  )
+}
+
+export function ArticleTocChevronIcon(props: SvgIconProps) {
+  return (
+    <svg aria-hidden width="10" fill="none" viewBox="0 0 10 16" {...props}>
+      <path
+        fill="currentColor"
+        d="M.21 5.352a.714.714 0 0 1 1.01 0L5 9.132l3.78-3.78a.714.714 0 0 1 1.01 1.01l-4.285 4.286a.714.714 0 0 1-1.01 0L.209 6.362a.714.714 0 0 1 0-1.01"
+      />
+    </svg>
+  )
+}

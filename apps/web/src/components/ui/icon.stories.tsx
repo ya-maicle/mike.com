@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 import {
+  ArticleLinkedInIcon,
   ArticleShareIcon,
+  ArticleTocChevronIcon,
+  ArticleXIcon,
   AudioForward15Icon,
   AudioPauseIcon,
   AudioPlayIcon,
@@ -71,7 +74,10 @@ export const AudioControls: Story = {
       <AudioPauseIcon />
       <AudioRewind15Icon />
       <AudioForward15Icon />
+      <ArticleXIcon />
+      <ArticleLinkedInIcon />
       <ArticleShareIcon className="-rotate-45" />
+      <ArticleTocChevronIcon />
     </div>
   ),
 }

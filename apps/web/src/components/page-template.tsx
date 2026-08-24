@@ -33,6 +33,8 @@ interface PageTemplateProps {
   headerActions?: ReactNode
   /** Page content */
   children: ReactNode
+  /** Optional grid treatment for page content only */
+  contentGridClassName?: string
   /** Header text alignment */
   headerAlign?: 'center' | 'left'
   /** Optional className for the outer wrapper */
@@ -50,6 +52,7 @@ export function PageTemplate({
   cover,
   headerActions,
   children,
+  contentGridClassName,
   headerAlign = 'center',
   className,
 }: PageTemplateProps) {
@@ -139,7 +142,7 @@ export function PageTemplate({
       ) : null}
 
       {/* Page Content - Rendered as grid children */}
-      <ContentGrid>{children}</ContentGrid>
+      <ContentGrid className={contentGridClassName}>{children}</ContentGrid>
     </div>
   )
 }

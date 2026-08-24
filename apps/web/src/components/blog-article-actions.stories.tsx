@@ -22,7 +22,15 @@ type Story = StoryObj<typeof meta>
 export const Ready: Story = {
   args: {
     postSlug: 'designing-for-ai-agents',
+    shareText: 'A practical field note about designing with AI agents.',
     audioUrl: '/sample-narration.mp3',
     durationSeconds: 1_082,
+  },
+}
+
+export const WithoutNarration: Story = {
+  args: {
+    postSlug: 'designing-for-ai-agents',
+    shareText: 'A practical field note about designing with AI agents.',
   },
 }

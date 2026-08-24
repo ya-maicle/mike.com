@@ -6,9 +6,11 @@ import { cache } from 'react'
 import { LegalPageContent } from '@/components/legal-page-content'
 import { BlogPostAnalytics } from '@/components/blog-post-analytics'
 import { BlogArticleActions } from '@/components/blog-article-actions'
+import { BlogArticleTableOfContents } from '@/components/blog-article-table-of-contents'
 import { PageTemplate } from '@/components/page-template'
 import { BlogPostStructuredData } from '@/components/site-structured-data'
 import { formatBlogDate } from '@/lib/blog'
+import { extractArticleHeadings } from '@/lib/article-headings'
 import { SITE_CONFIG } from '@/lib/constants'
 import { coverToHeroMedia } from '@/lib/cover-media'
 import { createPageMetadata, firstMetadataText } from '@/lib/seo'
@@ -78,6 +80,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     narrationAsset.mimeType === 'audio/mpeg' &&
     typeof narrationDuration === 'number' &&
     narrationDuration > 0
+  const articleHeadings = extractArticleHeadings(post.content)
 
   return (
     <>
@@ -98,16 +101,17 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         metadata={formatBlogDate(post.publishedAt)}
         coverMedia={coverToHeroMedia(post.cover, post.coverImage)}
         frameCoverMedia
+        contentGridClassName="gap-x-6"
         headerActions={
-          hasNarration ? (
-            <BlogArticleActions
-              postSlug={post.slug.current}
-              audioUrl={narrationAsset.url}
-              durationSeconds={narrationDuration}
-            />
-          ) : undefined
+          <BlogArticleActions
+            postSlug={post.slug.current}
+            shareText={post.excerpt}
+            audioUrl={hasNarration ? narrationAsset.url : undefined}
+            durationSeconds={hasNarration ? narrationDuration : undefined}
+          />
         }
       >
+        <BlogArticleTableOfContents headings={articleHeadings} />
         <LegalPageContent content={post.content as PortableTextBlock[]} />
       </PageTemplate>
     </>

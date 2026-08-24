@@ -2,16 +2,15 @@
 
 import { useEffect, useRef, useState } from 'react'
 
+import { BlogArticleShareControls } from '@/components/blog-article-share-controls'
 import { Button } from '@/components/ui/button'
 import {
-  ArticleShareIcon,
   AudioForward15Icon,
   AudioPauseIcon,
   AudioPlayIcon,
   AudioRewind15Icon,
 } from '@/components/ui/icon'
 import { captureAnalyticsEvent } from '@/lib/analytics/client'
-import { SITE_CONFIG } from '@/lib/constants'
 import { cn } from '@/lib/utils'
 
 const PLAYBACK_RATES = [0.5, 1, 1.5, 2] as const
@@ -21,8 +20,9 @@ type PlayerStatus = 'idle' | 'loading' | 'ready' | 'error'
 
 type BlogArticleActionsProps = {
   postSlug: string
-  audioUrl: string
-  durationSeconds: number
+  shareText: string
+  audioUrl?: string
+  durationSeconds?: number
 }
 
 function formatTime(value: number) {
@@ -32,47 +32,26 @@ function formatTime(value: number) {
   return `${minutes}:${String(seconds).padStart(2, '0')}`
 }
 
-async function copyText(value: string) {
-  if (navigator.clipboard?.writeText) {
-    try {
-      await navigator.clipboard.writeText(value)
-      return
-    } catch {
-      // Fall through to the selection-based copy path for older Safari contexts.
-    }
-  }
-
-  const textarea = document.createElement('textarea')
-  textarea.value = value
-  textarea.style.cssText = 'position:fixed;opacity:0;pointer-events:none'
-  document.body.append(textarea)
-  textarea.select()
-  const copied = document.execCommand('copy')
-  textarea.remove()
-  if (!copied) throw new Error('Copy failed.')
-}
-
 export function BlogArticleActions({
   postSlug,
+  shareText,
   audioUrl,
   durationSeconds,
 }: BlogArticleActionsProps) {
+  const hasNarration = Boolean(audioUrl && durationSeconds && durationSeconds > 0)
   const audioRef = useRef<HTMLAudioElement>(null)
   const startedRef = useRef(false)
   const milestonesRef = useRef(new Set<'25' | '50' | 'completed'>())
-  const copiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [status, setStatus] = useState<PlayerStatus>('idle')
   const [activated, setActivated] = useState(false)
   const [playing, setPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
-  const [duration, setDuration] = useState(durationSeconds)
+  const [duration, setDuration] = useState(durationSeconds ?? 0)
   const [playbackRate, setPlaybackRate] = useState<PlaybackRate>(1)
-  const [copied, setCopied] = useState(false)
 
   useEffect(
     () => () => {
       audioRef.current?.pause()
-      if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current)
     },
     [],
   )
@@ -85,7 +64,7 @@ export function BlogArticleActions({
 
   async function togglePlayback() {
     const audio = audioRef.current
-    if (!audio || status === 'loading') return
+    if (!audio || !audioUrl || status === 'loading') return
 
     if (!audio.paused) {
       audio.pause()
@@ -127,53 +106,42 @@ export function BlogArticleActions({
     })
   }
 
-  async function shareArticle() {
-    const canonicalUrl = new URL(`/blog/${postSlug}`, SITE_CONFIG.url).toString()
-    try {
-      await copyText(canonicalUrl)
-      captureAnalyticsEvent('blog_article_shared', { post_slug: postSlug, method: 'copy' })
-      setCopied(true)
-      if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current)
-      copiedTimerRef.current = setTimeout(() => setCopied(false), 1_800)
-    } catch {
-      setCopied(false)
-    }
-  }
-
   return (
     <div className="flex min-h-[53px] w-full items-center justify-between border-t border-black/[0.04] pt-3 dark:border-white/10">
-      <audio
-        ref={audioRef}
-        preload="none"
-        onCanPlay={() => setStatus('ready')}
-        onLoadedMetadata={(event) => {
-          if (Number.isFinite(event.currentTarget.duration))
-            setDuration(event.currentTarget.duration)
-        }}
-        onPlay={() => {
-          setPlaying(true)
-          if (!startedRef.current) {
-            startedRef.current = true
-            captureAnalyticsEvent('blog_audio_started', { post_slug: postSlug })
-          }
-        }}
-        onPause={() => setPlaying(false)}
-        onTimeUpdate={(event) => {
-          const nextTime = event.currentTarget.currentTime
-          setCurrentTime(nextTime)
-          if (duration > 0 && nextTime / duration >= 0.25) captureProgress('25')
-          if (duration > 0 && nextTime / duration >= 0.5) captureProgress('50')
-        }}
-        onEnded={() => {
-          setPlaying(false)
-          captureProgress('completed')
-        }}
-        onError={() => {
-          if (activated) setStatus('error')
-        }}
-      />
+      {hasNarration ? (
+        <audio
+          ref={audioRef}
+          preload="none"
+          onCanPlay={() => setStatus('ready')}
+          onLoadedMetadata={(event) => {
+            if (Number.isFinite(event.currentTarget.duration))
+              setDuration(event.currentTarget.duration)
+          }}
+          onPlay={() => {
+            setPlaying(true)
+            if (!startedRef.current) {
+              startedRef.current = true
+              captureAnalyticsEvent('blog_audio_started', { post_slug: postSlug })
+            }
+          }}
+          onPause={() => setPlaying(false)}
+          onTimeUpdate={(event) => {
+            const nextTime = event.currentTarget.currentTime
+            setCurrentTime(nextTime)
+            if (duration > 0 && nextTime / duration >= 0.25) captureProgress('25')
+            if (duration > 0 && nextTime / duration >= 0.5) captureProgress('50')
+          }}
+          onEnded={() => {
+            setPlaying(false)
+            captureProgress('completed')
+          }}
+          onError={() => {
+            if (activated) setStatus('error')
+          }}
+        />
+      ) : null}
 
-      {!activated ? (
+      {hasNarration && !activated ? (
         <Button
           type="button"
           variant="ghost"
@@ -188,7 +156,7 @@ export function BlogArticleActions({
           <span aria-hidden className="h-4 border-l border-black/[0.04] dark:border-white/10" />
           <span className="tabular-nums text-muted-foreground">{formatTime(duration)}</span>
         </Button>
-      ) : status === 'loading' ? (
+      ) : hasNarration && status === 'loading' ? (
         <Button
           type="button"
           variant="ghost"
@@ -202,7 +170,7 @@ export function BlogArticleActions({
           </span>
           <span>Loading…</span>
         </Button>
-      ) : (
+      ) : hasNarration ? (
         <div className="relative flex h-8">
           <div className="flex items-center">
             <Button
@@ -267,29 +235,9 @@ export function BlogArticleActions({
             </div>
           </div>
         </div>
-      )}
+      ) : null}
 
-      <div className="relative">
-        <Button
-          type="button"
-          variant="ghost"
-          className="h-10 gap-[0.3em] px-0 text-base font-medium leading-none hover:bg-transparent hover:text-muted-foreground"
-          onClick={shareArticle}
-        >
-          <ArticleShareIcon className="size-6 h-[17px] -rotate-45 !translate-y-0" />
-          Share
-        </Button>
-        <div
-          role="status"
-          aria-live="polite"
-          className={cn(
-            'pointer-events-none absolute right-0 top-full z-10 mt-1 rounded-md bg-foreground px-2 py-1 text-xs text-background shadow-md transition-opacity',
-            copied ? 'opacity-100' : 'opacity-0',
-          )}
-        >
-          {copied ? 'Copied' : ''}
-        </div>
-      </div>
+      <BlogArticleShareControls postSlug={postSlug} shareText={shareText} />
     </div>
   )
 }
