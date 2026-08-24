@@ -84,6 +84,7 @@ export function PageTemplate({
             <p
               className={cn(
                 'text-xl text-foreground leading-relaxed max-w-prose mt-2',
+                headerActions && 'mb-0',
                 subtitleClassName,
               )}
             >
@@ -95,8 +96,8 @@ export function PageTemplate({
         {headerActions ? (
           <div
             className={cn(
-              'mx-auto mt-20 max-w-[596px]',
-              hasCover ? 'pb-12 md:pb-7' : 'pb-20 md:pb-32',
+              '-mx-4 mt-20 max-w-[596px] md:mx-auto',
+              hasCover ? 'pb-[52px] md:pb-7' : 'pb-20 md:pb-32',
             )}
           >
             {headerActions}

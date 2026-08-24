@@ -147,7 +147,7 @@ export function BlogArticleActions({
   }
 
   return (
-    <div className="flex min-h-[53px] w-full items-start justify-between border-t border-border pt-3">
+    <div className="flex min-h-[53px] w-full items-start justify-between border-t border-black/[0.04] pt-3 dark:border-white/10">
       <audio
         ref={audioRef}
         preload="none"
@@ -191,7 +191,7 @@ export function BlogArticleActions({
             <Play className="size-4 fill-current" />
           </span>
           <span>Listen to article</span>
-          <span aria-hidden className="h-4 border-l border-border" />
+          <span aria-hidden className="h-4 border-l border-black/[0.04] dark:border-white/10" />
           <span className="tabular-nums text-muted-foreground">{formatTime(duration)}</span>
         </Button>
       ) : status === 'loading' ? (
