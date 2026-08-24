@@ -3,7 +3,13 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
-import { Link, Pause, Play, Redo, Undo } from '@/components/ui/icons'
+import {
+  ArticleShareIcon,
+  AudioForward15Icon,
+  AudioPauseIcon,
+  AudioPlayIcon,
+  AudioRewind15Icon,
+} from '@/components/ui/icon'
 import { captureAnalyticsEvent } from '@/lib/analytics/client'
 import { SITE_CONFIG } from '@/lib/constants'
 import { cn } from '@/lib/utils'
@@ -44,18 +50,6 @@ async function copyText(value: string) {
   const copied = document.execCommand('copy')
   textarea.remove()
   if (!copied) throw new Error('Copy failed.')
-}
-
-function FifteenSecondIcon({ direction }: { direction: 'back' | 'forward' }) {
-  const Icon = direction === 'back' ? Undo : Redo
-  return (
-    <span aria-hidden className="relative block size-5">
-      <Icon className="size-5" strokeWidth={1.7} />
-      <span className="absolute inset-0 flex items-center justify-center pt-px text-[6px] font-medium leading-none">
-        15
-      </span>
-    </span>
-  )
 }
 
 export function BlogArticleActions({
@@ -147,7 +141,7 @@ export function BlogArticleActions({
   }
 
   return (
-    <div className="flex min-h-[53px] w-full items-start justify-between border-t border-black/[0.04] pt-3 dark:border-white/10">
+    <div className="flex min-h-[53px] w-full items-center justify-between border-t border-black/[0.04] pt-3 dark:border-white/10">
       <audio
         ref={audioRef}
         preload="none"
@@ -188,7 +182,7 @@ export function BlogArticleActions({
           aria-label="Listen to article"
         >
           <span className="flex size-8 items-center justify-center rounded-full bg-muted transition-colors group-hover:bg-accent">
-            <Play className="size-4 fill-current" />
+            <AudioPlayIcon className="!h-auto !w-[11px] !translate-y-0" />
           </span>
           <span>Listen to article</span>
           <span aria-hidden className="h-4 border-l border-black/[0.04] dark:border-white/10" />
@@ -209,59 +203,69 @@ export function BlogArticleActions({
           <span>Loading…</span>
         </Button>
       ) : (
-        <div className="flex h-10 items-center gap-1">
-          <Button
-            type="button"
-            size="icon"
-            variant="secondary"
-            className="size-8"
-            onClick={togglePlayback}
-            aria-label={playing ? 'Pause narration' : 'Play narration'}
-          >
-            {playing ? (
-              <Pause className="size-4 fill-current" />
-            ) : (
-              <Play className="size-4 fill-current" />
-            )}
-          </Button>
-          <span
-            className={cn(
-              'w-11 text-center text-sm tabular-nums text-muted-foreground',
-              status === 'error' && 'w-auto px-1',
-            )}
-            role={status === 'error' ? 'status' : undefined}
-          >
-            {status === 'error' ? 'Unavailable' : formatTime(currentTime)}
-          </span>
-          <Button
-            type="button"
-            size="icon"
-            variant="ghost"
-            className="size-8"
-            onClick={() => skip(-15)}
-            aria-label="Go back 15 seconds"
-          >
-            <FifteenSecondIcon direction="back" />
-          </Button>
-          <Button
-            type="button"
-            size="icon"
-            variant="ghost"
-            className="size-8"
-            onClick={() => skip(15)}
-            aria-label="Go forward 15 seconds"
-          >
-            <FifteenSecondIcon direction="forward" />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            className="h-8 min-w-9 px-1.5 text-sm tabular-nums"
-            onClick={changePlaybackRate}
-            aria-label={`Playback speed ${playbackRate} times. Change speed`}
-          >
-            {playbackRate}x
-          </Button>
+        <div className="relative flex h-8">
+          <div className="flex items-center">
+            <Button
+              type="button"
+              size="icon"
+              variant="secondary"
+              className="size-8 p-0 pb-0 [&_svg]:!translate-y-0"
+              onClick={togglePlayback}
+              aria-label={playing ? 'Pause narration' : 'Play narration'}
+            >
+              {playing ? (
+                <AudioPauseIcon className="size-[unset] !h-auto !w-[10px]" />
+              ) : (
+                <AudioPlayIcon className="size-[unset] !h-auto !w-[11px]" />
+              )}
+            </Button>
+            <span
+              className={cn(
+                'shrink grow pl-3 text-base font-medium leading-none tabular-nums',
+                status === 'error' && 'text-muted-foreground',
+              )}
+              role={status === 'error' ? 'status' : undefined}
+            >
+              {status === 'error' ? 'Unavailable' : formatTime(currentTime)}
+            </span>
+          </div>
+          <div className="relative ml-3 flex gap-3 pl-3">
+            <span
+              aria-hidden
+              className="absolute inset-y-0 left-0 my-auto block h-5 w-px bg-black/[0.04] dark:bg-white/10"
+            />
+            <div className="flex items-center gap-3">
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="size-4 min-h-0 p-0 hover:bg-transparent hover:opacity-60 focus-visible:ring-0 [&_svg]:!translate-y-0"
+                onClick={() => skip(-15)}
+                aria-label="Go back 15 seconds"
+              >
+                <AudioRewind15Icon />
+              </Button>
+              <Button
+                type="button"
+                size="icon"
+                variant="ghost"
+                className="size-4 min-h-0 p-0 hover:bg-transparent hover:opacity-60 focus-visible:ring-0 [&_svg]:!translate-y-0"
+                onClick={() => skip(15)}
+                aria-label="Go forward 15 seconds"
+              >
+                <AudioForward15Icon />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                className="h-[26px] min-w-12 rounded-[10px] border border-foreground/80 bg-transparent px-2 py-0.5 text-base leading-5 hover:bg-transparent hover:opacity-60"
+                onClick={changePlaybackRate}
+                aria-label={`Playback speed ${playbackRate} times. Change speed`}
+              >
+                {playbackRate}x
+              </Button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -269,10 +273,10 @@ export function BlogArticleActions({
         <Button
           type="button"
           variant="ghost"
-          className="h-10 gap-2 px-0 hover:bg-transparent"
+          className="h-10 gap-[0.3em] px-0 text-base font-medium leading-none hover:bg-transparent hover:text-muted-foreground"
           onClick={shareArticle}
         >
-          <Link className="size-4" />
+          <ArticleShareIcon className="size-6 h-[17px] -rotate-45 !translate-y-0" />
           Share
         </Button>
         <div
