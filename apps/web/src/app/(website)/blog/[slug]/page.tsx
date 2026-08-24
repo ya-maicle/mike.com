@@ -95,11 +95,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       <PageTemplate
         title={post.title}
         subtitle={post.excerpt}
-        metadata={
-          hasNarration
-            ? [formatBlogDate(post.publishedAt), 'AI narration']
-            : formatBlogDate(post.publishedAt)
-        }
+        metadata={formatBlogDate(post.publishedAt)}
         coverMedia={coverToHeroMedia(post.cover, post.coverImage)}
         frameCoverMedia
         headerActions={
