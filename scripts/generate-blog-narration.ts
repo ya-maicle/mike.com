@@ -6,6 +6,12 @@ import { createHash } from 'node:crypto'
 import { buildBlogNarrationScript, splitNarrationScript } from '../apps/web/src/lib/blog-narration'
 import { generateNarrationAudio } from '../apps/web/src/lib/blog-narration-audio'
 import {
+  blogNarrationChunkLimit,
+  DEFAULT_BLOG_NARRATION_MODEL,
+  DEFAULT_BLOG_NARRATION_VOICE_ID,
+  DEFAULT_BLOG_NARRATION_VOICE_NAME,
+} from '../apps/web/src/lib/blog-narration-config'
+import {
   findSanityPost,
   patchNarration,
   uploadNarrationAsset,
@@ -13,9 +19,6 @@ import {
 import { listElevenLabsVoices } from './lib/elevenlabs-voices'
 
 const ELEVENLABS_API_ROOT = 'https://api.elevenlabs.io'
-const DEFAULT_MODEL = 'eleven_multilingual_v2'
-const DEFAULT_VOICE_ID = 'JBFqnCBsd6RMkjVDRZzb'
-const DEFAULT_VOICE_NAME = 'George'
 
 type CliOptions = {
   slug?: string
@@ -39,10 +42,18 @@ function optionValue(args: string[], name: string) {
 function parseOptions(args: string[]): CliOptions {
   return {
     slug: optionValue(args, '--slug'),
-    voiceId: optionValue(args, '--voice-id') ?? process.env.ELEVENLABS_VOICE_ID ?? DEFAULT_VOICE_ID,
+    voiceId:
+      optionValue(args, '--voice-id') ??
+      process.env.ELEVENLABS_VOICE_ID ??
+      DEFAULT_BLOG_NARRATION_VOICE_ID,
     voiceName:
-      optionValue(args, '--voice-name') ?? process.env.ELEVENLABS_VOICE_NAME ?? DEFAULT_VOICE_NAME,
-    model: optionValue(args, '--model') ?? process.env.ELEVENLABS_MODEL_ID ?? DEFAULT_MODEL,
+      optionValue(args, '--voice-name') ??
+      process.env.ELEVENLABS_VOICE_NAME ??
+      DEFAULT_BLOG_NARRATION_VOICE_NAME,
+    model:
+      optionValue(args, '--model') ??
+      process.env.ELEVENLABS_MODEL_ID ??
+      DEFAULT_BLOG_NARRATION_MODEL,
     dryRun: args.includes('--dry-run'),
     force: args.includes('--force'),
     allowProduction: args.includes('--allow-production'),
@@ -94,7 +105,7 @@ async function main() {
   })
   if (!script) throw new Error('The article produced an empty narration script.')
   const sourceHash = createHash('sha256').update(script).digest('hex')
-  const chunks = splitNarrationScript(script)
+  const chunks = splitNarrationScript(script, blogNarrationChunkLimit(options.model))
 
   console.log(
     `Narration source: ${post.slug.current} · ${script.length.toLocaleString('en-GB')} characters · ${chunks.length} chunk${chunks.length === 1 ? '' : 's'}`,

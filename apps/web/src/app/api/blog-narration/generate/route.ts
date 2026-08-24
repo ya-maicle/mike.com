@@ -5,6 +5,12 @@ import { z } from 'zod'
 import { buildBlogNarrationScript, splitNarrationScript } from '@/lib/blog-narration'
 import { generateNarrationAudio } from '@/lib/blog-narration-audio'
 import {
+  blogNarrationChunkLimit,
+  DEFAULT_BLOG_NARRATION_MODEL,
+  DEFAULT_BLOG_NARRATION_VOICE_ID,
+  DEFAULT_BLOG_NARRATION_VOICE_NAME,
+} from '@/lib/blog-narration-config'
+import {
   ensureDraftSanityPost,
   findSanityPostById,
   patchNarration,
@@ -18,9 +24,6 @@ export const maxDuration = 300
 export const dynamic = 'force-dynamic'
 
 const ELEVENLABS_API_ROOT = 'https://api.elevenlabs.io'
-const DEFAULT_MODEL = 'eleven_multilingual_v2'
-const DEFAULT_VOICE_ID = 'JBFqnCBsd6RMkjVDRZzb'
-const DEFAULT_VOICE_NAME = 'George'
 const GENERATION_ROLES = new Set(['administrator', 'developer', 'editor', 'write'])
 
 const requestSchema = z.object({
@@ -153,15 +156,15 @@ export async function POST(request: Request) {
       generationStatus: 'generating',
     })
 
-    const voiceId = process.env.ELEVENLABS_VOICE_ID?.trim() || DEFAULT_VOICE_ID
-    const voiceName = process.env.ELEVENLABS_VOICE_NAME?.trim() || DEFAULT_VOICE_NAME
-    const model = process.env.ELEVENLABS_MODEL_ID?.trim() || DEFAULT_MODEL
+    const voiceId = process.env.ELEVENLABS_VOICE_ID?.trim() || DEFAULT_BLOG_NARRATION_VOICE_ID
+    const voiceName = process.env.ELEVENLABS_VOICE_NAME?.trim() || DEFAULT_BLOG_NARRATION_VOICE_NAME
+    const model = process.env.ELEVENLABS_MODEL_ID?.trim() || DEFAULT_BLOG_NARRATION_MODEL
     const generated = await generateNarrationAudio({
       apiRoot: ELEVENLABS_API_ROOT,
       apiKey: requiredEnvironment('ELEVENLABS_API_KEY'),
       voiceId,
       model,
-      chunks: splitNarrationScript(script),
+      chunks: splitNarrationScript(script, blogNarrationChunkLimit(model)),
     })
 
     const current = await findSanityPostById(connection, post._id)
