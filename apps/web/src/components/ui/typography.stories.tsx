@@ -40,6 +40,13 @@ export const Overview: Story = {
             <tbody className="divide-y">
               {[
                 {
+                  token: 'Display',
+                  class: 'text-display',
+                  specs: 'Regular (400), 1.1 leading, -0.01em tracking',
+                  styles: '',
+                  example: 'The quick brown fox',
+                },
+                {
                   token: 'Hero (H1)',
                   class: 'text-5xl',
                   specs: 'Medium (500)',

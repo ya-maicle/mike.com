@@ -2,6 +2,7 @@
 @import 'tw-animate-css';
 @import '@maicle/ui/styles/primitives.css';
 @import '@maicle/ui/styles/semantic.css';
+@import '@maicle/ui/styles/typography.css';
 
 /* Ensure Tailwind scans lib/ and packages/ui for class usage */
 @source '../lib';

@@ -25,6 +25,8 @@ interface PageTemplateProps {
   subtitleClassName?: string
   /** Optional cover media (image or video) */
   coverMedia?: CoverMedia
+  /** Apply the portfolio media frame (rounded corners and an inset border). */
+  frameCoverMedia?: boolean
   /** Optional custom cover content rendered in the cover-media area (takes precedence over coverMedia) */
   cover?: ReactNode
   /** Page content */
@@ -42,6 +44,7 @@ export function PageTemplate({
   subtitle,
   subtitleClassName,
   coverMedia,
+  frameCoverMedia = false,
   cover,
   children,
   headerAlign = 'center',
@@ -94,23 +97,28 @@ export function PageTemplate({
       ) : coverMedia ? (
         <ContentGrid>
           <section className={cn(gridCols.full, 'mb-8')}>
-            {coverMedia.type === 'video' && coverMedia.video?.asset?.playbackId ? (
-              <DecorativeVideoPlayer
-                playbackId={coverMedia.video.asset.playbackId}
-                aspectRatio={coverMedia.video.asset.aspectRatio}
-                maxResolution="2160p"
-                minResolution="1080p"
-                eager
-              />
-            ) : coverMedia.type === 'image' && coverMedia.image ? (
-              <SanityImage
-                image={coverMedia.image}
-                className="w-full h-auto object-cover max-h-[90vh] rounded-[8px]"
-                priority
-                sizes="(min-width: 1376px) 1376px, 100vw"
-                aspectRatio="auto"
-              />
-            ) : null}
+            <div className={cn(frameCoverMedia && 'relative overflow-hidden rounded-lg bg-muted')}>
+              {coverMedia.type === 'video' && coverMedia.video?.asset?.playbackId ? (
+                <DecorativeVideoPlayer
+                  playbackId={coverMedia.video.asset.playbackId}
+                  aspectRatio={coverMedia.video.asset.aspectRatio}
+                  maxResolution="2160p"
+                  minResolution="1080p"
+                  eager
+                />
+              ) : coverMedia.type === 'image' && coverMedia.image ? (
+                <SanityImage
+                  image={coverMedia.image}
+                  className="w-full h-auto object-cover max-h-[90vh] rounded-[8px]"
+                  priority
+                  sizes="(min-width: 1376px) 1376px, 100vw"
+                  aspectRatio="auto"
+                />
+              ) : null}
+              {frameCoverMedia ? (
+                <div className="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-border" />
+              ) : null}
+            </div>
           </section>
         </ContentGrid>
       ) : null}

@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import robots from '@/app/robots'
-import { getSiteStructuredData } from '@/components/site-structured-data'
+import { getBlogPostStructuredData, getSiteStructuredData } from '@/components/site-structured-data'
 import { SITE_CONFIG } from '@/lib/constants'
 
 describe('SEO surface contracts', () => {
@@ -41,6 +41,25 @@ describe('SEO surface contracts', () => {
           mainEntity: { '@id': `${SITE_CONFIG.url}/#person` },
         },
       ],
+    })
+  })
+
+  it('connects blog posts to the site and author identity', () => {
+    const data = getBlogPostStructuredData({
+      title: 'Designing with agents',
+      description: 'A practical field note.',
+      path: '/blog/designing-with-agents',
+      publishedAt: '2026-08-24T12:00:00.000Z',
+      imageUrl: 'https://example.com/cover.jpg',
+    })
+
+    expect(data).toMatchObject({
+      '@type': 'BlogPosting',
+      url: `${SITE_CONFIG.url}/blog/designing-with-agents`,
+      author: { '@id': `${SITE_CONFIG.url}/#person` },
+      publisher: { '@id': `${SITE_CONFIG.url}/#person` },
+      isPartOf: { '@id': `${SITE_CONFIG.url}/#website` },
+      image: 'https://example.com/cover.jpg',
     })
   })
 })

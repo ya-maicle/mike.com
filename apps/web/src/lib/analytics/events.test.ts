@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
   contextSlugForPath,
+  meetsBlogPostEngagementThreshold,
   meetsCaseStudyEngagementThreshold,
   pageTypeForPath,
   requestedStudySlugFromPath,
@@ -13,6 +14,8 @@ describe('analytics route classification', () => {
     ['/work/tap', 'case_study'],
     ['/strengths', 'strengths_index'],
     ['/strengths/product-direction', 'strength_detail'],
+    ['/blog', 'blog_index'],
+    ['/blog/designing-with-ai', 'blog_post'],
     ['/bio', 'bio'],
     ['/login', 'login'],
     ['/privacy', 'legal'],
@@ -36,5 +39,8 @@ describe('analytics route classification', () => {
     expect(meetsCaseStudyEngagementThreshold(29_999, 0.5)).toBe(false)
     expect(meetsCaseStudyEngagementThreshold(30_000, 0.49)).toBe(false)
     expect(meetsCaseStudyEngagementThreshold(30_000, 0.5)).toBe(true)
+    expect(meetsBlogPostEngagementThreshold(29_999, 0.5)).toBe(false)
+    expect(meetsBlogPostEngagementThreshold(30_000, 0.49)).toBe(false)
+    expect(meetsBlogPostEngagementThreshold(30_000, 0.5)).toBe(true)
   })
 })

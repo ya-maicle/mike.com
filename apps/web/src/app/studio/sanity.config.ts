@@ -39,6 +39,10 @@ export default defineConfig({
               .icon(() => '🧭')
               .child(S.documentTypeList('program').title('Programs')),
             S.listItem()
+              .title('Blog')
+              .icon(() => '✍️')
+              .child(S.documentTypeList('blogPost').title('Blog posts')),
+            S.listItem()
               .title('Portfolio Access')
               .icon(() => '🔐')
               .child(
@@ -72,9 +76,15 @@ export default defineConfig({
     types: schemaTypes,
     templates: (templates) =>
       templates.filter(({ schemaType }) =>
-        ['homePage', 'caseStudy', 'program', 'page', 'portfolioAccessProfile', 'deck'].includes(
-          schemaType,
-        ),
+        [
+          'homePage',
+          'caseStudy',
+          'program',
+          'blogPost',
+          'page',
+          'portfolioAccessProfile',
+          'deck',
+        ].includes(schemaType),
       ),
   },
 
@@ -88,9 +98,15 @@ export default defineConfig({
     },
     newDocumentOptions: (prev) =>
       prev.filter(({ templateId }) =>
-        ['homePage', 'caseStudy', 'program', 'page', 'portfolioAccessProfile', 'deck'].includes(
-          templateId,
-        ),
+        [
+          'homePage',
+          'caseStudy',
+          'program',
+          'blogPost',
+          'page',
+          'portfolioAccessProfile',
+          'deck',
+        ].includes(templateId),
       ),
   },
 

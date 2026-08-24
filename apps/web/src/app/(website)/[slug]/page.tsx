@@ -39,7 +39,7 @@ type PageProps = {
 }
 
 // Reserved slugs that have their own routes
-const RESERVED_SLUGS = ['work', 'login', 'privacy', 'terms', 'stories', 'strengths']
+const RESERVED_SLUGS = ['work', 'login', 'privacy', 'terms', 'stories', 'strengths', 'blog']
 const NO_INDEX_SLUGS = new Set(['cookie-policy'])
 
 export async function generateStaticParams() {

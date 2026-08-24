@@ -113,7 +113,7 @@ async function posthogPersistence(page: Page) {
   }))
 }
 
-test.describe('PostHog analytics V1', () => {
+test.describe('PostHog analytics V2', () => {
   test.describe.configure({ timeout: 60_000 })
 
   test('loads only after consent, strips URL secrets, and captures pathname pageviews', async ({
@@ -185,9 +185,11 @@ test.describe('PostHog analytics V1', () => {
 
     await page.goto('/work/tap')
     await expect.poll(() => eventCount(requests, 'case_study_viewed')).toBe(1)
+    await expect.poll(() => eventCount(requests, '$pageview')).toBe(1)
 
     await page.goto('/work/care-ai-studio')
     await expect(page.getByText('Log in to view this case study')).toBeVisible()
+    await expect.poll(() => eventCount(requests, '$pageview')).toBe(2)
     await page.getByRole('main').getByRole('button', { name: 'Log in' }).click()
     await Promise.all([
       page.waitForURL('**/auth/v1/authorize**'),
@@ -208,6 +210,40 @@ test.describe('PostHog analytics V1', () => {
     expect(payloads).not.toContain('ya@maicle.co.uk')
     expect(payloads).not.toContain('playback_id')
     expect(payloads).not.toContain('playback_url')
+  })
+
+  test('captures blog discovery, post views, and meaningful reading engagement', async ({
+    page,
+  }) => {
+    await seedAnalyticsConsent(page)
+    const requests = await interceptPostHog(page)
+
+    await page.goto('/blog')
+    await expect.poll(() => eventCount(requests, '$pageview')).toBe(1)
+
+    const featuredLink = page
+      .locator(
+        'section[aria-label="Featured articles"] a[data-analytics-blog-card-placement="featured"]',
+      )
+      .first()
+    await expect(featuredLink).toBeVisible()
+    const postSlug = await featuredLink.getAttribute('data-analytics-blog-post-slug')
+    expect(postSlug).toBeTruthy()
+
+    await Promise.all([page.waitForURL(new RegExp(`/blog/${postSlug}$`)), featuredLink.click()])
+
+    await expect.poll(() => eventCount(requests, 'blog_card_clicked')).toBe(1)
+    await expect.poll(() => eventCount(requests, 'blog_post_viewed')).toBe(1)
+    await expect.poll(() => eventCount(requests, '$pageview')).toBe(2)
+
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight))
+    await page.waitForTimeout(31_000)
+    await expect.poll(() => eventCount(requests, 'blog_post_engaged')).toBe(1)
+
+    const payloads = requests.map(decodedRequestBody).join('\n')
+    expect(payloads).toContain('"page_type":"blog_post"')
+    expect(payloads).toContain('"card_placement":"featured"')
+    expect(payloads).toContain(`"post_slug":"${postSlug}"`)
   })
 
   test('removes PostHog identity and persistence when consent is withdrawn', async ({ page }) => {

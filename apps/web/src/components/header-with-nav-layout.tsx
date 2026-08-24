@@ -26,6 +26,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
   const { open: loginOpen, setOpen: setLoginOpen, openLogin } = useLoginModal()
   const { user } = useAuth()
   const pathname = usePathname()
+  const keepHeaderVisible = pathname === '/blog'
   const [hidden, setHidden] = React.useState(false)
   const [atTop, setAtTop] = React.useState(true)
   const lastYRef = React.useRef(0)
@@ -60,6 +61,11 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
     const onScroll = () => {
       const y = window.scrollY || 0
       setAtTop(y <= 0)
+      if (keepHeaderVisible) {
+        setHidden(false)
+        lastYRef.current = y
+        return
+      }
       // If we're at the very top, force header visible
       if (y <= 0) {
         setHidden(false)
@@ -73,9 +79,10 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
         lastYRef.current = y
       }
     }
+    onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  }, [keepHeaderVisible])
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
@@ -199,6 +206,20 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
                     )}
                   >
                     <span>Bio</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    href="/blog"
+                    onClick={() => setMobileNavOpen(false)}
+                    className={cn(
+                      'group flex w-full items-center gap-3 rounded-md px-4 py-3 md:px-3 md:py-2 text-xl md:text-base font-normal [font-family:var(--font-geist-sans)] transition-colors',
+                      pathname === '/blog' || pathname.startsWith('/blog/')
+                        ? 'bg-accent text-accent-foreground'
+                        : 'text-foreground hover:bg-accent hover:text-accent-foreground',
+                    )}
+                  >
+                    <span>Blog</span>
                   </Link>
                 </li>
               </ul>

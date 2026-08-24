@@ -5,7 +5,7 @@ import config from '@maicle/config/eslint'
 
 const eslintConfig = [
   {
-    ignores: ['.next/**', 'storybook-static/**', 'next-env.d.ts', 'vitest.shims.d.ts'],
+    ignores: ['.next*/**', 'storybook-static/**', 'next-env.d.ts', 'vitest.shims.d.ts'],
   },
   ...config,
   ...storybook.configs['flat/recommended'],

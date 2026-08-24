@@ -65,3 +65,41 @@ function JsonLd({ value }: { value: object }) {
 export function SiteStructuredData({ profileImages = [] }: { profileImages?: string[] }) {
   return <JsonLd value={getSiteStructuredData(profileImages)} />
 }
+
+type BlogPostStructuredDataProps = {
+  title: string
+  description: string
+  path: string
+  publishedAt: string
+  imageUrl?: string
+}
+
+export function getBlogPostStructuredData({
+  title,
+  description,
+  path,
+  publishedAt,
+  imageUrl,
+}: BlogPostStructuredDataProps) {
+  const url = new URL(path, SITE_CONFIG.url).toString()
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    '@id': `${url}#article`,
+    headline: title,
+    description,
+    url,
+    mainEntityOfPage: url,
+    datePublished: publishedAt,
+    inLanguage: 'en-GB',
+    ...(imageUrl ? { image: imageUrl } : {}),
+    author: { '@id': personId },
+    publisher: { '@id': personId },
+    isPartOf: { '@id': websiteId },
+  }
+}
+
+export function BlogPostStructuredData(props: BlogPostStructuredDataProps) {
+  return <JsonLd value={getBlogPostStructuredData(props)} />
+}

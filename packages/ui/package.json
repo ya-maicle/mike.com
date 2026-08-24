@@ -5,7 +5,8 @@
   "description": "Design tokens as CSS variables, consumed via @import from the web app. The component library itself lives in apps/web/src/components/ui with stories in the web Storybook.",
   "exports": {
     "./styles/primitives.css": "./styles/primitives.css",
-    "./styles/semantic.css": "./styles/semantic.css"
+    "./styles/semantic.css": "./styles/semantic.css",
+    "./styles/typography.css": "./styles/typography.css"
   },
   "files": [
     "styles"
