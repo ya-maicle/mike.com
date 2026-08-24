@@ -121,7 +121,7 @@ export const blogPost = defineType({
       title: 'Article narration',
       type: 'object',
       description:
-        'Pre-generated article audio. Run pnpm blog:narrate -- --slug <slug> to refresh it after editing the article.',
+        'Use Generate narration in the document actions menu after the article is ready, then review the attached MP3 before publishing.',
       options: { collapsible: true, collapsed: true },
       fields: [
         defineField({
@@ -180,6 +180,27 @@ export const blogPost = defineType({
           title: 'Generated at',
           type: 'datetime',
           readOnly: true,
+        }),
+        defineField({
+          name: 'generationStatus',
+          title: 'Generation status',
+          type: 'string',
+          readOnly: true,
+          options: {
+            list: [
+              { title: 'Generating', value: 'generating' },
+              { title: 'Ready', value: 'ready' },
+              { title: 'Error', value: 'error' },
+            ],
+          },
+        }),
+        defineField({
+          name: 'generationError',
+          title: 'Last generation error',
+          type: 'text',
+          rows: 3,
+          readOnly: true,
+          hidden: ({ parent }) => parent?.generationStatus !== 'error',
         }),
       ],
     }),

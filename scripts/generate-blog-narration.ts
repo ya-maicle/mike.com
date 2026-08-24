@@ -2,17 +2,15 @@
 /* eslint-disable no-console */
 
 import { createHash } from 'node:crypto'
-import { mkdtemp, rm } from 'node:fs/promises'
-import { tmpdir } from 'node:os'
-import { join } from 'node:path'
 
 import { buildBlogNarrationScript, splitNarrationScript } from '../apps/web/src/lib/blog-narration'
+import { generateNarrationAudio } from '../apps/web/src/lib/blog-narration-audio'
 import {
   findSanityPost,
-  generateNarrationAudio,
-  listElevenLabsVoices,
-  publishNarration,
-} from './lib/blog-narration-services'
+  patchNarration,
+  uploadNarrationAsset,
+} from '../apps/web/src/lib/blog-narration-sanity'
+import { listElevenLabsVoices } from './lib/elevenlabs-voices'
 
 const ELEVENLABS_API_ROOT = 'https://api.elevenlabs.io'
 const DEFAULT_MODEL = 'eleven_multilingual_v2'
@@ -112,44 +110,41 @@ async function main() {
     return
   }
 
-  const workDirectory = await mkdtemp(join(tmpdir(), 'maicle-narration-'))
-  try {
-    const generated = await generateNarrationAudio({
-      apiRoot: ELEVENLABS_API_ROOT,
-      apiKey: elevenLabsApiKey || requireEnvironment('ELEVENLABS_API_KEY'),
-      voiceId: options.voiceId,
-      model: options.model,
-      chunks,
-      slug: post.slug.current,
-      workDirectory,
-      onProgress: console.log,
-    })
-    console.log(`Uploading ${Math.round(generated.durationSeconds)} seconds of audio to Sanity…`)
-    await publishNarration({
-      sanity: {
-        projectId,
-        dataset,
-        token: writeToken || requireEnvironment('SANITY_API_WRITE_TOKEN'),
-      },
-      post,
-      audioPath: generated.outputPath,
-      narration: {
-        ...(post.narration?.scriptOverride
-          ? { scriptOverride: post.narration.scriptOverride }
-          : {}),
-        durationSeconds: generated.durationSeconds,
-        provider: 'elevenlabs',
-        model: options.model,
-        voiceId: options.voiceId,
-        voiceName: options.voiceName,
-        sourceHash,
-        generatedAt: new Date().toISOString(),
-      },
-    })
-    console.log(`Narration is ready on ${post._id}.`)
-  } finally {
-    await rm(workDirectory, { recursive: true, force: true })
+  const generated = await generateNarrationAudio({
+    apiRoot: ELEVENLABS_API_ROOT,
+    apiKey: elevenLabsApiKey || requireEnvironment('ELEVENLABS_API_KEY'),
+    voiceId: options.voiceId,
+    model: options.model,
+    chunks,
+    onProgress: console.log,
+  })
+  console.log(`Uploading ${Math.round(generated.durationSeconds)} seconds of audio to Sanity…`)
+  const sanityWriteConnection = {
+    projectId,
+    dataset,
+    token: writeToken || requireEnvironment('SANITY_API_WRITE_TOKEN'),
   }
+  const assetId = await uploadNarrationAsset({
+    connection: sanityWriteConnection,
+    audio: generated.audio,
+    filename: `${post.slug.current}-narration.mp3`,
+  })
+  await patchNarration(sanityWriteConnection, post, {
+    ...(post.narration?.scriptOverride ? { scriptOverride: post.narration.scriptOverride } : {}),
+    audioFile: {
+      _type: 'file',
+      asset: { _type: 'reference', _ref: assetId },
+    },
+    durationSeconds: generated.durationSeconds,
+    provider: 'elevenlabs',
+    model: options.model,
+    voiceId: options.voiceId,
+    voiceName: options.voiceName,
+    sourceHash,
+    generatedAt: new Date().toISOString(),
+    generationStatus: 'ready',
+  })
+  console.log(`Narration is ready on ${post._id}.`)
 }
 
 main().catch((error) => {

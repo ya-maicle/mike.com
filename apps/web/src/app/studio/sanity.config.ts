@@ -4,6 +4,7 @@ import { muxInput } from 'sanity-plugin-mux-input'
 import { media } from 'sanity-plugin-media'
 import { visionTool } from '@sanity/vision'
 import { schemaTypes } from '../../sanity/schemas'
+import { GenerateBlogNarrationAction } from '../../sanity/schemas/actions/generate-blog-narration'
 import { LinkToCaseStudyAction } from '../../sanity/schemas/actions/link-to-case-study'
 
 const projectId = process.env.SANITY_STUDIO_PROJECT_ID || process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
@@ -90,6 +91,9 @@ export default defineConfig({
 
   document: {
     actions: (prev, context) => {
+      if (context.schemaType === 'blogPost') {
+        return [...prev, GenerateBlogNarrationAction]
+      }
       const eligible = new Set(['caseStudyBlock', 'imageBlock', 'videoBlock', 'carouselBlock'])
       if (eligible.has(context.schemaType)) {
         return [...prev, LinkToCaseStudyAction]
