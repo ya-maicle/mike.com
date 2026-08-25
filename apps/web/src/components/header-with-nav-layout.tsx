@@ -84,6 +84,10 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
     return () => window.removeEventListener('scroll', onScroll)
   }, [keepHeaderVisible])
 
+  if (pathname === '/login') {
+    return <>{children}</>
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       {/* Header */}

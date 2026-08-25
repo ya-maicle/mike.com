@@ -8,6 +8,7 @@ import {
   AudioPauseIcon,
   AudioPlayIcon,
   AudioRewind15Icon,
+  GoogleIcon,
   Icon,
 } from './icon'
 import * as Icons from './icons'
@@ -78,6 +79,15 @@ export const AudioControls: Story = {
       <ArticleLinkedInIcon />
       <ArticleShareIcon className="-rotate-45" />
       <ArticleTocChevronIcon />
+    </div>
+  ),
+}
+
+export const BrandIcons: Story = {
+  render: () => (
+    <div className="flex items-center gap-4">
+      <GoogleIcon variant="brand" className="size-4" />
+      <GoogleIcon variant="monochrome" className="size-4" />
     </div>
   ),
 }

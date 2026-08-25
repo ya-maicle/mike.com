@@ -9,6 +9,7 @@ import { isCaseStudyPath, withAccessDenied } from '@/lib/portfolio-access-client
 import { captureAnalyticsEvent, resetAnalyticsIdentity } from '@/lib/analytics/client'
 import { consumePortfolioAccessContext } from '@/lib/analytics/portfolio-access'
 import { requestedStudySlugFromPath, type PortfolioAuthMethod } from '@/lib/analytics/events'
+import { GOOGLE_ONE_TAP_LOGIN_PENDING_KEY } from '@/lib/google-one-tap'
 
 type PortfolioClaimResult = {
   status: 'granted' | 'denied' | 'blocked'
@@ -80,7 +81,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   )
 
   const handleSignedInSession = React.useCallback(
-    async (newSession: Session, isOAuthCallback: boolean) => {
+    async (newSession: Session, isOAuthCallback: boolean, isOneTapSignIn = false) => {
       await upsertProfileFromUser(newSession.user)
 
       let urlReturnUrl: string | null = null
@@ -109,7 +110,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const claimStatus = claim.status
 
       const analyticsContext = consumePortfolioAccessContext()
-      if (analyticsContext || isOAuthCallback) {
+      const shouldCompleteAuth = isOAuthCallback || isOneTapSignIn
+
+      if (analyticsContext || shouldCompleteAuth) {
         const authMethod: PortfolioAuthMethod =
           analyticsContext?.authMethod ??
           (newSession.user.app_metadata?.provider === 'google' ? 'google' : 'magic_link')
@@ -133,7 +136,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
 
-      if (!safeReturnUrl || (!isOAuthCallback && claimStatus !== 'granted')) return
+      if (!safeReturnUrl || (!shouldCompleteAuth && claimStatus !== 'granted')) return
 
       localStorage.removeItem('auth-return-url')
 
@@ -169,10 +172,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(newSession?.user ?? null)
       setLoading(false)
 
+      let isOneTapSignIn = false
+      if (event === 'SIGNED_IN') {
+        try {
+          isOneTapSignIn = sessionStorage.getItem(GOOGLE_ONE_TAP_LOGIN_PENDING_KEY) === '1'
+          if (isOneTapSignIn) sessionStorage.removeItem(GOOGLE_ONE_TAP_LOGIN_PENDING_KEY)
+        } catch {}
+      }
+
       const shouldHandlePostLogin = (event === 'SIGNED_IN' || isOAuthCallback) && !!newSession?.user
 
       if (shouldHandlePostLogin) {
-        handleSignedInSession(newSession, isOAuthCallback).catch(() => {})
+        handleSignedInSession(newSession, isOAuthCallback, isOneTapSignIn).catch(() => {})
       }
     })
 
