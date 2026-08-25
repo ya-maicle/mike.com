@@ -1,0 +1,20 @@
+/* typography.css
+   Semantic typography tokens and reusable type treatments.
+   Layout-specific measure remains the responsibility of the consuming component.
+*/
+
+:root {
+  --typography-display-size: var(--text-5xl);
+  --typography-display-weight: 400;
+  --typography-display-line-height: 1.1;
+  --typography-display-letter-spacing: -0.01em;
+}
+
+@layer components {
+  .text-display {
+    font-size: var(--typography-display-size);
+    font-weight: var(--typography-display-weight);
+    line-height: var(--typography-display-line-height);
+    letter-spacing: var(--typography-display-letter-spacing);
+  }
+}

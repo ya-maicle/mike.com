@@ -1,5 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
-import { GoogleIcon, Icon } from './icon'
+import {
+  ArticleLinkedInIcon,
+  ArticleShareIcon,
+  ArticleTocChevronIcon,
+  ArticleXIcon,
+  AudioForward15Icon,
+  AudioPauseIcon,
+  AudioPlayIcon,
+  AudioRewind15Icon,
+  GoogleIcon,
+  Icon,
+} from './icon'
 import * as Icons from './icons'
 import { Button } from './button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './card'
@@ -53,6 +64,21 @@ export const Colors: Story = {
       <Icon icon={Icons.Heart} className="text-accent" />
       <Icon icon={Icons.Heart} className="text-warning" />
       <Icon icon={Icons.Heart} className="text-accent" />
+    </div>
+  ),
+}
+
+export const AudioControls: Story = {
+  render: () => (
+    <div className="flex items-center gap-4">
+      <AudioPlayIcon />
+      <AudioPauseIcon />
+      <AudioRewind15Icon />
+      <AudioForward15Icon />
+      <ArticleXIcon />
+      <ArticleLinkedInIcon />
+      <ArticleShareIcon className="-rotate-45" />
+      <ArticleTocChevronIcon />
     </div>
   ),
 }

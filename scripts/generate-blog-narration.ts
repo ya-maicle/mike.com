@@ -1,0 +1,164 @@
+#!/usr/bin/env tsx
+/* eslint-disable no-console */
+
+import { createHash } from 'node:crypto'
+
+import { buildBlogNarrationScript, splitNarrationScript } from '../apps/web/src/lib/blog-narration'
+import { generateNarrationAudio } from '../apps/web/src/lib/blog-narration-audio'
+import {
+  blogNarrationChunkLimit,
+  DEFAULT_BLOG_NARRATION_MODEL,
+  DEFAULT_BLOG_NARRATION_VOICE_ID,
+  DEFAULT_BLOG_NARRATION_VOICE_NAME,
+} from '../apps/web/src/lib/blog-narration-config'
+import {
+  findSanityPost,
+  patchNarration,
+  uploadNarrationAsset,
+} from '../apps/web/src/lib/blog-narration-sanity'
+import { listElevenLabsVoices } from './lib/elevenlabs-voices'
+
+const ELEVENLABS_API_ROOT = 'https://api.elevenlabs.io'
+
+type CliOptions = {
+  slug?: string
+  voiceId: string
+  voiceName: string
+  model: string
+  dryRun: boolean
+  force: boolean
+  allowProduction: boolean
+  listVoices: boolean
+}
+
+function optionValue(args: string[], name: string) {
+  const index = args.indexOf(name)
+  if (index < 0) return undefined
+  const value = args[index + 1]
+  if (!value || value.startsWith('--')) throw new Error(`${name} requires a value.`)
+  return value
+}
+
+function parseOptions(args: string[]): CliOptions {
+  return {
+    slug: optionValue(args, '--slug'),
+    voiceId:
+      optionValue(args, '--voice-id') ??
+      process.env.ELEVENLABS_VOICE_ID ??
+      DEFAULT_BLOG_NARRATION_VOICE_ID,
+    voiceName:
+      optionValue(args, '--voice-name') ??
+      process.env.ELEVENLABS_VOICE_NAME ??
+      DEFAULT_BLOG_NARRATION_VOICE_NAME,
+    model:
+      optionValue(args, '--model') ??
+      process.env.ELEVENLABS_MODEL_ID ??
+      DEFAULT_BLOG_NARRATION_MODEL,
+    dryRun: args.includes('--dry-run'),
+    force: args.includes('--force'),
+    allowProduction: args.includes('--allow-production'),
+    listVoices: args.includes('--list-voices'),
+  }
+}
+
+function requireEnvironment(name: string) {
+  const value = process.env[name]?.trim()
+  if (!value) throw new Error(`Missing ${name}.`)
+  return value
+}
+
+async function main() {
+  const options = parseOptions(process.argv.slice(2))
+  const elevenLabsApiKey = process.env.ELEVENLABS_API_KEY?.trim()
+
+  if (options.listVoices) {
+    await listElevenLabsVoices({
+      apiRoot: ELEVENLABS_API_ROOT,
+      apiKey: elevenLabsApiKey || requireEnvironment('ELEVENLABS_API_KEY'),
+      write: console.log,
+    })
+    return
+  }
+  if (!options.slug) throw new Error('Usage: pnpm blog:narrate -- --slug <article-slug>')
+
+  const projectId = requireEnvironment('NEXT_PUBLIC_SANITY_PROJECT_ID')
+  const dataset = requireEnvironment('NEXT_PUBLIC_SANITY_DATASET')
+  const readToken = process.env.SANITY_API_READ_TOKEN?.trim()
+  const writeToken = process.env.SANITY_API_WRITE_TOKEN?.trim()
+  if (dataset === 'production' && !options.allowProduction) {
+    throw new Error('Refusing to update production without --allow-production.')
+  }
+
+  const sanity = {
+    projectId,
+    dataset,
+    token: readToken || writeToken || requireEnvironment('SANITY_API_READ_TOKEN'),
+  }
+  const post = await findSanityPost(sanity, options.slug)
+  if (!post) throw new Error(`No blog post found for slug “${options.slug}”.`)
+
+  const script = buildBlogNarrationScript({
+    title: post.title,
+    excerpt: post.excerpt,
+    content: post.content,
+    scriptOverride: post.narration?.scriptOverride,
+  })
+  if (!script) throw new Error('The article produced an empty narration script.')
+  const sourceHash = createHash('sha256').update(script).digest('hex')
+  const chunks = splitNarrationScript(script, blogNarrationChunkLimit(options.model))
+
+  console.log(
+    `Narration source: ${post.slug.current} · ${script.length.toLocaleString('en-GB')} characters · ${chunks.length} chunk${chunks.length === 1 ? '' : 's'}`,
+  )
+  console.log(`Voice: ${options.voiceName} (${options.voiceId}) · model: ${options.model}`)
+  if (options.dryRun) return
+  if (
+    !options.force &&
+    post.narration?.sourceHash === sourceHash &&
+    post.narration.audioFile?.asset?._ref
+  ) {
+    console.log('Narration is already current. Use --force to regenerate it.')
+    return
+  }
+
+  const generated = await generateNarrationAudio({
+    apiRoot: ELEVENLABS_API_ROOT,
+    apiKey: elevenLabsApiKey || requireEnvironment('ELEVENLABS_API_KEY'),
+    voiceId: options.voiceId,
+    model: options.model,
+    chunks,
+    onProgress: console.log,
+  })
+  console.log(`Uploading ${Math.round(generated.durationSeconds)} seconds of audio to Sanity…`)
+  const sanityWriteConnection = {
+    projectId,
+    dataset,
+    token: writeToken || requireEnvironment('SANITY_API_WRITE_TOKEN'),
+  }
+  const assetId = await uploadNarrationAsset({
+    connection: sanityWriteConnection,
+    audio: generated.audio,
+    filename: `${post.slug.current}-narration.mp3`,
+  })
+  await patchNarration(sanityWriteConnection, post, {
+    ...(post.narration?.scriptOverride ? { scriptOverride: post.narration.scriptOverride } : {}),
+    audioFile: {
+      _type: 'file',
+      asset: { _type: 'reference', _ref: assetId },
+    },
+    durationSeconds: generated.durationSeconds,
+    provider: 'elevenlabs',
+    model: options.model,
+    voiceId: options.voiceId,
+    voiceName: options.voiceName,
+    sourceHash,
+    generatedAt: new Date().toISOString(),
+    generationStatus: 'ready',
+  })
+  console.log(`Narration is ready on ${post._id}.`)
+}
+
+main().catch((error) => {
+  console.error(error instanceof Error ? error.message : error)
+  process.exit(1)
+})

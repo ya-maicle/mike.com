@@ -4,6 +4,7 @@ import { Children, isValidElement, type ReactNode } from 'react'
 import type { PortableTextComponents } from 'next-sanity'
 import { cn } from '@/lib/utils'
 import { gridCols } from '@/lib/grid-columns'
+import { articleHeadingId } from '@/lib/article-headings'
 import { ContentBlock } from '@/components/content-block'
 
 type BlockProps = { children?: ReactNode }
@@ -11,18 +12,6 @@ type ListItemProps = { children?: ReactNode; value?: { style?: string } }
 type MarkProps = {
   children?: ReactNode
   value?: { href?: string; weight?: string; openInNewTab?: boolean }
-}
-
-/**
- * Generate a URL-safe slug from text
- */
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, '') // Remove special characters
-    .replace(/\s+/g, '-') // Replace spaces with hyphens
-    .replace(/-+/g, '-') // Replace multiple hyphens with single
 }
 
 /**
@@ -118,7 +107,7 @@ export const gridComponents: PortableTextComponents = {
       <p className={cn(gridCols.narrow, 'text-xl leading-7')}>{children}</p>
     ),
     h1: ({ children }: BlockProps) => {
-      const id = slugify(getTextFromChildren(children))
+      const id = articleHeadingId(getTextFromChildren(children))
       return (
         <h1 id={id} className={cn(gridCols.narrow, 'text-5xl mt-12 mb-6 md:mt-24 md:mb-12')}>
           {children}
@@ -126,15 +115,15 @@ export const gridComponents: PortableTextComponents = {
       )
     },
     h2: ({ children }: BlockProps) => {
-      const id = slugify(getTextFromChildren(children))
+      const id = articleHeadingId(getTextFromChildren(children))
       return (
-        <h2 id={id} className={cn(gridCols.narrow, 'mt-12 mb-6 md:mt-20 md:mb-10')}>
+        <h2 id={id} className={cn(gridCols.narrow, 'scroll-mt-28 mt-12 mb-6 md:mt-20 md:mb-10')}>
           {children}
         </h2>
       )
     },
     h3: ({ children }: BlockProps) => {
-      const id = slugify(getTextFromChildren(children))
+      const id = articleHeadingId(getTextFromChildren(children))
       return (
         <h3 id={id} className={cn(gridCols.narrow, 'mt-10 mb-5 md:mt-16 md:mb-8')}>
           {children}
@@ -142,7 +131,7 @@ export const gridComponents: PortableTextComponents = {
       )
     },
     h4: ({ children }: BlockProps) => {
-      const id = slugify(getTextFromChildren(children))
+      const id = articleHeadingId(getTextFromChildren(children))
       return (
         <h4 id={id} className={cn(gridCols.narrow, 'mt-10 mb-5 md:mt-16 md:mb-8 font-normal')}>
           {children}
@@ -150,7 +139,7 @@ export const gridComponents: PortableTextComponents = {
       )
     },
     h5: ({ children }: BlockProps) => {
-      const id = slugify(getTextFromChildren(children))
+      const id = articleHeadingId(getTextFromChildren(children))
       return (
         <h5 id={id} className={cn(gridCols.narrow, 'mt-10 mb-5 md:mt-16 md:mb-8 font-medium')}>
           {children}
@@ -158,7 +147,7 @@ export const gridComponents: PortableTextComponents = {
       )
     },
     h6: ({ children }: BlockProps) => {
-      const id = slugify(getTextFromChildren(children))
+      const id = articleHeadingId(getTextFromChildren(children))
       return (
         <h6 id={id} className={cn(gridCols.narrow, 'mt-6 mb-3 font-medium')}>
           {children}
@@ -256,7 +245,7 @@ export const typographyComponents: PortableTextComponents = {
   block: {
     normal: ({ children }: BlockProps) => <p className="text-xl leading-7">{children}</p>,
     h1: ({ children }: BlockProps) => {
-      const id = slugify(getTextFromChildren(children))
+      const id = articleHeadingId(getTextFromChildren(children))
       return (
         <h1 id={id} className="text-5xl mt-12 mb-6 md:mt-24 md:mb-12">
           {children}
@@ -264,15 +253,15 @@ export const typographyComponents: PortableTextComponents = {
       )
     },
     h2: ({ children }: BlockProps) => {
-      const id = slugify(getTextFromChildren(children))
+      const id = articleHeadingId(getTextFromChildren(children))
       return (
-        <h2 id={id} className="mt-12 mb-6 md:mt-20 md:mb-10">
+        <h2 id={id} className="scroll-mt-28 mt-12 mb-6 md:mt-20 md:mb-10">
           {children}
         </h2>
       )
     },
     h3: ({ children }: BlockProps) => {
-      const id = slugify(getTextFromChildren(children))
+      const id = articleHeadingId(getTextFromChildren(children))
       return (
         <h3 id={id} className="mt-10 mb-5 md:mt-16 md:mb-8">
           {children}
@@ -280,7 +269,7 @@ export const typographyComponents: PortableTextComponents = {
       )
     },
     h4: ({ children }: BlockProps) => {
-      const id = slugify(getTextFromChildren(children))
+      const id = articleHeadingId(getTextFromChildren(children))
       return (
         <h4 id={id} className="mt-10 mb-5 md:mt-16 md:mb-8 font-normal">
           {children}
@@ -288,7 +277,7 @@ export const typographyComponents: PortableTextComponents = {
       )
     },
     h5: ({ children }: BlockProps) => {
-      const id = slugify(getTextFromChildren(children))
+      const id = articleHeadingId(getTextFromChildren(children))
       return (
         <h5 id={id} className="mt-10 mb-5 md:mt-16 md:mb-8 font-medium">
           {children}
@@ -296,7 +285,7 @@ export const typographyComponents: PortableTextComponents = {
       )
     },
     h6: ({ children }: BlockProps) => {
-      const id = slugify(getTextFromChildren(children))
+      const id = articleHeadingId(getTextFromChildren(children))
       return (
         <h6 id={id} className="mt-6 mb-3 font-medium">
           {children}

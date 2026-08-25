@@ -14,7 +14,9 @@ import {
   initializePostHogAnalytics,
   resetAnalyticsIdentity,
 } from '@/lib/analytics/client'
-import { contextSlugForPath } from '@/lib/analytics/events'
+import { contextSlugForPath, type BlogCardPlacement } from '@/lib/analytics/events'
+
+const BLOG_CARD_PLACEMENTS = new Set<BlogCardPlacement>(['featured', 'rail', 'archive'])
 
 function authProviderForUser(provider: unknown) {
   return provider === 'google' ? 'google' : 'magic_link'
@@ -64,7 +66,28 @@ function PostHogLifecycle({ analyticsEnabled }: { analyticsEnabled: boolean }) {
       const target = event.target
       if (!(target instanceof Element)) return
       const anchor = target.closest<HTMLAnchorElement>('a[href]')
-      if (!anchor?.getAttribute('href')?.toLowerCase().startsWith('mailto:')) return
+      if (!anchor) return
+
+      const postSlug = anchor.dataset.analyticsBlogPostSlug
+      const rawPlacement = anchor.dataset.analyticsBlogCardPlacement
+      const rawPosition = anchor.dataset.analyticsBlogCardPosition
+      const cardPosition = rawPosition ? Number(rawPosition) : Number.NaN
+
+      if (
+        postSlug &&
+        rawPlacement &&
+        BLOG_CARD_PLACEMENTS.has(rawPlacement as BlogCardPlacement) &&
+        Number.isInteger(cardPosition) &&
+        cardPosition > 0
+      ) {
+        captureAnalyticsEvent('blog_card_clicked', {
+          post_slug: postSlug,
+          card_placement: rawPlacement as BlogCardPlacement,
+          card_position: cardPosition,
+        })
+      }
+
+      if (!anchor.getAttribute('href')?.toLowerCase().startsWith('mailto:')) return
 
       const placement = anchor.dataset.analyticsContactPlacement
       captureAnalyticsEvent('contact_clicked', {

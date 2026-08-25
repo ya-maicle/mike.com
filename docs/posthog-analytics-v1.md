@@ -1,5 +1,8 @@
 # PostHog Product Analytics V1
 
+> Historical contract. The current schema and blog extension are documented in
+> [PostHog Product Analytics V2](./posthog-analytics-v2.md).
+
 Status: implemented and verified locally on 2026-08-23. The PostHog EU project and
 Vercel Preview/Production configuration are ready; the application changes take effect
 on the next deployment containing this branch.

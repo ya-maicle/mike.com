@@ -1,4 +1,5 @@
 import { SITE_CONFIG } from '@/lib/constants'
+import { secondsToIsoDuration } from '@/lib/blog-narration'
 
 const personId = `${SITE_CONFIG.url}/#person`
 const websiteId = `${SITE_CONFIG.url}/#website`
@@ -64,4 +65,57 @@ function JsonLd({ value }: { value: object }) {
 
 export function SiteStructuredData({ profileImages = [] }: { profileImages?: string[] }) {
   return <JsonLd value={getSiteStructuredData(profileImages)} />
+}
+
+type BlogPostStructuredDataProps = {
+  title: string
+  description: string
+  path: string
+  publishedAt: string
+  imageUrl?: string
+  audio?: {
+    url: string
+    durationSeconds: number
+  }
+}
+
+export function getBlogPostStructuredData({
+  title,
+  description,
+  path,
+  publishedAt,
+  imageUrl,
+  audio,
+}: BlogPostStructuredDataProps) {
+  const url = new URL(path, SITE_CONFIG.url).toString()
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    '@id': `${url}#article`,
+    headline: title,
+    description,
+    url,
+    mainEntityOfPage: url,
+    datePublished: publishedAt,
+    inLanguage: 'en-GB',
+    ...(imageUrl ? { image: imageUrl } : {}),
+    ...(audio
+      ? {
+          audio: {
+            '@type': 'AudioObject',
+            contentUrl: audio.url,
+            encodingFormat: 'audio/mpeg',
+            duration: secondsToIsoDuration(audio.durationSeconds),
+          },
+        }
+      : {}),
+    author: { '@id': personId },
+    publisher: { '@id': personId },
+    isPartOf: { '@id': websiteId },
+  }
+}
+
+export function BlogPostStructuredData(props: BlogPostStructuredDataProps) {
+  return <JsonLd value={getBlogPostStructuredData(props)} />
 }

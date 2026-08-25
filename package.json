@@ -48,6 +48,8 @@
     "sanity:dev": "dotenv -e apps/web/.env.local -- sanity dev --port 3333",
     "sanity:build": "dotenv -e apps/web/.env.local -- sanity build",
     "sanity:deploy": "dotenv -e apps/web/.env.local -- sanity deploy",
+    "sanity:seed-blog-samples": "dotenv -e apps/web/.env.local -- pnpm --filter web exec tsx ../../scripts/seed-blog-samples.ts",
+    "blog:narrate": "dotenv -e apps/web/.env.local -- pnpm --filter web exec tsx ../../scripts/generate-blog-narration.ts",
     "prepare": "husky"
   },
   "lint-staged": {

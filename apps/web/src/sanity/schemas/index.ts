@@ -10,11 +10,13 @@ import { legalPage } from './legal-page'
 import { portfolioAccessProfile } from './portfolio-access-profile'
 import { program } from './program'
 import { deck } from './deck'
+import { blogPost } from './blog-post'
 
 export const schemaTypes = [
   homePage,
   caseStudy,
   program,
+  blogPost,
   page,
   imageBlock,
   videoBlock,
