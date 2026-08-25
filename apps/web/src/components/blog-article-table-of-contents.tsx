@@ -125,7 +125,7 @@ export function BlogArticleTableOfContents({ headings }: BlogArticleTableOfConte
         aria-label="Table of contents"
         data-show-toc={hasEnteredArticle}
         className={cn(
-          'sticky top-14 z-40 col-span-full row-start-1 -mx-6 h-0 w-[calc(100%+3rem)] -translate-y-px transition-opacity duration-300 @6xl:hidden',
+          'sticky top-[var(--mobile-site-header-offset)] z-40 col-span-full row-start-1 -mx-6 h-0 w-[calc(100%+3rem)] -translate-y-px transition-opacity duration-300 @6xl:hidden',
           hasEnteredArticle ? 'opacity-100' : 'pointer-events-none opacity-0',
         )}
       >

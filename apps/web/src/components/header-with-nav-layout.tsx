@@ -89,7 +89,14 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-foreground">
+    <div
+      className="min-h-screen flex flex-col bg-background text-foreground"
+      style={
+        {
+          '--mobile-site-header-offset': hidden ? '0rem' : '3.5rem',
+        } as React.CSSProperties
+      }
+    >
       {/* Header */}
       {mounted && (
         <header
