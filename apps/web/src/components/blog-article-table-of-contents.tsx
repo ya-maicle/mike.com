@@ -138,14 +138,16 @@ export function BlogArticleTableOfContents({ headings }: BlogArticleTableOfConte
               onClick={() => setMobileOpen(true)}
             >
               <span className="truncate pe-5 text-xs leading-tight">{activeHeading.text}</span>
-              <ArticleTocChevronIcon className="ml-auto shrink-0" />
+              <span className="ml-auto flex size-9 shrink-0 items-center justify-center">
+                <ArticleTocChevronIcon />
+              </span>
             </button>
           ) : (
             <button
               type="button"
               aria-label="Close table of contents"
               aria-expanded="true"
-              className="absolute right-6 top-0 z-10 flex h-11 items-center focus-visible:outline focus-visible:outline-foreground"
+              className="absolute right-6 top-0 z-10 flex h-11 w-9 items-center justify-center focus-visible:outline focus-visible:outline-foreground"
               onClick={() => setMobileOpen(false)}
             >
               <ArticleTocChevronIcon className="rotate-180 transition-transform duration-200" />
