@@ -125,7 +125,7 @@ export function BlogArticleTableOfContents({ headings }: BlogArticleTableOfConte
         aria-label="Table of contents"
         data-show-toc={hasEnteredArticle}
         className={cn(
-          'sticky top-14 z-40 col-span-full row-start-1 -mx-6 h-0 w-[calc(100%+3rem)] -translate-y-px transition-opacity duration-300 @6xl:hidden',
+          'sticky top-[var(--mobile-site-header-offset)] z-40 col-span-full row-start-1 -mx-6 h-0 w-[calc(100%+3rem)] -translate-y-px transition-opacity duration-300 @6xl:hidden',
           hasEnteredArticle ? 'opacity-100' : 'pointer-events-none opacity-0',
         )}
       >
@@ -138,14 +138,16 @@ export function BlogArticleTableOfContents({ headings }: BlogArticleTableOfConte
               onClick={() => setMobileOpen(true)}
             >
               <span className="truncate pe-5 text-xs leading-tight">{activeHeading.text}</span>
-              <ArticleTocChevronIcon className="ml-auto shrink-0" />
+              <span className="ml-auto flex size-9 shrink-0 items-center justify-center">
+                <ArticleTocChevronIcon />
+              </span>
             </button>
           ) : (
             <button
               type="button"
               aria-label="Close table of contents"
               aria-expanded="true"
-              className="absolute right-6 top-0 z-10 flex h-11 items-center focus-visible:outline focus-visible:outline-foreground"
+              className="absolute right-6 top-0 z-10 flex h-11 w-9 items-center justify-center focus-visible:outline focus-visible:outline-foreground"
               onClick={() => setMobileOpen(false)}
             >
               <ArticleTocChevronIcon className="rotate-180 transition-transform duration-200" />
