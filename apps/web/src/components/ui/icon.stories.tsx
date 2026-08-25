@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite'
-import { Icon } from './icon'
+import { GoogleIcon, Icon } from './icon'
 import * as Icons from './icons'
 import { Button } from './button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './card'
@@ -53,6 +53,15 @@ export const Colors: Story = {
       <Icon icon={Icons.Heart} className="text-accent" />
       <Icon icon={Icons.Heart} className="text-warning" />
       <Icon icon={Icons.Heart} className="text-accent" />
+    </div>
+  ),
+}
+
+export const BrandIcons: Story = {
+  render: () => (
+    <div className="flex items-center gap-4">
+      <GoogleIcon variant="brand" className="size-4" />
+      <GoogleIcon variant="monochrome" className="size-4" />
     </div>
   ),
 }
