@@ -17,13 +17,14 @@ import { usePathname } from 'next/navigation'
 import { Footer } from '@/components/footer'
 import { isStrengthDetailPath } from '@/lib/program-display'
 import { useMobileNavigation } from '@/components/providers/mobile-navigation-provider'
+import { rememberPortfolioAccessEntryPoint } from '@/lib/analytics/portfolio-access'
 
 export function HeaderWithNavLayout({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = React.useState(false)
   const [desktopNavOpen, setDesktopNavOpen] = React.useState(false)
   const { open: mobileNavOpen, setOpen: setMobileNavOpen } = useMobileNavigation()
 
-  const { open: loginOpen, setOpen: setLoginOpen, openLogin } = useLoginModal()
+  const { open: loginOpen, setOpen: setLoginOpen } = useLoginModal()
   const { user } = useAuth()
   const pathname = usePathname()
   const keepHeaderVisible = pathname === '/blog'
@@ -32,6 +33,11 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
   const lastYRef = React.useRef(0)
   const [isMobile, setIsMobile] = React.useState(false)
   const navOpen = isMobile ? mobileNavOpen : desktopNavOpen
+  const handleLoginNavigation = React.useCallback(() => {
+    rememberPortfolioAccessEntryPoint('header')
+    setMobileNavOpen(false)
+  }, [setMobileNavOpen])
+
   React.useEffect(() => setMounted(true), [])
   React.useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -167,9 +173,11 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
                   className="hidden md:inline-flex"
                   variant="secondary"
                   size="default"
-                  onClick={() => openLogin({ entryPoint: 'header' })}
+                  asChild
                 >
-                  Log in
+                  <Link href="/login" onClick={handleLoginNavigation}>
+                    Log in
+                  </Link>
                 </Button>
               )}
             </div>
@@ -239,12 +247,10 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
             {/* Mobile-only footer action for logged-out users */}
             {!user && (
               <div className="mt-auto flex justify-end md:hidden">
-                <Button
-                  variant="secondary"
-                  size="default"
-                  onClick={() => openLogin({ entryPoint: 'header' })}
-                >
-                  Log in
+                <Button variant="secondary" size="default" asChild>
+                  <Link href="/login" onClick={handleLoginNavigation}>
+                    Log in
+                  </Link>
                 </Button>
               </div>
             )}
