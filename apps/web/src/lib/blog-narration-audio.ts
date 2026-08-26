@@ -62,14 +62,15 @@ async function synthesizeChunk({
 }) {
   const url = new URL(`${apiRoot}/v1/text-to-speech/${voiceId}/with-timestamps`)
   url.searchParams.set('output_format', OUTPUT_FORMAT)
+  const supportsTextContext = model !== 'eleven_v3'
   const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'xi-api-key': apiKey },
     body: JSON.stringify({
       text,
       model_id: model,
-      ...(previousText ? { previous_text: previousText } : {}),
-      ...(nextText ? { next_text: nextText } : {}),
+      ...(supportsTextContext && previousText ? { previous_text: previousText } : {}),
+      ...(supportsTextContext && nextText ? { next_text: nextText } : {}),
     }),
   })
   if (!response.ok) {
