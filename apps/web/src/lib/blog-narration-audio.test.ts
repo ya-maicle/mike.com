@@ -54,5 +54,45 @@ describe('blog narration audio', () => {
     expect(result.durationSeconds).toBe(3.75)
     expect(fetchMock).toHaveBeenCalledTimes(2)
     expect(String(fetchMock.mock.calls[0]?.[0])).toContain('/with-timestamps')
+    expect(JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))).toEqual({
+      text: 'First.',
+      model_id: 'model',
+      next_text: 'Second.',
+    })
+    expect(JSON.parse(String(fetchMock.mock.calls[1]?.[1]?.body))).toEqual({
+      text: 'Second.',
+      model_id: 'model',
+      previous_text: 'First.',
+    })
+  })
+
+  it('omits unsupported text context when generating with Eleven v3', async () => {
+    const fetchMock = vi.fn().mockImplementation(() =>
+      Promise.resolve(
+        Response.json({
+          audio_base64: Buffer.from([0xff, 0xfb, 0x01]).toString('base64'),
+          alignment: { character_end_times_seconds: [1] },
+        }),
+      ),
+    )
+    vi.stubGlobal('fetch', fetchMock)
+
+    await generateNarrationAudio({
+      apiRoot: 'https://api.example.com',
+      apiKey: 'test-key',
+      voiceId: 'voice',
+      model: 'eleven_v3',
+      chunks: ['First.', 'Second.'],
+    })
+
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))).toEqual({
+      text: 'First.',
+      model_id: 'eleven_v3',
+    })
+    expect(JSON.parse(String(fetchMock.mock.calls[1]?.[1]?.body))).toEqual({
+      text: 'Second.',
+      model_id: 'eleven_v3',
+    })
   })
 })
