@@ -49,7 +49,7 @@ Feature Previews → Staging Deploy → Production Deploy
 | Environment    | Git Branch | Domain               | Deployment |
 | -------------- | ---------- | -------------------- | ---------- |
 | **Local**      | any        | `localhost:3000`     | Manual     |
-| **Preview**    | `preview`  | `staging.mikeiu.com` | Auto       |
+| **Preview**    | `preview`  | `preview.mikeiu.com` | Auto       |
 | **Production** | `main`     | `mikeiu.com`         | Manual PR  |
 
 ## Recruiter access (gated case studies)
@@ -63,24 +63,42 @@ Case studies with `visibility: recruiter` protect confidential client work; thei
 
 ## Authentication: Login & Logout (Supabase)
 
-A single Supabase browser client using the **PKCE flow** with `autoRefreshToken`, `persistSession`, and `detectSessionInUrl` (see `apps/web/src/lib/supabase.ts`). Google OAuth and passwordless magic links are both supported; sessions sync across tabs via storage events.
+The persistent Supabase browser client uses `autoRefreshToken`, `persistSession`, and an explicitly managed **PKCE** exchange for Google OAuth (see `apps/web/src/lib/supabase.ts`). Passwordless sends and token verification use isolated, non-persistent implicit clients instead, so no browser-bound PKCE verifier is left behind. Email carries a first-party `token_hash` in the URL fragment and can be opened in a different browser or on a different device; the authenticated session is created in the browser that opens and confirms the link. Persistent sessions sync across tabs via storage events.
 
-- The `AuthProvider` (`apps/web/src/components/providers/auth-provider.tsx`) handles the OAuth `?code=` return, cleans up URL params, claims portfolio access after sign-in, and validates any return path against open-redirect rules (`src/lib/url-validation.ts`).
-- The Google button and magic-link send live in `apps/web/src/components/login-form.tsx`.
+- The `AuthProvider` (`apps/web/src/components/providers/auth-provider.tsx`) handles OAuth and first-party magic-link completion, cleans up URL params, claims portfolio access after sign-in, and validates any return path against open-redirect rules (`src/lib/url-validation.ts`).
+- The Google button and magic-link send live in `apps/web/src/components/login-form.tsx`; a successful email request moves to the styled check-email state with a 60-second resend cooldown.
+- Magic-link emails land directly on `/auth/confirm`. The return path, one-time `token_hash`, and email type are fragment parameters, so they are absent from the initial page request, site access logs, and referrer headers. The page removes the fragment before an explicit user click submits the token to Supabase with `verifyOtp`, persists the session, and continues to the validated return path. This prevents email-security scanner GETs from consuming the link.
 - Logout clears the local session immediately, revokes globally in the background, and notifies other tabs.
 
-Environment: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_SITE_URL` (must match the domain you're on; no trailing whitespace).
+Environment: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, and
+`SUPABASE_SERVICE_ROLE_KEY` must be scoped independently in Vercel Preview and
+Production. `NEXT_PUBLIC_SITE_URL` must be the canonical domain for that scope
+(no trailing whitespace). The browser client derives its auth storage namespace
+from the environment-specific Supabase URL, so staging and production sessions
+cannot share a project namespace.
 
 Supabase settings (per environment):
 
-- Auth → URL Configuration: Site URL = canonical domain for that env; add every redirect domain to the allowlist (localhost, preview, prod, www variants).
+- Vercel Preview uses the `mikeiu-staging` Supabase project with Site URL
+  `https://preview.mikeiu.com`. Allow `https://preview.mikeiu.com/**` and the
+  team-restricted `https://*-mikeiu-com.vercel.app/**` pattern so branch and PR
+  deployments can complete authentication on the deployment that requested it.
+- Vercel Production uses the `mikeiu-prod` Supabase project with Site URL
+  `https://mikeiu.com` and redirect URL `https://mikeiu.com/auth/confirm`.
+- Local Supabase may additionally allow `http://localhost:3000/auth/confirm`
+  and `http://127.0.0.1:3000/auth/confirm`. Do not add a broad wildcard to the
+  production project.
 - Auth → Providers → Google: Client ID/Secret; authorized redirect URI is `https://<ref>.supabase.co/auth/v1/callback`.
-- Auth → Email: enable Magic Link. Note the "Resend magic link" button is Supabase's own email — the Resend service is not integrated.
+- Auth → Email: set Email OTP expiration to `1800` seconds (30 minutes). Publish both source-controlled templates from `supabase/templates/`: first-time addresses receive Confirm signup and existing users receive Magic Link. Update staging after the Preview deployment, then production after the Production deployment; the dashboards do not sync repository files. Keep Resend link/open tracking disabled.
+- Passwordless resend calls `signInWithOtp` again after the 60-second cooldown. Magic links are one-time use; expired or replayed links must be replaced with a fresh request.
 
 Known gotchas:
 
-- Email-client prefetch can consume one-time magic-link tokens (`otp_expired`) — resend and open directly.
-- `127.0.0.1` vs `localhost` mismatches fail the redirect allowlist.
+- For the initial rollout, deploy the app with the fragment-aware `/auth/confirm` page first, configure its redirect URLs, and only then replace the hosted Confirm signup and Magic Link templates. The dashboard does not deploy repository template changes automatically.
+- During the short deploy-to-template gap, `/auth/confirm` accepts the old template's implicit session fragment as a compatibility path; remove that path only after the hosted template has been live longer than the 30-minute link lifetime.
+- There is no `/auth/callback` route in the magic-link flow. The deliberate action on `/auth/confirm` is the scanner-prefetch boundary; never verify the token during the initial GET.
+- `token_hash` links are cross-device bearer credentials until used or expired. Keep the token and return path in the fragment, remove it immediately on load, and never expose it to analytics.
+- `127.0.0.1` vs `localhost` mismatches fail the exact redirect allowlist.
 - Debug logging: `localStorage.setItem('auth-debug', '1')` then hard refresh (or set `NEXT_PUBLIC_AUTH_DEBUG=1`). Logs are prefixed `[AUTH]`.
 
 Default profile data: on first sign-in a `profiles` row is upserted with a default avatar/name (`apps/web/src/lib/profile.ts`); RLS allows users to manage only their own row. A debug view exists at `/debug/profile` (404s in production).

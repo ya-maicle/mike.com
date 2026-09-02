@@ -97,7 +97,7 @@ export function pageTypeForPath(pathname: string): PageType {
   if (/^\/blog\/?$/.test(pathname)) return 'blog_index'
   if (/^\/blog\/[^/]+\/?$/.test(pathname)) return 'blog_post'
   if (pathname === '/bio') return 'bio'
-  if (pathname === '/login') return 'login'
+  if (pathname === '/login' || pathname.startsWith('/login/')) return 'login'
   if (/^\/(privacy|cookie-policy|terms)\/?$/.test(pathname)) return 'legal'
   return 'other'
 }

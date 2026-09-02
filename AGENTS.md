@@ -56,4 +56,5 @@ pnpm storybook:web      # Visual checks (the only Storybook)
 - [Testing]: keep crypto/logic in pure modules (no `server-only`/`next/headers`) so Vitest can import them.
 - [Dev]: Dropbox can corrupt `.next` via conflicted copies; set `NEXT_DIST_DIR` to a relative path outside the sync root.
 - [SEO]: `src/lib/constants.ts` is the canonical public-identity source; `src/lib/seo.ts` builds canonical/search/social metadata for every indexable page.
+- [Auth]: Magic links go directly to `/auth/confirm`; the return path and `token_hash` stay out of the initial HTTP request/logs in the URL fragment. There is no callback route; deploy the confirm-page code before manually switching hosted templates from `supabase/templates/`.
 <!-- Only add genuinely reusable knowledge, not story-specific details -->
