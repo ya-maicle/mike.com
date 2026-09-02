@@ -1,3 +1,5 @@
+import { isStandaloneAuthPath } from '@/lib/auth-routes'
+
 /**
  * Validates that a URL path is safe for redirect (prevents open redirect attacks).
  * Only allows relative paths that start with "/" and don't contain protocol indicators.
@@ -16,7 +18,12 @@ export function isValidReturnPath(path: string | null): boolean {
   const lowerPath = path.toLowerCase()
   if (lowerPath.includes('javascript:') || lowerPath.includes('data:')) return false
 
-  if (path === '/login' || path.startsWith('/login?') || path.startsWith('/login#')) return false
+  try {
+    const pathname = new URL(path, 'https://portfolio.invalid').pathname
+    if (isStandaloneAuthPath(pathname)) return false
+  } catch {
+    return false
+  }
 
   return true
 }

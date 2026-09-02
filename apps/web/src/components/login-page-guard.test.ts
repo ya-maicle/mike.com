@@ -15,6 +15,20 @@ const authState = vi.hoisted(() => ({
 }))
 const replace = vi.hoisted(() => vi.fn())
 
+function createMemoryStorage(): Storage {
+  const values = new Map<string, string>()
+  return {
+    get length() {
+      return values.size
+    },
+    clear: () => values.clear(),
+    getItem: (key) => values.get(key) ?? null,
+    key: (index) => Array.from(values.keys())[index] ?? null,
+    removeItem: (key) => void values.delete(key),
+    setItem: (key, value) => void values.set(key, value),
+  }
+}
+
 vi.mock('@/components/providers/auth-provider', () => ({
   useAuth: () => authState,
 }))
@@ -31,6 +45,10 @@ describe('LoginPageGuard', () => {
     authState.loading = true
     authState.user = null
     replace.mockReset()
+    Object.defineProperty(window, 'localStorage', {
+      configurable: true,
+      value: createMemoryStorage(),
+    })
     container = document.createElement('div')
     document.body.appendChild(container)
     root = createRoot(container)
@@ -74,5 +92,15 @@ describe('LoginPageGuard', () => {
     expect(container.innerHTML).toBe('')
     expect(replace).toHaveBeenCalledOnce()
     expect(replace).toHaveBeenCalledWith('/')
+  })
+
+  it('returns signed-in visitors to a remembered safe path', async () => {
+    authState.loading = false
+    authState.user = { id: 'user-1' }
+    localStorage.setItem('auth-return-url', '/work/private?tab=overview')
+
+    await renderGuard()
+
+    expect(replace).toHaveBeenCalledWith('/work/private?tab=overview')
   })
 })

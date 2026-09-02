@@ -3,6 +3,17 @@
 import * as React from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/components/providers/auth-provider'
+import { isValidReturnPath } from '@/lib/url-validation'
+
+function getSignedInDestination() {
+  try {
+    const returnPath = localStorage.getItem('auth-return-url')
+    if (isValidReturnPath(returnPath)) return returnPath!
+  } catch {
+    // Storage is optional; home is always a safe authenticated destination.
+  }
+  return '/'
+}
 
 export function LoginPageGuard({ children }: { children: React.ReactNode }) {
   const { loading, user } = useAuth()
@@ -10,7 +21,7 @@ export function LoginPageGuard({ children }: { children: React.ReactNode }) {
 
   React.useEffect(() => {
     if (!loading && user) {
-      router.replace('/')
+      router.replace(getSignedInDestination())
     }
   }, [loading, router, user])
 

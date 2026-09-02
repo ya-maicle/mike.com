@@ -18,6 +18,7 @@ import { Footer } from '@/components/footer'
 import { isStrengthDetailPath } from '@/lib/program-display'
 import { useMobileNavigation } from '@/components/providers/mobile-navigation-provider'
 import { rememberPortfolioAccessEntryPoint } from '@/lib/analytics/portfolio-access'
+import { isStandaloneAuthPath } from '@/lib/auth-routes'
 
 export function HeaderWithNavLayout({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = React.useState(false)
@@ -90,7 +91,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
     return () => window.removeEventListener('scroll', onScroll)
   }, [keepHeaderVisible])
 
-  if (pathname === '/login') {
+  if (isStandaloneAuthPath(pathname)) {
     return <>{children}</>
   }
 
@@ -304,7 +305,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
             className="sm:max-w-sm bg-transparent border-none shadow-none p-0"
           >
             <DialogTitle className="sr-only">Log in</DialogTitle>
-            <LoginForm />
+            <LoginForm onMagicLinkSent={() => setLoginOpen(false)} />
           </DialogContent>
         </Dialog>
       )}

@@ -21,11 +21,11 @@ const templates = [
     introduction:
       'Use the button below to sign in to the website. This link expires in 30 minutes and can only be used once.',
     action: {
-      href: '{{ .ConfirmationURL }}',
+      href: '{{ .RedirectTo }}&amp;token_hash={{ .TokenHash }}&amp;type=email',
       label: 'Sign in securely',
     },
     fallback: {
-      href: '{{ .ConfirmationURL }}',
+      href: '{{ .RedirectTo }}&amp;token_hash={{ .TokenHash }}&amp;type=email',
       label: 'Open the secure sign-in page',
     },
     securityNote:

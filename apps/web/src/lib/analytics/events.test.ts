@@ -18,6 +18,7 @@ describe('analytics route classification', () => {
     ['/blog/designing-with-ai', 'blog_post'],
     ['/bio', 'bio'],
     ['/login', 'login'],
+    ['/login/check-email', 'login'],
     ['/privacy', 'legal'],
     ['/cookie-policy', 'legal'],
     ['/anything-else', 'other'],

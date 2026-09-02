@@ -15,6 +15,7 @@ import {
   resetAnalyticsIdentity,
 } from '@/lib/analytics/client'
 import { contextSlugForPath, type BlogCardPlacement } from '@/lib/analytics/events'
+import { isSensitiveAuthPath } from '@/lib/auth-routes'
 
 const BLOG_CARD_PLACEMENTS = new Set<BlogCardPlacement>(['featured', 'rail', 'archive'])
 
@@ -22,8 +23,13 @@ function authProviderForUser(provider: unknown) {
   return provider === 'google' ? 'google' : 'magic_link'
 }
 
-function PostHogLifecycle({ analyticsEnabled }: { analyticsEnabled: boolean }) {
-  const pathname = usePathname()
+function PostHogLifecycle({
+  analyticsEnabled,
+  pathname,
+}: {
+  analyticsEnabled: boolean
+  pathname: string
+}) {
   const { user, loading } = useAuth()
   const [ready, setReady] = React.useState(false)
 
@@ -109,10 +115,22 @@ export function ConsentAwareAnalytics() {
   const { analyticsEnabled } = useCookiePreferences()
 
   return (
+    <React.Suspense fallback={null}>
+      <ConsentAwareAnalyticsForPath analyticsEnabled={analyticsEnabled} />
+    </React.Suspense>
+  )
+}
+
+function ConsentAwareAnalyticsForPath({ analyticsEnabled }: { analyticsEnabled: boolean }) {
+  const pathname = usePathname()
+
+  // The magic-link confirmation fragment contains a one-time bearer secret until
+  // the confirmation UI removes it. Keep third-party scripts off auth callbacks.
+  if (isSensitiveAuthPath(pathname)) return null
+
+  return (
     <>
-      <React.Suspense fallback={null}>
-        <PostHogLifecycle analyticsEnabled={analyticsEnabled} />
-      </React.Suspense>
+      <PostHogLifecycle analyticsEnabled={analyticsEnabled} pathname={pathname} />
       <Analytics beforeSend={(event) => (hasAnalyticsConsent() ? event : null)} />
       <SpeedInsights beforeSend={(event) => (hasAnalyticsConsent() ? event : null)} />
     </>
