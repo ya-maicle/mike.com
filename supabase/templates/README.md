@@ -19,13 +19,17 @@ spacing, typography, button, security notice, and footer.
 
 ## Hosted Supabase
 
-For every hosted project, manually copy the subject and generated HTML into
-**Auth → Email Templates → Magic Link** in the Supabase dashboard. Hosted Auth
-configuration belongs to each Supabase project; updating `mikeiu-staging` does
-not update `mikeiu-prod`.
+For every hosted project, copy the subject and generated HTML into both
+**Auth → Email Templates → Confirm signup** and **Magic Link** in the Supabase
+dashboard. A first-time email address receives Confirm signup because the login
+form also creates accounts; an existing user receives Magic Link. Hosted Auth
+configuration belongs to each Supabase project, so updating `mikeiu-staging`
+does not update `mikeiu-prod`.
 
-- Subject: `Sign in to mikeiu.com`
-- Body: `supabase/templates/magic-link.html`
+| Supabase template | Subject                 | Body                                   |
+| ----------------- | ----------------------- | -------------------------------------- |
+| Confirm signup    | `Sign in to mikeiu.com` | `supabase/templates/confirmation.html` |
+| Magic Link        | `Sign in to mikeiu.com` | `supabase/templates/magic-link.html`   |
 
 The hosted dashboard does not read this repository automatically, so repeat the
 copy after every committed template change. Supabase Auth caches hosted template
@@ -50,7 +54,7 @@ its own Supabase dashboard:
 
 | Deployment | Vercel scope | Supabase project | Site URL                     | Required redirect URL                                                         |
 | ---------- | ------------ | ---------------- | ---------------------------- | ----------------------------------------------------------------------------- |
-| Preview    | Preview      | `mikeiu-staging` | `https://preview.mikeiu.com` | `https://preview.mikeiu.com/auth/confirm`                                     |
+| Preview    | Preview      | `mikeiu-staging` | `https://preview.mikeiu.com` | `https://preview.mikeiu.com/**` and `https://*-mikeiu-com.vercel.app/**`      |
 | Production | Production   | `mikeiu-prod`    | `https://mikeiu.com`         | `https://mikeiu.com/auth/confirm`                                             |
 | Local      | Development  | local Supabase   | `http://localhost:3000`      | `http://localhost:3000/auth/confirm` and `http://127.0.0.1:3000/auth/confirm` |
 
@@ -60,11 +64,11 @@ add its exact `/auth/confirm` URL before sending a link from that host.
 Promote the change in two independent passes:
 
 1. Merge and deploy to Preview. In `mikeiu-staging`, verify the Preview Site URL
-   and redirect URL, set Email OTP expiry to `1800`, then publish this template
-   and test a cross-browser link.
+   and both redirect patterns, set Email OTP expiry to `1800`, then publish both
+   templates and test new and existing email addresses across browsers.
 2. Merge and deploy the tested Preview commit to Production. In `mikeiu-prod`,
    verify the production Site URL and redirect URL, set Email OTP expiry to
-   `1800`, then publish the same template and test a production link.
+   `1800`, then publish both templates and test new and existing addresses.
 
 Always deploy the application before publishing the corresponding hosted
 template. Repository deployment alone does not change either Supabase project's

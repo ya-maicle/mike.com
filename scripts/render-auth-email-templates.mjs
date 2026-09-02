@@ -14,6 +14,24 @@ const brand = {
 
 const templates = [
   {
+    file: 'supabase/templates/confirmation.html',
+    preview: 'Confirm your email to finish signing in to mikeiu.com.',
+    eyebrow: 'Confirm your email',
+    title: 'Finish signing in',
+    introduction:
+      'Confirm this email address to create your account and sign in. This link expires in 30 minutes and can only be used once.',
+    action: {
+      href: '{{ .RedirectTo }}&amp;token_hash={{ .TokenHash }}&amp;type=email',
+      label: 'Confirm and sign in',
+    },
+    fallback: {
+      href: '{{ .RedirectTo }}&amp;token_hash={{ .TokenHash }}&amp;type=email',
+      label: 'open the secure confirmation page',
+    },
+    securityNote:
+      'If you didn’t request this email, you can safely ignore it. For your security, never forward this confirmation link.',
+  },
+  {
     file: 'supabase/templates/magic-link.html',
     preview: 'Your secure sign-in link for mikeiu.com expires in 30 minutes.',
     eyebrow: 'Secure sign-in',
@@ -26,7 +44,7 @@ const templates = [
     },
     fallback: {
       href: '{{ .RedirectTo }}&amp;token_hash={{ .TokenHash }}&amp;type=email',
-      label: 'Open the secure sign-in page',
+      label: 'open the secure sign-in page',
     },
     securityNote:
       'If you didn’t request this email, you can safely ignore it. For your security, never forward this sign-in link.',

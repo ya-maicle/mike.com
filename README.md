@@ -80,20 +80,21 @@ cannot share a project namespace.
 Supabase settings (per environment):
 
 - Vercel Preview uses the `mikeiu-staging` Supabase project with Site URL
-  `https://preview.mikeiu.com` and redirect URL
-  `https://preview.mikeiu.com/auth/confirm`.
+  `https://preview.mikeiu.com`. Allow `https://preview.mikeiu.com/**` and the
+  team-restricted `https://*-mikeiu-com.vercel.app/**` pattern so branch and PR
+  deployments can complete authentication on the deployment that requested it.
 - Vercel Production uses the `mikeiu-prod` Supabase project with Site URL
   `https://mikeiu.com` and redirect URL `https://mikeiu.com/auth/confirm`.
 - Local Supabase may additionally allow `http://localhost:3000/auth/confirm`
   and `http://127.0.0.1:3000/auth/confirm`. Do not add a broad wildcard to the
   production project.
 - Auth → Providers → Google: Client ID/Secret; authorized redirect URI is `https://<ref>.supabase.co/auth/v1/callback`.
-- Auth → Email: enable Magic Link and set Email OTP expiration to `1800` seconds (30 minutes). Copy the subject and generated HTML from `supabase/templates/` into the staging project after the Preview deployment, then repeat in the production project after the Production deployment. The dashboards do not sync repository files. Keep Resend link/open tracking disabled.
+- Auth → Email: set Email OTP expiration to `1800` seconds (30 minutes). Publish both source-controlled templates from `supabase/templates/`: first-time addresses receive Confirm signup and existing users receive Magic Link. Update staging after the Preview deployment, then production after the Production deployment; the dashboards do not sync repository files. Keep Resend link/open tracking disabled.
 - Passwordless resend calls `signInWithOtp` again after the 60-second cooldown. Magic links are one-time use; expired or replayed links must be replaced with a fresh request.
 
 Known gotchas:
 
-- For the initial rollout, deploy the app with the fragment-aware `/auth/confirm` page first, configure its exact redirect URL, and only then replace the hosted Magic Link template. The dashboard does not deploy repository template changes automatically.
+- For the initial rollout, deploy the app with the fragment-aware `/auth/confirm` page first, configure its redirect URLs, and only then replace the hosted Confirm signup and Magic Link templates. The dashboard does not deploy repository template changes automatically.
 - During the short deploy-to-template gap, `/auth/confirm` accepts the old template's implicit session fragment as a compatibility path; remove that path only after the hosted template has been live longer than the 30-minute link lifetime.
 - There is no `/auth/callback` route in the magic-link flow. The deliberate action on `/auth/confirm` is the scanner-prefetch boundary; never verify the token during the initial GET.
 - `token_hash` links are cross-device bearer credentials until used or expired. Keep the token and return path in the fragment, remove it immediately on load, and never expose it to analytics.

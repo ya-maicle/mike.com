@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="color-scheme" content="light" />
     <meta name="supported-color-schemes" content="light" />
-    <title>Sign in to mikeiu.com</title>
+    <title>Finish signing in</title>
     <style>
       @media only screen and (max-width: 620px) {
         .email-shell { width: 100% !important; }
@@ -17,7 +17,7 @@
   </head>
   <body style="margin: 0; padding: 0; background-color: #f4f4f5; color: #18181b;">
     <div style="display: none; max-height: 0; overflow: hidden; opacity: 0; color: transparent;">
-      Your secure sign-in link for mikeiu.com expires in 30 minutes.
+      Confirm your email to finish signing in to mikeiu.com.
     </div>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width: 100%; background-color: #f4f4f5;">
       <tr>
@@ -35,17 +35,17 @@
                   </tr>
                   <tr>
                     <td style="padding: 0 0 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 700; line-height: 16px; letter-spacing: 1.4px; text-transform: uppercase; color: #71717a;">
-                      Secure sign-in
+                      Confirm your email
                     </td>
                   </tr>
                   <tr>
                     <td class="email-title" style="padding: 0 0 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 36px; font-weight: 600; line-height: 42px; letter-spacing: -1px; color: #18181b;">
-                      Sign in to mikeiu.com
+                      Finish signing in
                     </td>
                   </tr>
                   <tr>
                     <td style="padding: 0 0 32px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 16px; font-weight: 400; line-height: 25px; color: #52525b;">
-                      Use the button below to sign in to the website. This link expires in 30 minutes and can only be used once.
+                      Confirm this email address to create your account and sign in. This link expires in 30 minutes and can only be used once.
                     </td>
                   </tr>
                   <tr>
@@ -54,7 +54,7 @@
                         <tr>
                           <td bgcolor="#18181b" style="border-radius: 999px;">
                             <a href="{{ .RedirectTo }}&amp;token_hash={{ .TokenHash }}&amp;type=email" style="display: inline-block; padding: 14px 24px; border: 1px solid #18181b; border-radius: 999px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 15px; font-weight: 600; line-height: 20px; color: #ffffff; text-decoration: none;">
-                              Sign in securely
+                              Confirm and sign in
                             </a>
                           </td>
                         </tr>
@@ -63,12 +63,12 @@
                   </tr>
                   <tr>
                     <td style="padding: 0 0 32px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 400; line-height: 20px; color: #71717a;">
-                      If the button doesn’t open, <a href="{{ .RedirectTo }}&amp;token_hash={{ .TokenHash }}&amp;type=email" style="color: #3f3f46; font-weight: 600; text-decoration: underline; text-decoration-color: #a1a1aa; text-underline-offset: 3px;">open the secure sign-in page</a>.
+                      If the button doesn’t open, <a href="{{ .RedirectTo }}&amp;token_hash={{ .TokenHash }}&amp;type=email" style="color: #3f3f46; font-weight: 600; text-decoration: underline; text-decoration-color: #a1a1aa; text-underline-offset: 3px;">open the secure confirmation page</a>.
                     </td>
                   </tr>
                   <tr>
                     <td style="padding: 20px; background-color: #fafafa; border: 1px solid #e4e4e7; border-radius: 12px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 400; line-height: 20px; color: #52525b;">
-                      If you didn’t request this email, you can safely ignore it. For your security, never forward this sign-in link.
+                      If you didn’t request this email, you can safely ignore it. For your security, never forward this confirmation link.
                     </td>
                   </tr>
                 </table>

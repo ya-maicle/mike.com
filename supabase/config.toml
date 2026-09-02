@@ -152,6 +152,10 @@ otp_expiry = 1800
 # subject = "You have been invited"
 # content_path = "./supabase/templates/invite.html"
 
+[auth.email.template.confirmation]
+subject = "Sign in to mikeiu.com"
+content_path = "./supabase/templates/confirmation.html"
+
 [auth.email.template.magic_link]
 subject = "Sign in to mikeiu.com"
 content_path = "./supabase/templates/magic-link.html"
