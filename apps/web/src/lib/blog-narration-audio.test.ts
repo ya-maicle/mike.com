@@ -46,7 +46,7 @@ describe('blog narration audio', () => {
       apiRoot: 'https://api.example.com',
       apiKey: 'test-key',
       voiceId: 'voice',
-      model: 'model',
+      model: 'eleven_multilingual_v2',
       chunks: ['First.', 'Second.'],
     })
 
@@ -56,12 +56,12 @@ describe('blog narration audio', () => {
     expect(String(fetchMock.mock.calls[0]?.[0])).toContain('/with-timestamps')
     expect(JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))).toEqual({
       text: 'First.',
-      model_id: 'model',
+      model_id: 'eleven_multilingual_v2',
       next_text: 'Second.',
     })
     expect(JSON.parse(String(fetchMock.mock.calls[1]?.[1]?.body))).toEqual({
       text: 'Second.',
-      model_id: 'model',
+      model_id: 'eleven_multilingual_v2',
       previous_text: 'First.',
     })
   })
