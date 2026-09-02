@@ -10,11 +10,12 @@ Add these values to `apps/web/.env.local` without committing them:
 
 ```bash
 ELEVENLABS_API_KEY=...
-ELEVENLABS_VOICE_ID=JBFqnCBsd6RMkjVDRZzb
-ELEVENLABS_VOICE_NAME=George
+ELEVENLABS_VOICE_ID=EkK5I93UQWFDigLMpZcX
+ELEVENLABS_VOICE_NAME="James - Husky, Engaging and Bold"
+ELEVENLABS_MODEL_ID=eleven_multilingual_v2
 ```
 
-The default is ElevenLabs' British narration voice George with
+The default is ElevenLabs' James narration voice with
 `eleven_multilingual_v2`, selected for stable long-form delivery. The voice and model can
 also be overridden per command.
 
