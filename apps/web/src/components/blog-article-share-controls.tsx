@@ -8,6 +8,13 @@ import { captureAnalyticsEvent } from '@/lib/analytics/client'
 import { blogShareLinks } from '@/lib/blog-share'
 import { SITE_CONFIG } from '@/lib/constants'
 
+export type ContentReference = { type: 'blog'; slug: string } | { type: 'case-study'; slug: string }
+
+type ContentShareControlsProps = {
+  content: ContentReference
+  shareText: string
+}
+
 type BlogArticleShareControlsProps = {
   postSlug: string
   shareText: string
@@ -33,10 +40,23 @@ async function copyText(value: string) {
   if (!copied) throw new Error('Copy failed.')
 }
 
-export function BlogArticleShareControls({ postSlug, shareText }: BlogArticleShareControlsProps) {
+function canonicalUrlFor(content: ContentReference) {
+  const path = content.type === 'blog' ? `/blog/${content.slug}` : `/work/${content.slug}`
+  return new URL(path, SITE_CONFIG.url).toString()
+}
+
+function captureShare(content: ContentReference, method: 'copy' | 'linkedin' | 'x') {
+  if (content.type === 'blog') {
+    captureAnalyticsEvent('blog_article_shared', { post_slug: content.slug, method })
+  } else {
+    captureAnalyticsEvent('case_study_shared', { study_slug: content.slug, method })
+  }
+}
+
+export function ContentShareControls({ content, shareText }: ContentShareControlsProps) {
   const copiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [copied, setCopied] = useState(false)
-  const canonicalUrl = new URL(`/blog/${postSlug}`, SITE_CONFIG.url).toString()
+  const canonicalUrl = canonicalUrlFor(content)
 
   useEffect(
     () => () => {
@@ -45,10 +65,10 @@ export function BlogArticleShareControls({ postSlug, shareText }: BlogArticleSha
     [],
   )
 
-  async function shareArticle() {
+  async function shareContent() {
     try {
       await copyText(canonicalUrl)
-      captureAnalyticsEvent('blog_article_shared', { post_slug: postSlug, method: 'copy' })
+      captureShare(content, 'copy')
       setCopied(true)
       if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current)
       copiedTimerRef.current = setTimeout(() => setCopied(false), 1_800)
@@ -60,7 +80,7 @@ export function BlogArticleShareControls({ postSlug, shareText }: BlogArticleSha
   function shareToSocialNetwork(method: 'x' | 'linkedin') {
     const links = blogShareLinks({ url: canonicalUrl, text: shareText })
     window.open(method === 'x' ? links.x : links.linkedIn, '_blank', 'noopener,noreferrer')
-    captureAnalyticsEvent('blog_article_shared', { post_slug: postSlug, method })
+    captureShare(content, method)
   }
 
   return (
@@ -68,7 +88,7 @@ export function BlogArticleShareControls({ postSlug, shareText }: BlogArticleSha
       <Button
         type="button"
         variant="ghost"
-        aria-label="X"
+        aria-label="Share on X"
         className="h-10 w-[18px] min-w-0 rounded-none p-0 has-[>svg]:!px-0 hover:bg-transparent hover:text-muted-foreground"
         onClick={() => shareToSocialNetwork('x')}
       >
@@ -77,7 +97,7 @@ export function BlogArticleShareControls({ postSlug, shareText }: BlogArticleSha
       <Button
         type="button"
         variant="ghost"
-        aria-label="LinkedIn"
+        aria-label="Share on LinkedIn"
         className="h-10 w-[18px] min-w-0 rounded-none p-0 has-[>svg]:!px-0 hover:bg-transparent hover:text-muted-foreground"
         onClick={() => shareToSocialNetwork('linkedin')}
       >
@@ -88,7 +108,7 @@ export function BlogArticleShareControls({ postSlug, shareText }: BlogArticleSha
           type="button"
           variant="ghost"
           className="h-10 gap-[0.3em] rounded-[4px] p-0 has-[>svg]:!px-0 text-base font-medium leading-none hover:bg-transparent hover:text-muted-foreground"
-          onClick={shareArticle}
+          onClick={shareContent}
         >
           <ArticleShareIcon className="size-6 h-[17px] -rotate-45 !translate-y-0" />
           Share
@@ -107,4 +127,8 @@ export function BlogArticleShareControls({ postSlug, shareText }: BlogArticleSha
       </div>
     </div>
   )
+}
+
+export function BlogArticleShareControls({ postSlug, shareText }: BlogArticleShareControlsProps) {
+  return <ContentShareControls content={{ type: 'blog', slug: postSlug }} shareText={shareText} />
 }

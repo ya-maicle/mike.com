@@ -33,6 +33,7 @@ const requestSchema = z.object({
     .max(200)
     .regex(/^(?:drafts\.)?[A-Za-z0-9._-]+$/),
   regenerate: z.boolean().optional().default(false),
+  documentType: z.enum(['blogPost', 'caseStudy']).optional().default('blogPost'),
 })
 
 function requiredEnvironment(name: string) {
@@ -49,7 +50,7 @@ function bearerToken(request: Request) {
 function narrationScript(post: SanityPost) {
   return buildBlogNarrationScript({
     title: post.title,
-    excerpt: post.excerpt,
+    excerpt: post.excerpt ?? post.summary,
     content: post.content,
     scriptOverride: post.narration?.scriptOverride,
   })
@@ -68,10 +69,11 @@ function withoutGenerationError(post: SanityPost) {
 async function bestEffortMarkError(
   connection: SanityConnection,
   documentId: string,
+  documentType: SanityPost['_type'],
   message: string,
 ) {
   try {
-    const current = await findSanityPostById(connection, documentId)
+    const current = await findSanityPostById(connection, documentId, documentType)
     if (!current) return
     await patchNarration(connection, current, {
       ...current.narration,
@@ -115,7 +117,7 @@ export async function POST(request: Request) {
     }
     if (!GENERATION_ROLES.has(user.role)) {
       return Response.json(
-        { error: 'Your Sanity role cannot generate article narration.' },
+        { error: 'Your Sanity role cannot generate narration.' },
         { status: 403 },
       )
     }
@@ -126,7 +128,11 @@ export async function POST(request: Request) {
 
   let post: SanityPost | undefined
   try {
-    const requestedPost = await findSanityPostById(connection, payload.documentId)
+    const requestedPost = await findSanityPostById(
+      connection,
+      payload.documentId,
+      payload.documentType,
+    )
     if (requestedPost && !payload.regenerate) {
       const requestedScript = narrationScript(requestedPost)
       if (
@@ -138,9 +144,9 @@ export async function POST(request: Request) {
       }
     }
 
-    post = await ensureDraftSanityPost(connection, payload.documentId)
+    post = await ensureDraftSanityPost(connection, payload.documentId, payload.documentType)
     const script = narrationScript(post)
-    if (!script) throw new Error('Add article text or a narration script before generating audio.')
+    if (!script) throw new Error('Add content or a narration script before generating audio.')
 
     const hash = sourceHash(script)
     if (
@@ -167,9 +173,9 @@ export async function POST(request: Request) {
       chunks: splitNarrationScript(script, blogNarrationChunkLimit(model)),
     })
 
-    const current = await findSanityPostById(connection, post._id)
+    const current = await findSanityPostById(connection, post._id, payload.documentType)
     if (!current || sourceHash(narrationScript(current)) !== hash) {
-      throw new Error('The article changed during generation. Review it and generate again.')
+      throw new Error('The content changed during generation. Review it and generate again.')
     }
 
     const assetId = await uploadNarrationAsset({
@@ -201,7 +207,7 @@ export async function POST(request: Request) {
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Narration generation failed.'
     console.error('Narration generation failed.', error)
-    if (post) await bestEffortMarkError(connection, post._id, message)
+    if (post) await bestEffortMarkError(connection, post._id, payload.documentType, message)
     return Response.json({ error: message }, { status: 500 })
   }
 }

@@ -36,6 +36,21 @@ export type AnalyticsEventMap = {
   case_study_engaged: CaseStudyEventProperties & {
     engagement_basis: 'scroll_and_time' | 'video_25'
   }
+  case_study_audio_started: {
+    study_slug: string
+  }
+  case_study_audio_progressed: {
+    study_slug: string
+    milestone: '25' | '50' | 'completed'
+  }
+  case_study_audio_speed_changed: {
+    study_slug: string
+    playback_rate: 0.5 | 1 | 1.5 | 2
+  }
+  case_study_shared: {
+    study_slug: string
+    method: 'copy' | 'linkedin' | 'x'
+  }
   portfolio_access_started: {
     auth_method: PortfolioAuthMethod
     entry_point: PortfolioAccessEntryPoint

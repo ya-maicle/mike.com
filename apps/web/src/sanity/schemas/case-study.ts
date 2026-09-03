@@ -1,5 +1,6 @@
 import { defineType, defineField } from 'sanity'
 import { blockStyles } from './objects/block-styles'
+import { narrationField } from './objects/narration-field'
 import { SEO_TITLE_MAX_LENGTH } from '../../lib/constants'
 
 export const caseStudy = defineType({
@@ -259,6 +260,7 @@ export const caseStudy = defineType({
       title: 'Published At',
       type: 'datetime',
     }),
+    narrationField,
     defineField({
       name: 'seoSettings',
       title: 'SEO & Social Sharing',

@@ -50,6 +50,17 @@ export const CASE_STUDY_WITH_BLOCKS = groq`
       video${MUX_VIDEO_PROJECTION}
     },
     projectInfo,
+    narration{
+      durationSeconds,
+      provider,
+      model,
+      voiceId,
+      voiceName,
+      generatedAt,
+      audioFile{
+        asset->{ _id, url, mimeType, size, originalFilename }
+      }
+    },
 
     panelContent[]${CASE_STUDY_BLOCKS_PROJECTION},
     content[]${CASE_STUDY_BLOCKS_PROJECTION}

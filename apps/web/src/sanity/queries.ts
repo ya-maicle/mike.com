@@ -135,6 +135,23 @@ export type CaseStudy = {
     year?: string
     link?: { text?: string; url?: string }
   }
+  narration?: {
+    durationSeconds?: number
+    provider?: string
+    model?: string
+    voiceId?: string
+    voiceName?: string
+    generatedAt?: string
+    audioFile?: {
+      asset?: {
+        _id: string
+        url: string
+        mimeType?: string
+        size?: number
+        originalFilename?: string
+      }
+    }
+  }
   content?: (
     | { _type: 'block'; [key: string]: any } // eslint-disable-line @typescript-eslint/no-explicit-any
     | ImageBlock

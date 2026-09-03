@@ -21,9 +21,10 @@ type NarrationRecord = {
 export type SanityPost = {
   _id: string
   _rev: string
-  _type: 'blogPost'
+  _type: 'blogPost' | 'caseStudy'
   title: string
   excerpt?: string
+  summary?: string
   slug: { current: string }
   content?: Array<{ _type?: string; children?: Array<{ text?: string }> }>
   narration?: NarrationRecord
@@ -64,16 +65,26 @@ async function queryPosts(
   ).result
 }
 
-export async function findSanityPost(connection: SanityConnection, slug: string) {
-  const posts = await queryPosts(connection, `*[_type == "blogPost" && slug.current == $slug]`, {
+export async function findSanityPost(
+  connection: SanityConnection,
+  slug: string,
+  documentType: SanityPost['_type'] = 'blogPost',
+) {
+  const posts = await queryPosts(connection, `*[_type == $documentType && slug.current == $slug]`, {
     slug,
+    documentType,
   })
   return posts.find(({ _id }) => _id.startsWith('drafts.')) ?? posts[0]
 }
 
-export async function findSanityPostById(connection: SanityConnection, documentId: string) {
-  const posts = await queryPosts(connection, `*[_type == "blogPost" && _id == $documentId]`, {
+export async function findSanityPostById(
+  connection: SanityConnection,
+  documentId: string,
+  documentType: SanityPost['_type'] = 'blogPost',
+) {
+  const posts = await queryPosts(connection, `*[_type == $documentType && _id == $documentId]`, {
     documentId,
+    documentType,
   })
   return posts[0]
 }
@@ -96,26 +107,27 @@ async function mutate(connection: SanityConnection, mutations: Array<Record<stri
 export async function ensureDraftSanityPost(
   connection: SanityConnection,
   requestedDocumentId: string,
+  documentType: SanityPost['_type'] = 'blogPost',
 ) {
   const publishedId = publishedIdFor(requestedDocumentId)
   const draftId = `drafts.${publishedId}`
   const posts = await queryPosts(
     connection,
-    `*[_type == "blogPost" && _id in [$draftId, $publishedId]]`,
-    { draftId, publishedId },
+    `*[_type == $documentType && _id in [$draftId, $publishedId]]`,
+    { draftId, publishedId, documentType },
   )
   const draft = posts.find(({ _id }) => _id === draftId)
   if (draft) return draft
 
   const published = posts.find(({ _id }) => _id === publishedId)
-  if (!published) throw new Error('The blog post could not be found in Sanity.')
+  if (!published) throw new Error('The content could not be found in Sanity.')
 
   const { _rev, _createdAt, _updatedAt, ...content } = published
   void _rev
   void _createdAt
   void _updatedAt
   const created = await mutate(connection, [
-    { createIfNotExists: { ...content, _id: draftId, _type: 'blogPost' } },
+    { createIfNotExists: { ...content, _id: draftId, _type: documentType } },
   ])
   const createdDraft = created.results?.[0]?.document
   if (!createdDraft) throw new Error('Sanity did not create the narration draft.')
@@ -137,7 +149,7 @@ export async function patchNarration(
     },
   ])
   const updated = result.results?.[0]?.document
-  if (!updated) throw new Error('Sanity did not return the updated blog post.')
+  if (!updated) throw new Error('Sanity did not return the updated content.')
   return updated
 }
 

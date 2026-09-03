@@ -2,7 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-import { BlogArticleShareControls } from '@/components/blog-article-share-controls'
+import {
+  ContentShareControls,
+  type ContentReference,
+} from '@/components/blog-article-share-controls'
 import { Button } from '@/components/ui/button'
 import {
   AudioForward15Icon,
@@ -18,6 +21,14 @@ const PLAYBACK_RATES = [0.5, 1, 1.5, 2] as const
 type PlaybackRate = (typeof PLAYBACK_RATES)[number]
 type PlayerStatus = 'idle' | 'loading' | 'ready' | 'error'
 
+type ContentActionsProps = {
+  content: ContentReference
+  shareText: string
+  listenLabel: string
+  audioUrl?: string
+  durationSeconds?: number
+}
+
 type BlogArticleActionsProps = {
   postSlug: string
   shareText: string
@@ -32,12 +43,43 @@ function formatTime(value: number) {
   return `${minutes}:${String(seconds).padStart(2, '0')}`
 }
 
-export function BlogArticleActions({
-  postSlug,
+function captureAudioStarted(content: ContentReference) {
+  if (content.type === 'blog') {
+    captureAnalyticsEvent('blog_audio_started', { post_slug: content.slug })
+  } else {
+    captureAnalyticsEvent('case_study_audio_started', { study_slug: content.slug })
+  }
+}
+
+function captureAudioProgress(content: ContentReference, milestone: '25' | '50' | 'completed') {
+  if (content.type === 'blog') {
+    captureAnalyticsEvent('blog_audio_progressed', { post_slug: content.slug, milestone })
+  } else {
+    captureAnalyticsEvent('case_study_audio_progressed', { study_slug: content.slug, milestone })
+  }
+}
+
+function captureAudioSpeed(content: ContentReference, playbackRate: PlaybackRate) {
+  if (content.type === 'blog') {
+    captureAnalyticsEvent('blog_audio_speed_changed', {
+      post_slug: content.slug,
+      playback_rate: playbackRate,
+    })
+  } else {
+    captureAnalyticsEvent('case_study_audio_speed_changed', {
+      study_slug: content.slug,
+      playback_rate: playbackRate,
+    })
+  }
+}
+
+export function ContentActions({
+  content,
   shareText,
+  listenLabel,
   audioUrl,
   durationSeconds,
-}: BlogArticleActionsProps) {
+}: ContentActionsProps) {
   const hasNarration = Boolean(audioUrl && durationSeconds && durationSeconds > 0)
   const audioRef = useRef<HTMLAudioElement>(null)
   const startedRef = useRef(false)
@@ -59,7 +101,7 @@ export function BlogArticleActions({
   function captureProgress(milestone: '25' | '50' | 'completed') {
     if (milestonesRef.current.has(milestone)) return
     milestonesRef.current.add(milestone)
-    captureAnalyticsEvent('blog_audio_progressed', { post_slug: postSlug, milestone })
+    captureAudioProgress(content, milestone)
   }
 
   async function togglePlayback() {
@@ -100,10 +142,7 @@ export function BlogArticleActions({
     const audio = audioRef.current
     if (audio) audio.playbackRate = nextRate
     setPlaybackRate(nextRate)
-    captureAnalyticsEvent('blog_audio_speed_changed', {
-      post_slug: postSlug,
-      playback_rate: nextRate,
-    })
+    captureAudioSpeed(content, nextRate)
   }
 
   return (
@@ -121,7 +160,7 @@ export function BlogArticleActions({
             setPlaying(true)
             if (!startedRef.current) {
               startedRef.current = true
-              captureAnalyticsEvent('blog_audio_started', { post_slug: postSlug })
+              captureAudioStarted(content)
             }
           }}
           onPause={() => setPlaying(false)}
@@ -147,12 +186,12 @@ export function BlogArticleActions({
           variant="ghost"
           className="group h-10 gap-3 p-0 hover:bg-transparent"
           onClick={togglePlayback}
-          aria-label="Listen to article"
+          aria-label={listenLabel}
         >
           <span className="flex size-8 items-center justify-center rounded-full bg-muted transition-colors group-hover:bg-accent">
             <AudioPlayIcon className="!h-auto !w-[11px] !translate-y-0" />
           </span>
-          <span>Listen to article</span>
+          <span>{listenLabel}</span>
           <span aria-hidden className="h-4 border-l border-black/[0.04] dark:border-white/10" />
           <span className="tabular-nums text-muted-foreground">{formatTime(duration)}</span>
         </Button>
@@ -237,7 +276,24 @@ export function BlogArticleActions({
         </div>
       ) : null}
 
-      <BlogArticleShareControls postSlug={postSlug} shareText={shareText} />
+      <ContentShareControls content={content} shareText={shareText} />
     </div>
+  )
+}
+
+export function BlogArticleActions({
+  postSlug,
+  shareText,
+  audioUrl,
+  durationSeconds,
+}: BlogArticleActionsProps) {
+  return (
+    <ContentActions
+      content={{ type: 'blog', slug: postSlug }}
+      shareText={shareText}
+      listenLabel="Listen to article"
+      audioUrl={audioUrl}
+      durationSeconds={durationSeconds}
+    />
   )
 }
