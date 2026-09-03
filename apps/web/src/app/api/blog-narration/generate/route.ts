@@ -6,9 +6,7 @@ import { buildBlogNarrationScript, splitNarrationScript } from '@/lib/blog-narra
 import { generateNarrationAudio } from '@/lib/blog-narration-audio'
 import {
   blogNarrationChunkLimit,
-  DEFAULT_BLOG_NARRATION_MODEL,
-  DEFAULT_BLOG_NARRATION_VOICE_ID,
-  DEFAULT_BLOG_NARRATION_VOICE_NAME,
+  resolveBlogNarrationConfiguration,
 } from '@/lib/blog-narration-config'
 import {
   ensureDraftSanityPost,
@@ -35,12 +33,6 @@ const requestSchema = z.object({
   regenerate: z.boolean().optional().default(false),
   documentType: z.enum(['blogPost', 'caseStudy']).optional().default('blogPost'),
 })
-
-function requiredEnvironment(name: string) {
-  const value = process.env[name]?.trim()
-  if (!value) throw new Error(`The server is missing ${name}.`)
-  return value
-}
 
 function bearerToken(request: Request) {
   const authorization = request.headers.get('authorization')
@@ -102,12 +94,22 @@ export async function POST(request: Request) {
   }
 
   let connection: SanityConnection
+  let elevenLabs: ReturnType<typeof resolveBlogNarrationConfiguration>['elevenLabs']
   try {
-    connection = {
-      projectId: requiredEnvironment('NEXT_PUBLIC_SANITY_PROJECT_ID'),
-      dataset: requiredEnvironment('NEXT_PUBLIC_SANITY_DATASET'),
-      token: requiredEnvironment('SANITY_API_WRITE_TOKEN'),
-    }
+    const configuration = resolveBlogNarrationConfiguration()
+    connection = configuration.sanity
+    elevenLabs = configuration.elevenLabs
+  } catch (error) {
+    console.error('Narration route configuration failed.', error)
+    return Response.json(
+      {
+        error: error instanceof Error ? error.message : 'Narration generation is not configured.',
+      },
+      { status: 503 },
+    )
+  }
+
+  try {
     const user = await verifySanityStudioUser({ ...connection, token: studioToken })
     if (!user) {
       return Response.json(
@@ -122,8 +124,11 @@ export async function POST(request: Request) {
       )
     }
   } catch (error) {
-    console.error('Narration route configuration failed.', error)
-    return Response.json({ error: 'Narration generation is not configured.' }, { status: 503 })
+    console.error('Sanity Studio user verification failed.', error)
+    return Response.json(
+      { error: 'Sanity Studio could not be reached to verify your session. Try again.' },
+      { status: 502 },
+    )
   }
 
   let post: SanityPost | undefined
@@ -162,15 +167,12 @@ export async function POST(request: Request) {
       generationStatus: 'generating',
     })
 
-    const voiceId = process.env.ELEVENLABS_VOICE_ID?.trim() || DEFAULT_BLOG_NARRATION_VOICE_ID
-    const voiceName = process.env.ELEVENLABS_VOICE_NAME?.trim() || DEFAULT_BLOG_NARRATION_VOICE_NAME
-    const model = process.env.ELEVENLABS_MODEL_ID?.trim() || DEFAULT_BLOG_NARRATION_MODEL
     const generated = await generateNarrationAudio({
       apiRoot: ELEVENLABS_API_ROOT,
-      apiKey: requiredEnvironment('ELEVENLABS_API_KEY'),
-      voiceId,
-      model,
-      chunks: splitNarrationScript(script, blogNarrationChunkLimit(model)),
+      apiKey: elevenLabs.apiKey,
+      voiceId: elevenLabs.voiceId,
+      model: elevenLabs.model,
+      chunks: splitNarrationScript(script, blogNarrationChunkLimit(elevenLabs.model)),
     })
 
     const current = await findSanityPostById(connection, post._id, payload.documentType)
@@ -191,9 +193,9 @@ export async function POST(request: Request) {
       },
       durationSeconds: generated.durationSeconds,
       provider: 'elevenlabs',
-      model,
-      voiceId,
-      voiceName,
+      model: elevenLabs.model,
+      voiceId: elevenLabs.voiceId,
+      voiceName: elevenLabs.voiceName,
       sourceHash: hash,
       generatedAt: new Date().toISOString(),
       generationStatus: 'ready',

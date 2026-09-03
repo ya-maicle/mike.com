@@ -1,8 +1,9 @@
-# Blog narration workflow
+# Blog and case-study narration workflow
 
-Blog audio is generated ahead of publication with ElevenLabs, stored as a Sanity file
-asset, and loaded by the article player only after a reader presses Play. Generation is
-manual, while synthesis, upload, metadata, and draft attachment are automated.
+Blog and case-study audio is generated ahead of publication with ElevenLabs, stored as a
+Sanity file asset, and loaded by the page player only after a reader presses Play.
+Generation is manual, while synthesis, upload, metadata, and draft attachment are
+automated.
 
 ## One-time local configuration
 
@@ -22,12 +23,13 @@ also be overridden per command.
 The key should be restricted to Text to Speech and read-only Voices, with a usage cap and
 automatic leak protection enabled. `ELEVENLABS_API_KEY` and `SANITY_API_WRITE_TOKEN`
 must be server-only variables in each Vercel environment where the Studio action should
-work. They are never added to the Studio bundle.
+work. They are never added to the Studio bundle. Adding or changing them requires a new
+deployment for that environment.
 
 ## Generate from Sanity Studio
 
-1. Finish the title, excerpt, and article body. Optionally add a narration script override
-   in **Article narration**.
+1. Finish the title, summary or excerpt, and body. Optionally add a narration script
+   override in **AI narration**.
 2. Open the document actions menu beside **Publish** and choose **Generate narration**.
 3. Wait for the confirmation that the MP3 is attached to the draft.
 4. Review the audio and publish normally when ready.

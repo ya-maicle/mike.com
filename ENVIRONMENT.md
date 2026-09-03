@@ -21,6 +21,11 @@ Production). Never commit secrets. Only `NEXT_PUBLIC_*` vars are exposed to the 
 | `NEXT_PUBLIC_POSTHOG_ENABLED`   | client                 | `src/lib/analytics/client.ts`        | Set `true` only on nominated Preview and Production deployments                 |
 | `NEXT_PUBLIC_POSTHOG_ENV`       | client                 | `src/lib/analytics/client.ts`        | Event dimension: `preview` or `production`                                      |
 | `SANITY_API_READ_TOKEN`         | server                 | `src/sanity/client.ts`, CI build     | Read token; required everywhere once the dataset is private                     |
+| `SANITY_API_WRITE_TOKEN`        | server                 | narration generation API, scripts    | Writes narration metadata and uploads audio; required in every enabled scope    |
+| `ELEVENLABS_API_KEY`            | server                 | narration generation API             | Text-to-Speech credential; required in every enabled scope                      |
+| `ELEVENLABS_VOICE_ID`           | server                 | narration generation API             | Optional voice override; defaults to the configured James voice                 |
+| `ELEVENLABS_VOICE_NAME`         | server                 | narration generation API             | Optional display name stored with generated audio                               |
+| `ELEVENLABS_MODEL_ID`           | server                 | narration generation API             | Optional model override; defaults to `eleven_multilingual_v2`                   |
 | `SUPABASE_SERVICE_ROLE_KEY`     | server                 | `src/lib/portfolio-access-events.ts` | Service role for access-event logging; never expose                             |
 | `PORTFOLIO_ACCESS_SECRET`       | server                 | `src/lib/portfolio-access.ts`        | HMAC secret for access cookies. Missing secret fails closed (all access denied) |
 | `MUX_SIGNING_KEY_ID`            | server                 | `src/lib/mux-signing.ts`             | Mux signing-key id for signed playback of gated videos                          |
@@ -33,13 +38,13 @@ the EU ingestion host, disables autocapture/session replay/flags, and honours Do
 
 ## Studio / CLI / scripts (repo root)
 
-| Variable                                                        | Used by                                           | Purpose                                                               |
-| --------------------------------------------------------------- | ------------------------------------------------- | --------------------------------------------------------------------- |
-| `SANITY_STUDIO_PROJECT_ID` / `SANITY_STUDIO_DATASET`            | `sanity.config.ts`                                | Studio CLI overrides (fall back to `NEXT_PUBLIC_SANITY_*`)            |
-| `SANITY_STUDIO_MUX_TOKEN_ID` / `SANITY_STUDIO_MUX_TOKEN_SECRET` | sanity-plugin-mux-input, `scripts/mux-*.ts`       | Mux API credentials for uploads and admin scripts                     |
-| `SANITY_API_WRITE_TOKEN`                                        | `scripts/mux-rotate-gated-to-signed.ts --execute` | Patches `mux.videoAsset` docs after playback-id rotation              |
-| `SUPABASE_STAGING_PROJECT_REF` / `SUPABASE_PROD_PROJECT_REF`    | `db:link:*` scripts                               | Supabase project refs for linking                                     |
-| `MUX_TOKEN_ID` / `MUX_TOKEN_SECRET`                             | `scripts/mux-*.ts`                                | Mux API credentials (scripts fall back to the `SANITY_STUDIO_*` pair) |
+| Variable                                                        | Used by                                     | Purpose                                                               |
+| --------------------------------------------------------------- | ------------------------------------------- | --------------------------------------------------------------------- |
+| `SANITY_STUDIO_PROJECT_ID` / `SANITY_STUDIO_DATASET`            | `sanity.config.ts`                          | Studio CLI overrides (fall back to `NEXT_PUBLIC_SANITY_*`)            |
+| `SANITY_STUDIO_MUX_TOKEN_ID` / `SANITY_STUDIO_MUX_TOKEN_SECRET` | sanity-plugin-mux-input, `scripts/mux-*.ts` | Mux API credentials for uploads and admin scripts                     |
+| `SANITY_API_WRITE_TOKEN`                                        | narration and Mux scripts                   | Writes narration and patches `mux.videoAsset` docs                    |
+| `SUPABASE_STAGING_PROJECT_REF` / `SUPABASE_PROD_PROJECT_REF`    | `db:link:*` scripts                         | Supabase project refs for linking                                     |
+| `MUX_TOKEN_ID` / `MUX_TOKEN_SECRET`                             | `scripts/mux-*.ts`                          | Mux API credentials (scripts fall back to the `SANITY_STUDIO_*` pair) |
 
 ## CI (GitHub Actions secrets)
 
@@ -47,6 +52,11 @@ the EU ingestion host, disables autocapture/session replay/flags, and honours Do
 | --------------------------------- | ----------- | ------------------------------------------- |
 | `VERCEL_AUTOMATION_BYPASS_SECRET` | smoke tests | Bypass Vercel deployment protection         |
 | `SANITY_API_READ_TOKEN`           | build step  | Required once the Sanity dataset is private |
+
+Environment variables added in Vercel apply only to new deployments. After changing
+narration variables, redeploy the affected Preview or Production deployment before using
+the Studio action. `SANITY_API_WRITE_TOKEN` and `ELEVENLABS_API_KEY` must be present in the
+same Vercel scope as the embedded Studio.
 
 ## Runbook: enabling signed Mux playback for gated case studies
 
