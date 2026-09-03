@@ -1,7 +1,8 @@
 export const SITE_CONFIG = {
   name: 'Mike Iukhtenko',
   legalName: 'Mikhail Iukhtenko',
-  alternateNames: ['Mike Yukhtenko', 'Mikhail Iukhtenko'],
+  personAlternateNames: ['Mike Yukhtenko', 'Mikhail Iukhtenko'],
+  websiteAlternateNames: ['mikeiu.com'],
   role: 'Product Design Leader',
   description:
     'Product Design Leader specialising in agentic AI experiences, new interfaces, and complex problem spaces.',

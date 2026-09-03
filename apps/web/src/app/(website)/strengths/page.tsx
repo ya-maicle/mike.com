@@ -1,25 +1,35 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
+import { cache } from 'react'
 
 import { sanityFetch } from '@/sanity/client'
 import { PUBLISHED_PROGRAMS, programsTag } from '@/sanity/queries/program-queries'
 import type { Program } from '@/sanity/queries/program-queries'
 import { programPath } from '@/lib/program-display'
 import { createPageMetadata } from '@/lib/seo'
+import { shouldIndexStrengthsArchive, strengthsArchiveDescription } from '@/lib/search-indexing'
 
 export const dynamic = 'force-static'
 export const revalidate = 300
 
-export const metadata: Metadata = createPageMetadata({
-  title: 'What I Bring',
-  description:
-    'Five product design leadership strengths, each grounded in a clear purpose and real examples.',
-  path: '/strengths',
-})
+const getPublishedPrograms = cache(() =>
+  sanityFetch<Program[]>(PUBLISHED_PROGRAMS, {}, { tag: programsTag }),
+)
+
+export async function generateMetadata(): Promise<Metadata> {
+  const programs = await getPublishedPrograms()
+
+  return createPageMetadata({
+    title: 'What I Bring',
+    description: strengthsArchiveDescription(programs.length),
+    path: '/strengths',
+    noIndex: !shouldIndexStrengthsArchive(programs.length),
+  })
+}
 
 export default async function StrengthsPage() {
-  const programs = await sanityFetch<Program[]>(PUBLISHED_PROGRAMS, {}, { tag: programsTag })
+  const programs = await getPublishedPrograms()
 
   return (
     <div className="flex flex-col pb-16 md:pb-24">
@@ -30,7 +40,7 @@ export default async function StrengthsPage() {
           </div>
           <h1>What I bring</h1>
           <p className="text-xl text-foreground leading-relaxed max-w-prose mt-2">
-            Five things I do well. Each one with a clear purpose and real examples behind it.
+            {strengthsArchiveDescription(programs.length)}
           </p>
         </header>
 

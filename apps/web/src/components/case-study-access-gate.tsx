@@ -47,7 +47,7 @@ export function CaseStudyAccessGate({
         coverMedia={coverMedia}
         className="pb-0"
       >
-        <section className={`${gridCols.narrow} py-16 md:py-24`}>
+        <section data-nosnippet className={`${gridCols.narrow} py-16 md:py-24`}>
           <div className="mx-auto flex max-w-[592px] flex-col items-center gap-6 text-center">
             <div className="flex size-12 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
               <Icon icon={Icons.Lock} size="md" />

@@ -13,6 +13,7 @@ import {
 import { SITE_CONFIG } from '@/lib/constants'
 import { createPageMetadata, firstMetadataText } from '@/lib/seo'
 import { socialImageFromSanity } from '@/lib/sanity-social-image'
+import { gridCols } from '@/lib/grid-columns'
 
 type CoverMedia =
   | { type: 'image'; image: SanityImage }
@@ -41,6 +42,9 @@ type PageProps = {
 // Reserved slugs that have their own routes
 const RESERVED_SLUGS = ['work', 'login', 'privacy', 'terms', 'stories', 'strengths', 'blog']
 const NO_INDEX_SLUGS = new Set(['cookie-policy'])
+const BIO_HEADING = `About ${SITE_CONFIG.name}`
+const BIO_SEO_TITLE = `${BIO_HEADING} | ${SITE_CONFIG.role}`
+const BIO_DESCRIPTION = `${SITE_CONFIG.name}, also known as ${SITE_CONFIG.legalName}, is a London-based product design leader working across AI, enterprise platforms and complex systems at scale.`
 
 export async function generateStaticParams() {
   const pages = await sanityFetch<{ slug: string }[]>(
@@ -77,19 +81,24 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 
   if (!page) return { title: 'Page not found', robots: { index: false, follow: false } }
 
-  const title = firstMetadataText(page.seoSettings?.metaTitle, page.title) ?? SITE_CONFIG.name
-  const description =
-    firstMetadataText(
-      page.seoSettings?.metaDescription,
-      page.subtitle,
-      `${page.title} — ${SITE_CONFIG.name}, ${SITE_CONFIG.role}.`,
-    ) ?? SITE_CONFIG.description
+  const isBio = slug === 'bio'
+  const title = isBio
+    ? BIO_SEO_TITLE
+    : (firstMetadataText(page.seoSettings?.metaTitle, page.title) ?? SITE_CONFIG.name)
+  const description = isBio
+    ? BIO_DESCRIPTION
+    : (firstMetadataText(
+        page.seoSettings?.metaDescription,
+        page.subtitle,
+        `${page.title} — ${SITE_CONFIG.name}, ${SITE_CONFIG.role}.`,
+      ) ?? SITE_CONFIG.description)
   const shareImage =
     page.seoSettings?.shareImage ||
     (page.coverMedia?.type === 'image' ? page.coverMedia.image : undefined)
 
   return createPageMetadata({
     title,
+    absoluteTitle: isBio,
     description,
     path: `/${slug}`,
     type: 'article',
@@ -171,21 +180,30 @@ export default async function DynamicPage(props: PageProps) {
     : undefined
   const isBio = slug === 'bio'
   const pageContent = (
-    <LegalPageContent
-      content={page.content}
-      className={isBio ? `${ebGaramond.className} [--text-xl:20px]` : undefined}
-    />
+    <>
+      {isBio && page.subtitle ? (
+        <p
+          className={`${gridCols.narrow} ${ebGaramond.className} mb-6 text-xl leading-7 text-foreground`}
+        >
+          {page.subtitle}
+        </p>
+      ) : null}
+      <LegalPageContent
+        content={page.content}
+        className={isBio ? `${ebGaramond.className} [--text-xl:20px]` : undefined}
+      />
+    </>
   )
 
   return (
     <PageTemplate
-      title={page.title}
+      title={isBio ? BIO_HEADING : page.title}
       titleClassName={
         isBio
           ? `${ebGaramond.className} text-[clamp(36px,9vw,72px)] leading-none tracking-[-1px]`
           : undefined
       }
-      subtitle={page.subtitle}
+      subtitle={isBio ? BIO_DESCRIPTION : page.subtitle}
       subtitleClassName={isBio ? `${ebGaramond.className} [--text-xl:20px]` : undefined}
       coverMedia={page.coverMedia}
       metadata={formattedDate}

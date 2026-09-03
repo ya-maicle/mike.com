@@ -38,7 +38,7 @@ export function CookiePreferencesDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto">
+      <DialogContent data-nosnippet className="max-h-[calc(100dvh-2rem)] overflow-y-auto">
         <DialogHeader className="pr-6 text-left">
           <DialogTitle>Cookie preferences</DialogTitle>
           <DialogDescription className="pt-2 leading-6 text-foreground">
