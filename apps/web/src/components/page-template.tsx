@@ -23,6 +23,8 @@ interface PageTemplateProps {
   subtitle?: string
   /** Optional typography class for the subtitle */
   subtitleClassName?: string
+  /** Optional visible authorship shown below the lead text */
+  byline?: ReactNode
   /** Optional cover media (image or video) */
   coverMedia?: CoverMedia
   /** Apply the portfolio media frame (rounded corners and an inset border). */
@@ -47,6 +49,7 @@ export function PageTemplate({
   metadata,
   subtitle,
   subtitleClassName,
+  byline,
   coverMedia,
   frameCoverMedia = false,
   cover,
@@ -94,6 +97,8 @@ export function PageTemplate({
               {subtitle}
             </p>
           )}
+
+          {byline ? <div className="pt-2 md:pt-3">{byline}</div> : null}
         </header>
 
         {headerActions ? (

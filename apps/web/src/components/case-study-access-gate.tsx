@@ -9,6 +9,8 @@ import { useLoginModal } from '@/components/providers/login-modal-provider'
 import { resolveStudyCoverMedia } from '@/lib/cover-media'
 import type { CaseStudy } from '@/sanity/queries'
 import { CaseStudyAnalytics } from '@/components/case-study-analytics'
+import { CaseStudyByline } from '@/components/case-study-byline'
+import { ContentActions } from '@/components/blog-article-actions'
 import type { StudyAccessSource } from '@/lib/analytics/events'
 
 type CaseStudyAccessGateProps = {
@@ -44,8 +46,16 @@ export function CaseStudyAccessGate({
           ].filter(Boolean) as string[]
         }
         subtitle={study.summary}
+        byline={<CaseStudyByline />}
         coverMedia={coverMedia}
         className="pb-0"
+        headerActions={
+          <ContentActions
+            content={{ type: 'case-study', slug: study.slug.current }}
+            shareText={study.summary ?? study.title}
+            listenLabel="Listen to case study"
+          />
+        }
       >
         <section data-nosnippet className={`${gridCols.narrow} py-16 md:py-24`}>
           <div className="mx-auto flex max-w-[592px] flex-col items-center gap-6 text-center">

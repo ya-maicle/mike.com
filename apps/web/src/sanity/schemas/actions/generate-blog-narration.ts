@@ -20,7 +20,7 @@ export const GenerateBlogNarrationAction: DocumentActionComponent = (props) => {
   const [working, setWorking] = useState(false)
   const [confirmRegeneration, setConfirmRegeneration] = useState(false)
 
-  if (type !== 'blogPost') return null
+  if (type !== 'blogPost' && type !== 'caseStudy') return null
 
   const document = (draft ?? published) as BlogDocument | null
   const hasAudio = Boolean(document?.narration?.audioFile?.asset?._ref)
@@ -45,6 +45,7 @@ export const GenerateBlogNarrationAction: DocumentActionComponent = (props) => {
         },
         body: JSON.stringify({
           documentId: document?._id ?? props.id,
+          documentType: type,
           regenerate: hasAudio,
         }),
       })
@@ -68,7 +69,7 @@ export const GenerateBlogNarrationAction: DocumentActionComponent = (props) => {
     label,
     icon: () => '🎙️',
     disabled: working || !document,
-    title: 'Generate an ElevenLabs MP3 and attach it to this draft',
+    title: 'Generate an ElevenLabs MP3 and attach it to this content draft',
     onHandle: () => {
       if (hasAudio) setConfirmRegeneration(true)
       else void generate()

@@ -91,7 +91,7 @@ export default defineConfig({
 
   document: {
     actions: (prev, context) => {
-      if (context.schemaType === 'blogPost') {
+      if (context.schemaType === 'blogPost' || context.schemaType === 'caseStudy') {
         return [...prev, GenerateBlogNarrationAction]
       }
       const eligible = new Set(['caseStudyBlock', 'imageBlock', 'videoBlock', 'carouselBlock'])

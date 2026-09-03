@@ -15,6 +15,8 @@ import { resolveStudyCoverMedia } from '@/lib/cover-media'
 import { cn } from '@/lib/utils'
 import { createPortal } from 'react-dom'
 import { CaseStudyAnalytics } from '@/components/case-study-analytics'
+import { CaseStudyByline } from '@/components/case-study-byline'
+import { ContentActions } from '@/components/blog-article-actions'
 import type { StudyAccessSource } from '@/lib/analytics/events'
 
 interface CaseStudyLayoutProps {
@@ -33,6 +35,13 @@ export function CaseStudyLayout({
   companySlug,
 }: CaseStudyLayoutProps) {
   const [isPanelOpen, setIsPanelOpen] = React.useState(false)
+  const narrationAsset = data.narration?.audioFile?.asset
+  const narrationDuration = data.narration?.durationSeconds
+  const hasNarration =
+    narrationAsset?.url &&
+    narrationAsset.mimeType === 'audio/mpeg' &&
+    typeof narrationDuration === 'number' &&
+    narrationDuration > 0
 
   const togglePanel = () => setIsPanelOpen((current) => !current)
 
@@ -101,8 +110,18 @@ export function CaseStudyLayout({
               ].filter(Boolean) as string[]
             }
             subtitle={data.summary}
+            byline={<CaseStudyByline />}
             className="pb-0"
             coverMedia={resolveStudyCoverMedia(data.headerMedia, data.cover, data.coverImage)}
+            headerActions={
+              <ContentActions
+                content={{ type: 'case-study', slug: data.slug.current }}
+                shareText={data.summary ?? data.title}
+                listenLabel="Listen to case study"
+                audioUrl={hasNarration ? narrationAsset.url : undefined}
+                durationSeconds={hasNarration ? narrationDuration : undefined}
+              />
+            }
           >
             {data.content && <PortableText value={data.content} components={gridComponents} />}
             {otherStudies && (
