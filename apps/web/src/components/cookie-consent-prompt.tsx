@@ -19,6 +19,7 @@ export function CookieConsentPrompt({
 }: CookieConsentPromptProps) {
   return (
     <Card
+      data-nosnippet
       role="region"
       aria-label="Cookie consent"
       className="fixed inset-x-4 bottom-4 z-40 gap-4 py-4 shadow-none sm:right-6 sm:bottom-6 sm:left-auto sm:w-full sm:max-w-sm"

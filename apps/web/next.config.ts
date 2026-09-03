@@ -1,7 +1,16 @@
 import type { NextConfig } from 'next'
 
+export const permanentRedirects = [
+  {
+    source: '/biography',
+    destination: '/bio',
+    permanent: true,
+  },
+]
+
 const nextConfig: NextConfig = {
   ...(process.env.NEXT_DIST_DIR ? { distDir: process.env.NEXT_DIST_DIR } : {}),
+  redirects: async () => permanentRedirects,
   images: {
     // srcset candidate widths for ALL next/image usage, including the custom
     // Sanity loader: exact canvas size (1376) and retina (2752) + standards.

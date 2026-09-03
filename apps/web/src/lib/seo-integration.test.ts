@@ -1,10 +1,19 @@
 import { describe, expect, it } from 'vitest'
 
+import { permanentRedirects } from '../../next.config'
 import robots from '@/app/robots'
 import { getBlogPostStructuredData, getSiteStructuredData } from '@/components/site-structured-data'
 import { SITE_CONFIG } from '@/lib/constants'
 
 describe('SEO surface contracts', () => {
+  it('permanently redirects the legacy biography URL to the bio page', () => {
+    expect(permanentRedirects).toContainEqual({
+      source: '/biography',
+      destination: '/bio',
+      permanent: true,
+    })
+  })
+
   it('allows noindex pages to be crawled while excluding API routes', () => {
     const config = robots()
     const rules = Array.isArray(config.rules) ? config.rules : [config.rules]
@@ -28,11 +37,14 @@ describe('SEO surface contracts', () => {
         {
           '@type': 'Person',
           '@id': `${SITE_CONFIG.url}/#person`,
+          alternateName: SITE_CONFIG.personAlternateNames,
           image: [profileImage],
         },
         {
           '@type': 'WebSite',
           '@id': `${SITE_CONFIG.url}/#website`,
+          name: SITE_CONFIG.name,
+          alternateName: SITE_CONFIG.websiteAlternateNames,
           publisher: { '@id': `${SITE_CONFIG.url}/#person` },
         },
         {

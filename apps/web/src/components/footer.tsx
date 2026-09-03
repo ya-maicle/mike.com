@@ -1,6 +1,5 @@
 'use client'
 
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { SITE_CONFIG } from '@/lib/constants'
@@ -10,17 +9,13 @@ import { useCookiePreferences } from '@/components/providers/cookie-preferences-
 import { Button } from '@/components/ui/button'
 
 export function Footer() {
-  const [year, setYear] = useState<number>(2025)
+  const year = new Date().getFullYear()
   const pathname = usePathname()
   const flush = isStrengthDetailPath(pathname)
   const { openPreferences } = useCookiePreferences()
 
-  useEffect(() => {
-    setYear(new Date().getFullYear())
-  }, [])
-
   return (
-    <footer className="mt-auto px-6 md:px-8">
+    <footer data-nosnippet className="mt-auto px-6 md:px-8">
       <div className="max-w-[var(--content-max-width)] mx-auto">
         <div className={cn('py-8', !flush && 'border-t border-border')}>
           <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4 text-base text-foreground">

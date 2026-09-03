@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 
 import { SITE_CONFIG } from '@/lib/constants'
+import { shouldIndexBlogArchive, shouldIndexStrengthsArchive } from '@/lib/search-indexing'
 import { sanityFetch } from '@/sanity/client'
 
 type SitemapDocument = {
@@ -35,6 +36,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { tag: 'sitemap', revalidate: 300 },
   )
 
+  const blogPostCount = documents.filter((document) => document._type === 'blogPost').length
+  const strengthCount = documents.filter((document) => document._type === 'program').length
+
   const staticRoutes: MetadataRoute.Sitemap = [
     {
       url: SITE_CONFIG.url,
@@ -46,16 +50,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly',
       priority: 0.9,
     },
-    {
-      url: `${SITE_CONFIG.url}/blog`,
-      changeFrequency: 'weekly',
-      priority: 0.85,
-    },
-    {
-      url: `${SITE_CONFIG.url}/strengths`,
-      changeFrequency: 'monthly',
-      priority: 0.8,
-    },
+    ...(shouldIndexBlogArchive(blogPostCount)
+      ? [
+          {
+            url: `${SITE_CONFIG.url}/blog`,
+            changeFrequency: 'weekly' as const,
+            priority: 0.85,
+          },
+        ]
+      : []),
+    ...(shouldIndexStrengthsArchive(strengthCount)
+      ? [
+          {
+            url: `${SITE_CONFIG.url}/strengths`,
+            changeFrequency: 'monthly' as const,
+            priority: 0.8,
+          },
+        ]
+      : []),
   ]
 
   const contentRoutes: MetadataRoute.Sitemap = documents.flatMap((document) => {
