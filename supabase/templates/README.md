@@ -17,6 +17,14 @@ Run `pnpm email:templates:check` to confirm the committed output is current. Add
 future auth messages to the `templates` array so they reuse the same brand,
 spacing, typography, button, security notice, and footer.
 
+The shared layout uses a white canvas, the website's standalone logo mark,
+generous spacing, a centered pill button, and one footer divider. The email-safe
+PNG at `apps/web/public/email/logo-mark.png` is a 3× export of the exact path in
+`apps/web/src/components/ui/logotype.tsx`, displayed at 72 × 41 pixels on desktop
+and 48 pixels wide on mobile, preserving its proportions. It uses a
+white background so the black mark remains legible when a mail client changes
+the message background. Keep the accessible alt text when updating the image.
+
 ## Hosted Supabase
 
 For every hosted project, copy the subject and generated HTML into both
@@ -35,6 +43,11 @@ The hosted dashboard does not read this repository automatically, so repeat the
 copy after every committed template change. Supabase Auth caches hosted template
 bodies for up to 10 minutes; wait for that cache window before judging a live
 test send.
+
+Before publishing this design to either hosted project, deploy the logo asset
+to `https://mikeiu.com/email/logo-mark.png` and verify that it loads. Both email
+templates use this public production asset, including staging emails. The logo
+is decorative branding; sign-in and the text fallback do not depend on images.
 
 For the initial rollout, deploy the application with the fragment-aware
 `/auth/confirm` page first, configure its exact redirect URL, and only then
