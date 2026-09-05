@@ -385,3 +385,19 @@ export const MultiStep: Story = {
     )
   },
 }
+
+export const Media: Story = {
+  render: () => (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button>Open media lightbox</Button>
+      </DialogTrigger>
+      <DialogContent variant="media" aria-describedby={undefined}>
+        <DialogTitle className="sr-only">Media lightbox</DialogTitle>
+        <div className="flex aspect-video w-full max-w-[min(1244px,calc((100dvh-2rem)*16/9))] items-center justify-center rounded-lg bg-neutral-900 text-white">
+          Centered 16:9 film
+        </div>
+      </DialogContent>
+    </Dialog>
+  ),
+}

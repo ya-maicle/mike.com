@@ -6,8 +6,8 @@ import { ContentGrid } from '@/components/content-grid'
 import { gridCols } from '@/lib/grid-columns'
 import { sanityFetch } from '@/sanity/client'
 import { HOME_PAGE_QUERY, homePageTag, type HomePage } from '@/sanity/queries/home-page-queries'
-import { SanityImage } from '@/components/sanity-image'
-import { DecorativeVideoBlock } from '@/components/decorative-video-block'
+import { HomeShowreel } from '@/components/home-showreel'
+import { HOME_SHOWREEL } from '@/lib/home-showreel'
 import { ProgramsSection } from '@/components/programs-section'
 import { FeaturedWorkSection } from '@/components/featured-work-section'
 import { HomeLogoStrip } from '@/components/home-logo-strip'
@@ -95,40 +95,9 @@ export default async function Home() {
         <HomeLogoStrip />
       </section>
 
-      {/* Media Block - renders if coverMedia exists in Sanity */}
-      {data?.coverMedia && (
-        <section
-          className={`${gridCols.full} mt-6 md:mt-8 mb-12 md:mb-16 aspect-video rounded-[8px] overflow-hidden`}
-        >
-          {data.coverMedia.type === 'image' && data.coverMedia.image?.asset ? (
-            <SanityImage
-              image={data.coverMedia.image}
-              className="w-full h-full object-cover"
-              sizes="(min-width: 1376px) 1376px, 100vw"
-              aspectRatio="16/9"
-              priority
-            />
-          ) : data.coverMedia.type === 'video' && data.coverMedia.video?.asset?.playbackId ? (
-            <DecorativeVideoBlock
-              playbackId={data.coverMedia.video.asset.playbackId}
-              maxResolution="2160p"
-              minResolution="1080p"
-              eager
-              priority
-            />
-          ) : (
-            // Fallback placeholder if media type is selected but no asset uploaded
-            <div className="w-full h-full bg-secondary" />
-          )}
-        </section>
-      )}
-
-      {/* Placeholder if no coverMedia exists yet */}
-      {!data?.coverMedia && (
-        <section
-          className={`${gridCols.full} mt-6 md:mt-8 mb-12 md:mb-16 aspect-video bg-secondary rounded-[8px] overflow-hidden`}
-        />
-      )}
+      <section className={`${gridCols.full} mt-6 md:mt-8 mb-12 md:mb-16`}>
+        <HomeShowreel playbackId={HOME_SHOWREEL.playbackId} />
+      </section>
 
       {/* Programs Section */}
       {data?.programsSection && (
