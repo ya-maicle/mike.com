@@ -12,9 +12,11 @@ const title = 'Product design showreel'
 test('opens the approved film from the start with sound and restores the silent preview', async ({
   page,
 }) => {
+  await page.setViewportSize({ width: 1920, height: 1080 })
   await page.goto('/')
   const trigger = page.getByRole('button', { name: 'Play showreel with sound' })
   await trigger.scrollIntoViewIfNeeded()
+  await expect(trigger.locator('svg')).toHaveCount(0)
   const preview = page.locator('[data-showreel-preview] mux-player')
   await expect.poll(async () => (await playback(preview)).paused).toBe(false)
   await preview.evaluate((node) => {
@@ -27,6 +29,9 @@ test('opens the approved film from the start with sound and restores the silent 
   expect(await playback(player)).toMatchObject({ muted: false, paused: false })
   expect((await playback(player)).time).toBeLessThan(5)
   expect(await playback(preview)).toMatchObject({ muted: true, paused: true })
+  const bounds = await player.boundingBox()
+  expect(bounds!.width).toBeCloseTo(1244, 0)
+  expect(bounds!.x).toBeCloseTo(338, 0)
   await expect(dialog).toHaveCSS('background-color', 'rgb(0, 0, 0)')
   await expect(page.locator('body')).toHaveCSS('overflow', 'hidden')
   await expect(player).toHaveAttribute(

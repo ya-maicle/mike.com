@@ -66,20 +66,34 @@ export function DecorativeVideoPlayer({
         videoClassName="block h-full w-full object-cover"
       />
 
-      <div className="absolute bottom-4 right-4 z-10">
-        <Button
-          variant="secondary"
-          size="icon"
-          className="rounded-full w-7 h-7 bg-background/80 hover:bg-background backdrop-blur-sm text-foreground border border-border/10 transition-transform active:scale-95"
-          onClick={togglePlay}
-        >
-          {isPlaying ? (
-            <Pause className="h-3 w-3 fill-current" />
-          ) : (
-            <Play className="h-3 w-3 fill-current ml-0.5" />
-          )}
-        </Button>
-      </div>
+      <DecorativeVideoPlaybackButton isPlaying={isPlaying} onClick={togglePlay} />
+    </div>
+  )
+}
+
+// Shared with the homepage showreel so its control keeps the original video styling.
+export function DecorativeVideoPlaybackButton({
+  isPlaying,
+  onClick,
+}: {
+  isPlaying: boolean
+  onClick: () => void
+}) {
+  return (
+    <div className="absolute bottom-4 right-4 z-10">
+      <Button
+        variant="secondary"
+        size="icon"
+        className="rounded-full w-7 h-7 bg-background/80 hover:bg-background backdrop-blur-sm text-foreground border border-border/10 transition-transform active:scale-95"
+        aria-label={isPlaying ? 'Pause background preview' : 'Play background preview'}
+        onClick={onClick}
+      >
+        {isPlaying ? (
+          <Pause className="h-3 w-3 fill-current" />
+        ) : (
+          <Play className="h-3 w-3 fill-current ml-0.5" />
+        )}
+      </Button>
     </div>
   )
 }
