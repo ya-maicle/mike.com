@@ -29,6 +29,7 @@ export interface MuxContentPlayerProps {
   muted?: boolean
   loop?: boolean
   controls?: boolean
+  objectFit?: 'cover' | 'contain'
   maxResolution?: MuxMaxResolution
   /**
    * ABR floor — keeps Mux from starting on a soft low rendition. Only set this
@@ -54,6 +55,7 @@ export const MuxContentPlayer = React.forwardRef<HTMLVideoElement | null, MuxCon
       // Reason: content videos render in the 1376px canvas = 2752 device px on
       // retina; a 1440p ceiling leaves them permanently soft there.
       maxResolution = '2160p',
+      objectFit = 'cover',
       minResolution,
     },
     ref,
@@ -108,7 +110,7 @@ export const MuxContentPlayer = React.forwardRef<HTMLVideoElement | null, MuxCon
         streamType="on-demand"
         maxResolution={maxResolution}
         minResolution={minResolution}
-        autoPlay={autoPlay ? 'muted' : false}
+        autoPlay={autoPlay ? (muted ? 'muted' : true) : false}
         muted={muted}
         loop={loop}
         nohotkeys={!controls}
@@ -123,7 +125,7 @@ export const MuxContentPlayer = React.forwardRef<HTMLVideoElement | null, MuxCon
           height: '100%',
           aspectRatio: 'auto',
           '--controls': controls ? undefined : 'none',
-          '--media-object-fit': 'cover',
+          '--media-object-fit': objectFit,
         }}
       />
     )
