@@ -1,0 +1,90 @@
+/* Mux's exported parts cross its shadow boundary; bare media-* selectors don't.
+ * Keep film controls light on a dark scrim in both site themes, using the same
+ * neutral palette and Optimistic typography as the rest of the design system.
+ * Decorative loops intentionally retain their existing, separate controls.
+ */
+mux-player[data-controls] {
+  --media-primary-color: var(--zinc-50);
+  --media-accent-color: var(--zinc-50);
+  --media-secondary-color: transparent;
+  --media-font-family: var(--font-optimistic), var(--font-maicle-plain), sans-serif;
+  --media-font-size: var(--text-base);
+  --media-font-weight: 400;
+  --seek-backward-button: none;
+  --seek-forward-button: none;
+  --top-controls: none;
+}
+
+mux-player[data-controls]::part(controller) {
+  /* Mux otherwise hides play and elapsed / duration below 470px. */
+  --bottom-play-button: inline-flex;
+  --bottom-time-display: inline-flex;
+}
+
+mux-player[data-controls]::part(control-bar) {
+  --gradient-steps: transparent 0%, rgb(0 0 0 / 0.45) 45%, rgb(0 0 0 / 0.85) 100%;
+}
+
+mux-player[data-controls]::part(bottom control-bar) {
+  padding: 0 8px 4px;
+}
+
+mux-player[data-controls]::part(button) {
+  --media-control-hover-background: color-mix(in oklab, var(--white) 15%, transparent);
+  border-radius: 999px;
+}
+
+mux-player[data-controls]::part(bottom button) {
+  --media-control-height: 18px;
+  --media-control-padding: 13px;
+  --media-button-icon-width: 18px;
+  --media-button-icon-height: 18px;
+  min-width: 44px;
+  min-height: 44px;
+  box-sizing: border-box;
+}
+
+mux-player[data-controls]::part(center play) {
+  --media-control-background: color-mix(in oklab, var(--black) 60%, transparent);
+  --media-control-hover-background: color-mix(in oklab, var(--black) 75%, transparent);
+  width: 64px;
+  height: 64px;
+  padding: 18px;
+  box-sizing: border-box;
+  filter: none;
+  stroke: none;
+  text-shadow: none;
+}
+
+mux-player[data-controls]::part(time range) {
+  --media-range-track-height: 4px;
+  --media-range-track-border-radius: 999px;
+  --media-range-track-background: color-mix(in oklab, var(--white) 20%, transparent);
+  --media-time-range-buffered-color: color-mix(in oklab, var(--white) 30%, transparent);
+  --media-range-thumb-background: var(--zinc-50);
+  --media-range-thumb-width: 10px;
+  --media-range-thumb-height: 10px;
+  padding-inline: 12px;
+}
+
+mux-player[data-controls]::part(time display) {
+  --media-control-padding: 0 6px;
+  font-variant-numeric: tabular-nums;
+  align-items: center;
+}
+
+mux-player[data-controls]::part(menu) {
+  --media-menu-background: var(--zinc-900);
+  --media-text-color: var(--zinc-50);
+  --media-menu-item-hover-background: var(--zinc-800);
+  border: 1px solid color-mix(in oklab, var(--white) 15%, transparent);
+  border-radius: var(--radius);
+}
+
+/* Keep touch controls roomy without squeezing the time display. */
+@media (max-width: 639px) {
+  mux-player[data-controls] {
+    --volume-range: none;
+    --pip-button: none;
+  }
+}

@@ -118,6 +118,7 @@ export const MuxContentPlayer = React.forwardRef<HTMLVideoElement | null, MuxCon
         onTimeUpdate={handleTimeUpdate}
         onEnded={() => trackMilestone('completed')}
         playsInline
+        data-controls={controls ? '' : undefined}
         className={className}
         style={{
           display: 'block',
