@@ -54,7 +54,7 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
       <section className={cn(widthClass, 'space-y-3')}>
         <SanityImage
           image={block.image}
-          className="w-full h-auto rounded-[8px]"
+          className="content-media-frame w-full h-auto rounded-[8px]"
           sizes="(min-width: 1376px) 1376px, 100vw"
           aspectRatio="auto"
         />
@@ -108,7 +108,7 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
           contentId={block._key || 'content-video'}
           tokens={block.video?.asset?.tokens}
           title={block.title}
-          className="w-full h-auto rounded-[8px] overflow-hidden"
+          className="content-media-frame w-full h-auto rounded-[8px] overflow-hidden"
         />
         {block.title && (
           <div className={narrowClass}>
@@ -154,7 +154,7 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
         <>
           <SanityImage
             image={image}
-            className="w-full h-auto rounded-[8px]"
+            className="content-media-frame w-full h-auto rounded-[8px]"
             sizes="(max-width: 768px) 100vw, 50vw"
             aspectRatio="auto"
           />

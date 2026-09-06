@@ -51,7 +51,7 @@ export function DecorativeVideoPlayer({
 
   return (
     <div
-      className={cn('relative group overflow-hidden rounded-[8px]', className)}
+      className={cn('content-media-frame relative group overflow-hidden rounded-[8px]', className)}
       style={{ aspectRatio: toCssAspectRatio(aspectRatio) }}
     >
       <DecorativeVideo
