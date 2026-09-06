@@ -113,6 +113,7 @@ export function CaseStudyLayout({
             byline={<CaseStudyByline />}
             className="pb-0"
             coverMedia={resolveStudyCoverMedia(data.headerMedia, data.cover, data.coverImage)}
+            frameCoverMedia
             headerActions={
               <ContentActions
                 content={{ type: 'case-study', slug: data.slug.current }}
