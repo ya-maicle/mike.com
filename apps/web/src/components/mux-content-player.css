@@ -65,11 +65,18 @@ mux-player[data-controls]::part(time range) {
   --media-range-thumb-background: var(--zinc-50);
   --media-range-thumb-width: 10px;
   --media-range-thumb-height: 10px;
+  --media-preview-background: var(--zinc-900);
+  --media-box-arrow-background: var(--zinc-900);
+  --media-text-color: var(--zinc-50);
+  --media-preview-thumbnail-border: 1px solid var(--zinc-700);
+  --media-preview-border-radius: var(--radius);
   padding-inline: 12px;
 }
 
 mux-player[data-controls]::part(time display) {
   --media-control-padding: 0 6px;
+  --media-control-hover-background: color-mix(in oklab, var(--white) 15%, transparent);
+  border-radius: 999px;
   font-variant-numeric: tabular-nums;
   align-items: center;
 }
@@ -78,6 +85,7 @@ mux-player[data-controls]::part(menu) {
   --media-menu-background: var(--zinc-900);
   --media-text-color: var(--zinc-50);
   --media-menu-item-hover-background: var(--zinc-800);
+  --media-menu-item-checked-background: var(--zinc-700);
   border: 1px solid color-mix(in oklab, var(--white) 15%, transparent);
   border-radius: var(--radius);
 }
