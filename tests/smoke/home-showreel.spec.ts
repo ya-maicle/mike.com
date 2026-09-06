@@ -34,10 +34,7 @@ test('opens the approved film from the start with sound and restores the silent 
   expect(bounds!.x).toBeCloseTo(338, 0)
   await expect(dialog).toHaveCSS('background-color', 'rgb(0, 0, 0)')
   await expect(page.locator('body')).toHaveCSS('overflow', 'hidden')
-  await expect(player).toHaveAttribute(
-    'playback-id',
-    'GBt6wWOHZ02MIKW4Eie69t02VNqRB02j3xx6A9C8wrivCc',
-  )
+  await expect(player).toHaveAttribute('playback-id', 'Q127vnculMs3EjxLEeDfDHp2uB79Vn9ujToEx8njqmI')
   await page.keyboard.press('Escape')
   await expect(dialog).toBeHidden()
   await expect(trigger).toBeFocused()
