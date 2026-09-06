@@ -68,7 +68,8 @@ export const homePage = defineType({
       name: 'coverMedia',
       title: 'Cover Media',
       type: 'object',
-      description: 'Optional media block displayed below the hero section',
+      description:
+        'Media displayed below the homepage logos. Select a video to show a silent preview that opens with sound when clicked.',
       fields: [
         defineField({
           name: 'type',
@@ -102,6 +103,8 @@ export const homePage = defineType({
           name: 'video',
           title: 'Video',
           type: 'mux.video',
+          description:
+            'The showreel used for both the homepage preview and the player with sound. Replace it here to update both.',
           hidden: ({ parent }) => parent?.type !== 'video',
         }),
       ],

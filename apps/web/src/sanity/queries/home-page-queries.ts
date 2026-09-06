@@ -10,7 +10,7 @@ import {
 export const homePageTag = 'homePage'
 
 export const HOME_PAGE_QUERY = groq`
-  *[_type == "homePage"][0]{
+  *[_type == "homePage" && _id == "homePage"][0]{
     _id,
     tagline,
     subtitle,
@@ -68,7 +68,7 @@ export const HOME_PAGE_QUERY = groq`
 `
 
 export const HOME_PAGE_PROGRAMS_QUERY = groq`
-  *[_type == "homePage"][0].programsSection.programs[]->{
+  *[_type == "homePage" && _id == "homePage"][0].programsSection.programs[]->{
     _id,
     title,
     "description": homeListDescription,
@@ -94,7 +94,7 @@ export type HomePage = {
   coverMedia?: {
     type: 'image' | 'video'
     image?: SanityImage
-    video?: { asset: { playbackId: string; aspectRatio?: string } }
+    video?: { asset?: { playbackId?: string; aspectRatio?: string } | null }
   }
   programsSection?: {
     label?: string

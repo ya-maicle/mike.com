@@ -2,13 +2,13 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 import { MuxContentPlayer } from './mux-content-player'
 import { CookiePreferencesProvider } from './providers/cookie-preferences-provider'
 import { MobileNavigationProvider } from './providers/mobile-navigation-provider'
-import { HOME_SHOWREEL } from '@/lib/home-showreel'
+import { MUX_DEMO_PLAYBACK_ID } from '@/stories/video-fixtures'
 
 const meta: Meta<typeof MuxContentPlayer> = {
   title: 'Components/Video Player',
   component: MuxContentPlayer,
   args: {
-    playbackId: HOME_SHOWREEL.playbackId,
+    playbackId: MUX_DEMO_PLAYBACK_ID,
     title: 'Product design showreel',
     controls: true,
     objectFit: 'contain',

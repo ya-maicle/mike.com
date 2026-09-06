@@ -13,6 +13,8 @@ export default defineConfig({
   test: {
     projects: [
       {
+        // Match Next.js when unit tests render server components.
+        esbuild: { jsx: 'automatic' },
         test: {
           name: 'unit',
           environment: 'node',
