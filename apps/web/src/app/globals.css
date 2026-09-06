@@ -11,6 +11,12 @@
 
 @variant dark (.dark &);
 
+/* Match the work cards' inset media border without changing asset dimensions. */
+[data-case-study-layout] .content-media-frame {
+  outline: 1px solid var(--border);
+  outline-offset: -1px;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
