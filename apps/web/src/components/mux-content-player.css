@@ -4,6 +4,7 @@
  * Decorative loops intentionally retain their existing, separate controls.
  */
 mux-player[data-controls] {
+  container: video-player / inline-size;
   --media-primary-color: var(--zinc-50);
   --media-accent-color: var(--zinc-50);
   --media-secondary-color: transparent;
@@ -81,9 +82,9 @@ mux-player[data-controls]::part(menu) {
   border-radius: var(--radius);
 }
 
-/* Keep touch controls roomy without squeezing the time display. */
-@media (max-width: 639px) {
-  mux-player[data-controls] {
+/* Respond to the film's width, including small embeds on desktop. */
+@container video-player (max-width: 639px) {
+  mux-player[data-controls]::part(controller) {
     --volume-range: none;
     --pip-button: none;
   }
