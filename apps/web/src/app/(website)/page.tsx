@@ -7,7 +7,7 @@ import { gridCols } from '@/lib/grid-columns'
 import { sanityFetch } from '@/sanity/client'
 import { HOME_PAGE_QUERY, homePageTag, type HomePage } from '@/sanity/queries/home-page-queries'
 import { HomeShowreel } from '@/components/home-showreel'
-import { HOME_SHOWREEL } from '@/lib/home-showreel'
+import { SanityImage } from '@/components/sanity-image'
 import { ProgramsSection } from '@/components/programs-section'
 import { FeaturedWorkSection } from '@/components/featured-work-section'
 import { HomeLogoStrip } from '@/components/home-logo-strip'
@@ -49,6 +49,8 @@ export default async function Home() {
   const subtitle =
     data?.subtitle ||
     'Principal Product Designer working at the intersection of strategy, systems, and execution.'
+  const coverMedia = data?.coverMedia
+  const playbackId = coverMedia?.type === 'video' ? coverMedia.video?.asset?.playbackId : undefined
 
   return (
     <ContentGrid>
@@ -95,9 +97,23 @@ export default async function Home() {
         <HomeLogoStrip />
       </section>
 
-      <section className={`${gridCols.full} mt-6 md:mt-8 mb-12 md:mb-16`}>
-        <HomeShowreel playbackId={HOME_SHOWREEL.playbackId} />
-      </section>
+      {playbackId ? (
+        <section className={`${gridCols.full} mt-6 md:mt-8 mb-12 md:mb-16`}>
+          <HomeShowreel key={playbackId} playbackId={playbackId} />
+        </section>
+      ) : coverMedia?.type === 'image' && coverMedia.image?.asset ? (
+        <section
+          className={`${gridCols.full} mt-6 md:mt-8 mb-12 md:mb-16 aspect-video overflow-hidden rounded-lg`}
+        >
+          <SanityImage
+            image={coverMedia.image}
+            className="h-full w-full object-cover"
+            sizes="(min-width: 1376px) 1376px, 100vw"
+            aspectRatio="16/9"
+            priority
+          />
+        </section>
+      ) : null}
 
       {/* Programs Section */}
       {data?.programsSection && (

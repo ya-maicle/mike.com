@@ -9,7 +9,7 @@ async function playback(player: Locator) {
 
 const title = 'Product design showreel'
 
-test('opens the approved film from the start with sound and restores the silent preview', async ({
+test('opens the selected film from the start with sound and restores the silent preview', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1920, height: 1080 })
@@ -19,6 +19,8 @@ test('opens the approved film from the start with sound and restores the silent 
   await expect(trigger.locator('svg')).toHaveCount(0)
   const preview = page.locator('[data-showreel-preview] mux-player')
   await expect.poll(async () => (await playback(preview)).paused).toBe(false)
+  const selectedPlaybackId = await preview.getAttribute('playback-id')
+  expect(selectedPlaybackId).toBeTruthy()
   await preview.evaluate((node) => {
     ;(node as HTMLVideoElement).currentTime = 12
   })
@@ -34,7 +36,7 @@ test('opens the approved film from the start with sound and restores the silent 
   expect(bounds!.x).toBeCloseTo(338, 0)
   await expect(dialog).toHaveCSS('background-color', 'rgb(0, 0, 0)')
   await expect(page.locator('body')).toHaveCSS('overflow', 'hidden')
-  await expect(player).toHaveAttribute('playback-id', 'Q127vnculMs3EjxLEeDfDHp2uB79Vn9ujToEx8njqmI')
+  await expect(player).toHaveAttribute('playback-id', selectedPlaybackId!)
   await page.keyboard.press('Escape')
   await expect(dialog).toBeHidden()
   await expect(trigger).toBeFocused()

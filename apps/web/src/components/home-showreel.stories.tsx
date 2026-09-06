@@ -2,12 +2,12 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite'
 import { HomeShowreel } from './home-showreel'
 import { CookiePreferencesProvider } from './providers/cookie-preferences-provider'
 import { MobileNavigationProvider } from './providers/mobile-navigation-provider'
-import { HOME_SHOWREEL } from '@/lib/home-showreel'
+import { MUX_DEMO_PLAYBACK_ID } from '@/stories/video-fixtures'
 
 const meta: Meta<typeof HomeShowreel> = {
   title: 'Components/Home Showreel',
   component: HomeShowreel,
-  args: { playbackId: HOME_SHOWREEL.playbackId },
+  args: { playbackId: MUX_DEMO_PLAYBACK_ID },
   parameters: { layout: 'fullscreen' },
   decorators: [
     (Story) => (
