@@ -5,6 +5,7 @@ import { SanityImage } from '@/components/sanity-image'
 import { ContentGrid } from '@/components/content-grid'
 import { gridCols } from '@/lib/grid-columns'
 import { DecorativeVideoPlayer } from '@/components/decorative-video-player'
+import { MediaFrame } from '@/components/ui/media-frame'
 import type { ReactNode } from 'react'
 import type { SanityImage as SanityImageType } from '@/sanity/queries'
 
@@ -120,28 +121,27 @@ export function PageTemplate({
       ) : coverMedia ? (
         <ContentGrid>
           <section className={cn(gridCols.full, 'mb-8')}>
-            <div className={cn(frameCoverMedia && 'relative overflow-hidden rounded-lg bg-muted')}>
-              {coverMedia.type === 'video' && coverMedia.video?.asset?.playbackId ? (
-                <DecorativeVideoPlayer
-                  playbackId={coverMedia.video.asset.playbackId}
-                  aspectRatio={coverMedia.video.asset.aspectRatio}
-                  maxResolution="2160p"
-                  minResolution="1080p"
-                  eager
-                />
-              ) : coverMedia.type === 'image' && coverMedia.image ? (
+            {coverMedia.type === 'video' && coverMedia.video?.asset?.playbackId ? (
+              <DecorativeVideoPlayer
+                playbackId={coverMedia.video.asset.playbackId}
+                aspectRatio={coverMedia.video.asset.aspectRatio}
+                maxResolution="2160p"
+                minResolution="1080p"
+                bordered={frameCoverMedia}
+                className={cn(frameCoverMedia && 'bg-muted')}
+                eager
+              />
+            ) : coverMedia.type === 'image' && coverMedia.image ? (
+              <MediaFrame bordered={frameCoverMedia} className={cn(frameCoverMedia && 'bg-muted')}>
                 <SanityImage
                   image={coverMedia.image}
-                  className="w-full h-auto object-cover max-h-[90vh] rounded-[8px]"
+                  className="w-full h-auto object-cover max-h-[90vh]"
                   priority
                   sizes="(min-width: 1376px) 1376px, 100vw"
                   aspectRatio="auto"
                 />
-              ) : null}
-              {frameCoverMedia ? (
-                <div className="pointer-events-none absolute inset-0 rounded-lg ring-1 ring-inset ring-border" />
-              ) : null}
-            </div>
+              </MediaFrame>
+            ) : null}
           </section>
         </ContentGrid>
       ) : null}

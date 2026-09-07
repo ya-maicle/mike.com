@@ -4,12 +4,13 @@ import * as React from 'react'
 import { DecorativeVideo } from '@/components/decorative-video'
 import { Play, Pause } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
+import { MediaFrame } from '@/components/ui/media-frame'
 
 interface DecorativeVideoPlayerProps {
   playbackId: string
   tokens?: import('@/components/mux-content-player').MuxPlaybackTokens
   className?: string
+  bordered?: boolean
   aspectRatio?: string
   maxResolution?: import('@/components/mux-content-player').MuxMaxResolution
   minResolution?: import('@/components/mux-content-player').MuxMinResolution
@@ -28,6 +29,7 @@ export function DecorativeVideoPlayer({
   playbackId,
   tokens,
   className,
+  bordered,
   aspectRatio,
   maxResolution,
   minResolution,
@@ -50,8 +52,9 @@ export function DecorativeVideoPlayer({
   }
 
   return (
-    <div
-      className={cn('content-media-frame relative group overflow-hidden rounded-[8px]', className)}
+    <MediaFrame
+      className={className}
+      bordered={bordered}
       style={{ aspectRatio: toCssAspectRatio(aspectRatio) }}
     >
       <DecorativeVideo
@@ -67,7 +70,7 @@ export function DecorativeVideoPlayer({
       />
 
       <DecorativeVideoPlaybackButton isPlaying={isPlaying} onClick={togglePlay} />
-    </div>
+    </MediaFrame>
   )
 }
 
