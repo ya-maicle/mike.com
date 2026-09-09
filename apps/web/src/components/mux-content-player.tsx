@@ -18,6 +18,8 @@ export type MuxMinResolution = '480p' | '540p' | '720p' | '1080p' | '1440p' | '2
 
 export interface MuxContentPlayerProps {
   playbackId: string
+  /** Pass the media ref through next/dynamic without attaching it to the loader. */
+  playerRef?: React.Ref<HTMLVideoElement | null>
   /** Stable Sanity block key used for privacy-safe content analytics. */
   contentId?: string
   /** Required for assets with a signed playback policy; omit for public assets. */
@@ -43,6 +45,7 @@ export const MuxContentPlayer = React.forwardRef<HTMLVideoElement | null, MuxCon
   function MuxContentPlayer(
     {
       playbackId,
+      playerRef,
       contentId,
       tokens,
       title,
@@ -100,7 +103,7 @@ export const MuxContentPlayer = React.forwardRef<HTMLVideoElement | null, MuxCon
     return (
       <MuxPlayerReact
         key={analyticsEnabled ? 'analytics-enabled' : 'analytics-disabled'}
-        ref={ref as React.Ref<MuxPlayerRefAttributes>}
+        ref={(playerRef ?? ref) as React.Ref<MuxPlayerRefAttributes>}
         disableCookies
         disableTracking={!analyticsEnabled}
         playbackId={playbackId}
@@ -132,3 +135,6 @@ export const MuxContentPlayer = React.forwardRef<HTMLVideoElement | null, MuxCon
     )
   },
 )
+
+// Storybook's dynamic-import transform requires a default component export.
+export default MuxContentPlayer

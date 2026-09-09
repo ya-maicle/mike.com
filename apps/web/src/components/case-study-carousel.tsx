@@ -6,6 +6,7 @@ import { SanityImage } from '@/components/sanity-image'
 import { DecorativeVideo } from '@/components/decorative-video'
 import { ArrowLeft, ArrowRight, Pause, Play } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { MediaFrame } from '@/components/ui/media-frame'
 
 interface CaseStudyCarouselProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -37,7 +38,7 @@ export function CaseStudyCarousel({ items, title, description }: CaseStudyCarous
 
   return (
     <section className="w-full space-y-4 max-w-[var(--content-max-width)] mx-auto">
-      <div className="relative group overflow-hidden rounded-[8px]">
+      <MediaFrame>
         <Carousel
           setApi={setApi}
           opts={{
@@ -113,7 +114,7 @@ export function CaseStudyCarousel({ items, title, description }: CaseStudyCarous
             <ArrowRight className={carouselIconClass} />
           </Button>
         </div>
-      </div>
+      </MediaFrame>
 
       {(title || description) && (
         <div className="mx-auto max-w-[592px]">

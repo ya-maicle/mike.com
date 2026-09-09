@@ -5,10 +5,7 @@ import dynamic from 'next/dynamic'
 import { cn } from '@/lib/utils'
 import { getMuxPosterUrl } from '@/lib/mux-poster'
 
-const MuxContentPlayer = dynamic(
-  () => import('@/components/mux-content-player').then((m) => m.MuxContentPlayer),
-  { ssr: false },
-)
+const MuxContentPlayer = dynamic(() => import('@/components/mux-content-player'), { ssr: false })
 
 export interface DecorativeVideoProps {
   playbackId: string
@@ -97,7 +94,7 @@ export const DecorativeVideo = React.forwardRef<HTMLVideoElement | null, Decorat
         ) : null}
         {hasBeenVisible && (!priority || isPosterReady) ? (
           <MuxContentPlayer
-            ref={ref}
+            playerRef={ref}
             playbackId={playbackId}
             tokens={tokens}
             poster={poster}

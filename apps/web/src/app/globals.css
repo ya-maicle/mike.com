@@ -11,10 +11,10 @@
 
 @variant dark (.dark &);
 
-/* Match the work cards' inset media border without changing asset dimensions. */
-[data-case-study-layout] .content-media-frame {
-  outline: 1px solid var(--border);
-  outline-offset: -1px;
+/* Every MediaFrame inherits the same edge, including the portaled mobile panel. */
+[data-case-study-layout],
+[data-case-study-panel-content] {
+  --content-media-border: var(--border);
 }
 
 @theme inline {

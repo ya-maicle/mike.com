@@ -212,7 +212,7 @@ export function CaseStudyLayout({
 
 function PanelContent({ data }: { data: CaseStudy }) {
   return (
-    <div className="max-w-[592px] mx-auto w-full space-y-8 pb-24">
+    <div data-case-study-panel-content className="max-w-[592px] mx-auto w-full space-y-8 pb-24">
       {data.panelContent && (
         <div className="space-y-0">
           {data.panelContent.map((block, i) => (

@@ -8,6 +8,7 @@ import { MuxContentPlayer } from '@/components/mux-content-player'
 import { DecorativeVideoBlock } from '@/components/decorative-video-block'
 import { DecorativeVideoPlayer } from '@/components/decorative-video-player'
 import { CaseStudyCarousel } from '@/components/case-study-carousel'
+import { MediaFrame } from '@/components/ui/media-frame'
 import { PortableText } from 'next-sanity'
 import { typographyComponents } from '@/components/portable-text-grid'
 
@@ -52,12 +53,14 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
 
     return (
       <section className={cn(widthClass, 'space-y-3')}>
-        <SanityImage
-          image={block.image}
-          className="content-media-frame w-full h-auto rounded-[8px]"
-          sizes="(min-width: 1376px) 1376px, 100vw"
-          aspectRatio="auto"
-        />
+        <MediaFrame>
+          <SanityImage
+            image={block.image}
+            className="w-full h-auto"
+            sizes="(min-width: 1376px) 1376px, 100vw"
+            aspectRatio="auto"
+          />
+        </MediaFrame>
         {block.image?.caption && (
           <div className={cn(narrowClass, 'text-center text-sm text-muted-foreground')}>
             {block.image.caption}
@@ -103,13 +106,18 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
 
     return (
       <section className={cn(widthClass, 'space-y-3')}>
-        <MuxContentPlayer
-          playbackId={playbackId}
-          contentId={block._key || 'content-video'}
-          tokens={block.video?.asset?.tokens}
-          title={block.title}
-          className="content-media-frame w-full h-auto rounded-[8px] overflow-hidden"
-        />
+        <MediaFrame
+          className="aspect-video"
+          style={{ aspectRatio: block.video?.asset?.aspectRatio?.replace(':', ' / ') }}
+        >
+          <MuxContentPlayer
+            playbackId={playbackId}
+            contentId={block._key || 'content-video'}
+            tokens={block.video?.asset?.tokens}
+            title={block.title}
+            className="w-full h-full"
+          />
+        </MediaFrame>
         {block.title && (
           <div className={narrowClass}>
             <h3 className="text-xl font-semibold">{block.title}</h3>
@@ -152,12 +160,14 @@ export function ContentBlock({ block, layout = 'max-width' }: ContentBlockProps)
       if (!image) return null
       return (
         <>
-          <SanityImage
-            image={image}
-            className="content-media-frame w-full h-auto rounded-[8px]"
-            sizes="(max-width: 768px) 100vw, 50vw"
-            aspectRatio="auto"
-          />
+          <MediaFrame>
+            <SanityImage
+              image={image}
+              className="w-full h-auto"
+              sizes="(max-width: 768px) 100vw, 50vw"
+              aspectRatio="auto"
+            />
+          </MediaFrame>
           {image?.caption && <div className="text-sm text-muted-foreground">{image.caption}</div>}
         </>
       )
