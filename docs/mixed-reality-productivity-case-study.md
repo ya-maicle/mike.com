@@ -1,6 +1,6 @@
-# Designing a workspace for mixed reality — review record
+# Simple productivity for Meta VR Glasses — review record
 
-The case study is a standard `caseStudy` document in the Sanity **development** dataset. The website reads it through the existing `/work/[slug]` route, `CaseStudyLayout`, Portable Text blocks, Sanity images, and Mux player. No case-study-specific page or video player is part of this PR.
+This case study is a standard `caseStudy` document in the Sanity **development** dataset. The website renders it through the existing `/work/[slug]` route, `CaseStudyLayout`, Portable Text blocks, Sanity images and Mux player. The content is editable in Sanity Studio; there is no project-specific page or custom video player.
 
 - Sanity document ID: `caseStudy-meta-vr-productivity`
 - Slug: `mixed-reality-productivity`
@@ -9,25 +9,35 @@ The case study is a standard `caseStudy` document in the Sanity **development** 
 - Visibility in development: public for review
 - Production dataset: no matching case study
 
+## Editorial update
+
+**Title:** Simple productivity for Meta VR Glasses
+
+**Summary:** A productivity vision for Meta VR Glasses, connecting everyday work journeys, spatial interactions and a shared direction for the teams shaping the experience.
+
+The opening paragraph now describes the project and states the role precisely: “I led the early design concepts for the productivity vision at Reality Labs.” The rest of the story focuses on the work journey, spatial windows, input, continuity with a computer and the shared direction that came out of the concepts. It distinguishes the early team concepts from the later public device footage. See [the current copy snapshot](mixed-reality-productivity-copy.md) for the complete body and project-panel text.
+
+The five-paragraph slide-in “About the project” panel uses the same standard structure as Care AI Studio: Project, Role, Collaboration, Delivery and Outcome, followed by the usual metadata grid. It is stored in Sanity `panelContent`.
+
+Visible image captions and descriptions were removed, as were the title and description beneath the keynote video. Image alt text remains for accessibility. The archived notes disagree on whether the strategy work was in 2024 or 2025, so `projectInfo.year` remains blank pending confirmation.
+
 ## Media placement
 
 | Placement | Source | Sanity development asset |
 | --- | --- | --- |
-| Work cover and case-study hero | 7.7-second Meta VR Glasses promo edit: café workspace → projected keyboard → glasses reveal | `mux.videoAsset.meta-vr-productivity-cover-v2-2026` |
-| Body image: multiwindow work | HzOS POE Figma journey | `image-899cd1f1c33f12cd03a5db1aa1a30c7d23f97019-3840x2161-png` |
-| Body image: spatial comparison | HzOS POE Figma journey | `image-2bbbc261a6ab38df18b348dc90589eb1e1ff26b9-3840x2161-png` |
-| Body image: surface typing | HzOS POE Figma journey | `image-5801586988f3c785c0638fc4f0fb578df4b67fd5-3840x2161-png` |
-| Body pair: workspace restoration and display formats | HzOS POE remote-display board | `image-f303bec9ff922bbd1501e7ba9390dc8fef19ffe8-1930x1090-png`; `image-5bcb762d6f894eae01cc6b9a87c432d0a08bfadb-1930x1090-png` |
+| Work cover and case-study hero | 7.7-second Meta VR Glasses promo edit: café worker → projected keyboard → glasses reveal | `mux.videoAsset.meta-vr-productivity-cover-v2-2026` |
+| Body image: multiwindow work | HzOS POE Figma journey | `image-e92f7c2c2cd376353c72ff7d0ca0e210f855c0f7-3840x2161-png` |
+| Body image: spatial comparison | HzOS POE Figma journey | `image-6bee19cdb8eeb9e30718cbccf887e1b16374c444-3840x2161-png` |
+| Body image: surface typing | HzOS POE Figma journey | `image-ad440ecc6282ede53a1bcf8aff2765338d7b7b7e-3840x2161-png` |
+| Body pair: workspace restoration and display formats | HzOS POE remote-display board | `image-dd48360f9fd0733bf2638bc77d5a6784ad9a2f7a-1920x1080-png`; `image-e294d5235e3fff9e48ec57968d3758f4b2322ea8-1920x1080-png` |
 | Body video: workspace input | 13-second Meta Connect 2026 keynote excerpt | `mux.videoAsset.meta-vr-productivity-connect-2026` |
 
-The promo excerpt is only the hero on the detail page; it is not repeated in the content blocks. The keynote excerpt and each Figma frame appear once in the body. The earlier café still and product stills were removed so the cover and body do not repeat the same launch imagery. The cover and header fields reference the same promo asset because the existing Work card uses those fields at different screen sizes.
+The five new Figma exports have square corners. Corner radius was removed before export so the shared website `MediaFrame` supplies the radius. Shadow was also removed for the two remote-display exports to avoid a transparent rim. The Figma source frames were restored after export.
 
-The cover was recut after review because the earlier sequence ended on the compute puck without showing the glasses. The replacement opens on the work use case and closes on a clear product shot. The superseded Mux asset remains unreferenced by this case study.
+Each Figma image and the keynote excerpt appears once in the body. The promo excerpt appears as the hero on the detail page and as the video cover on the Work and homepage cards; it does not repeat in body content. The earlier café still and product stills were removed. Old rounded exports and the superseded cover Mux asset remain unreferenced by this case study.
 
-## Editorial review
+## Sanity editing and project lists
 
-The body now follows the vision work from assignment through a representative work journey, spatial comparison, input, continuity with a connected computer, cross-team outcome and public launch context. Figma images are captioned as team vision concepts. The public keynote footage is identified as later product context. The slide-in “About the project” panel follows the Care AI Studio case-study pattern: five normal-text paragraphs with bold labels for Project, Role, Collaboration, Delivery, and Outcome, followed by the standard project metadata grid. The copy is stored in Sanity `panelContent`; no layout change is required.
+The title, summary, body (`content`), slide-in panel (`panelContent`), cover/header media, metadata and SEO fields are editable on the case-study document in Sanity Studio. The homepage project selection is editable through `homePage.featuredWorkSection.projects`; this project is currently first. `featuredOrder` is 3, which places it in the shared “Keep exploring” list on the other published case studies. The page and panel use shared components and their usual interface labels.
 
-The archived case-study notes disagree on whether the strategy work was in 2024 or 2025. The Sanity `projectInfo.year` field is intentionally blank until that date is confirmed. Public 2026 launch media is identified as illustration, separate from the original strategy work.
-
-The Sanity development document and Mux uploads are the media and content source of truth. The raw selects in `apps/web/.local-drafts/` are ignored local working files; they are not used at runtime. This PR does not copy the case study into the production dataset or deploy production code.
+The Sanity development document and Mux uploads are the live content and media source. This PR records the reviewed state for comparison; it does not copy content to the production dataset or deploy production code. Raw selects in `apps/web/.local-drafts/` are ignored local working files and are not used at runtime.
