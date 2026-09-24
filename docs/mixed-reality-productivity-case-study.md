@@ -22,6 +22,8 @@ The promo excerpt is only the hero on the detail page; it is not repeated in the
 
 ## Editorial review
 
+The slide-in “About the project” panel follows the Care AI Studio case-study pattern: five normal-text paragraphs with bold labels for Project, Role, Collaboration, Delivery, and Outcome, followed by the standard project metadata grid. The copy is stored in Sanity `panelContent`; no layout change is required.
+
 The archived case-study notes disagree on whether the strategy work was in 2024 or 2025. The Sanity `projectInfo.year` field is intentionally blank until that date is confirmed. Public 2026 launch media is identified as illustration, separate from the original strategy work.
 
 The Sanity development document and Mux uploads are the media and content source of truth. The raw selects in `apps/web/.local-drafts/` are ignored local working files; they are not used at runtime. This PR does not copy the case study into the production dataset or deploy production code.
