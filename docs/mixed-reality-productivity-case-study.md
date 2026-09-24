@@ -1,4 +1,4 @@
-# Simple productivity for Meta VR Glasses — review record
+# Productivity for Meta VR Glasses — review record
 
 This case study is a standard `caseStudy` document in the Sanity **development** dataset. The website renders it through the existing `/work/[slug]` route, `CaseStudyLayout`, Portable Text blocks, Sanity images and Mux player. The content is editable in Sanity Studio; there is no project-specific page or custom video player.
 
@@ -6,18 +6,18 @@ This case study is a standard `caseStudy` document in the Sanity **development**
 - Slug: `mixed-reality-productivity`
 - Local route: `/work/mixed-reality-productivity`
 - Work list: `/work`
-- Visibility in development: public for review
+- Visibility in development: recruiter-only (the cover and teaser remain public under the site's existing access pattern)
 - Production dataset: no matching case study
 
 ## Editorial update
 
-**Title:** Simple productivity for Meta VR Glasses
+**Title:** Productivity for Meta VR Glasses
 
-**Summary:** A productivity vision for Meta VR Glasses, connecting everyday work journeys, spatial interactions and a shared direction for the teams shaping the experience.
+**Summary:** Early productivity concepts for Meta VR Glasses, connecting everyday work journeys, spatial interactions and a shared direction for the teams shaping the experience.
 
 The opening paragraph now describes the project and states the role precisely: “I led the early design concepts for the productivity vision at Reality Labs.” The rest of the story focuses on the work journey, spatial windows, input, continuity with a computer and the shared direction that came out of the concepts. It distinguishes the early team concepts from the later public device footage. See [the current copy snapshot](mixed-reality-productivity-copy.md) for the complete body and project-panel text.
 
-The five-paragraph slide-in “About the project” panel uses the same standard structure as Care AI Studio: Project, Role, Collaboration, Delivery and Outcome, followed by the usual metadata grid. It is stored in Sanity `panelContent`.
+The four-paragraph slide-in “About the project” panel uses the same standard structure as Care AI Studio: Project, Role, Delivery and Outcome, followed by the usual metadata grid. It is stored in Sanity `panelContent`.
 
 Visible image captions and descriptions were removed, as were the title and description beneath the keynote video. Image alt text remains for accessibility. The archived notes disagree on whether the strategy work was in 2024 or 2025, so `projectInfo.year` remains blank pending confirmation.
 
