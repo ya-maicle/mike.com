@@ -1,6 +1,6 @@
-# Productivity for Meta VR Glasses — development copy snapshot
+# Productivity for Meta VR Glasses — Sanity copy snapshot
 
-This is a review snapshot of the current Sanity **development** document. Sanity Studio remains the content source of truth.
+This is a review snapshot of the matching Sanity **development** and **production** body, panel and SEO fields. Sanity Studio remains the content source of truth.
 
 **Title:** Productivity for Meta VR Glasses
 
