@@ -1,43 +1,24 @@
-# Simple productivity for Meta VR Glasses — review record
+# Productivity for Meta VR Glasses — review record
 
-This case study is a standard `caseStudy` document in the Sanity **development** dataset. The website renders it through the existing `/work/[slug]` route, `CaseStudyLayout`, Portable Text blocks, Sanity images and Mux player. The content is editable in Sanity Studio; there is no project-specific page or custom video player.
+The case study is the standard `caseStudy` document `caseStudy-meta-vr-productivity`, rendered at `/work/mixed-reality-productivity`. The body, panel, SEO fields, images and Mux video references are editable in Sanity Studio. This change updates the **development** dataset for preview. The production dataset is unchanged.
 
-- Sanity document ID: `caseStudy-meta-vr-productivity`
-- Slug: `mixed-reality-productivity`
-- Local route: `/work/mixed-reality-productivity`
-- Work list: `/work`
-- Visibility in development: public for review
-- Production dataset: no matching case study
-
-## Editorial update
-
-**Title:** Simple productivity for Meta VR Glasses
-
-**Summary:** A productivity vision for Meta VR Glasses, connecting everyday work journeys, spatial interactions and a shared direction for the teams shaping the experience.
-
-The opening paragraph now describes the project and states the role precisely: “I led the early design concepts for the productivity vision at Reality Labs.” The rest of the story focuses on the work journey, spatial windows, input, continuity with a computer and the shared direction that came out of the concepts. It distinguishes the early team concepts from the later public device footage. See [the current copy snapshot](mixed-reality-productivity-copy.md) for the complete body and project-panel text.
-
-The five-paragraph slide-in “About the project” panel uses the same standard structure as Care AI Studio: Project, Role, Collaboration, Delivery and Outcome, followed by the usual metadata grid. It is stored in Sanity `panelContent`.
-
-Visible image captions and descriptions were removed, as were the title and description beneath the keynote video. Image alt text remains for accessibility. The archived notes disagree on whether the strategy work was in 2024 or 2025, so `projectInfo.year` remains blank pending confirmation.
-
-## Media placement
+## Calling and new imagery
 
 | Placement | Source | Sanity development asset |
 | --- | --- | --- |
-| Work cover and case-study hero | 7.7-second Meta VR Glasses promo edit: café worker → projected keyboard → glasses reveal | `mux.videoAsset.meta-vr-productivity-cover-v2-2026` |
-| Body image: multiwindow work | HzOS POE Figma journey | `image-e92f7c2c2cd376353c72ff7d0ca0e210f855c0f7-3840x2161-png` |
-| Body image: spatial comparison | HzOS POE Figma journey | `image-6bee19cdb8eeb9e30718cbccf887e1b16374c444-3840x2161-png` |
-| Body image: surface typing | HzOS POE Figma journey | `image-ad440ecc6282ede53a1bcf8aff2765338d7b7b7e-3840x2161-png` |
-| Body pair: workspace restoration and display formats | HzOS POE remote-display board | `image-dd48360f9fd0733bf2638bc77d5a6784ad9a2f7a-1920x1080-png`; `image-e294d5235e3fff9e48ec57968d3758f4b2322ea8-1920x1080-png` |
-| Body video: workspace input | 13-second Meta Connect 2026 keynote excerpt | `mux.videoAsset.meta-vr-productivity-connect-2026` |
+| After “The project” | Official Meta café workspace image supplied by the owner | `image-2c5cd49c2c86f763f1226217d99f66ccf2b59e38-1814x1020-webp` |
+| “Calls alongside the work” concept | Owner's early HzOS POE exploration showing a call and shared work | `image-f63c669f7c4c264b063b42cf586494af6b31e82e-2880x1621-png` |
+| “Calls alongside the work” public product | Official Meta calling image supplied by the owner | `image-580c335e418f1970ca914b9883245e128aab4f6c-4000x2250-jpg` |
+| Open Graph and X/Twitter card | Owner's 1200 × 630 social artwork | `image-605adcc116bfae4a7e878161784cdd7519b87d2c-1200x630-jpg` |
 
-The five new Figma exports have square corners. Corner radius was removed before export so the shared website `MediaFrame` supplies the radius. Shadow was also removed for the two remote-display exports to avoid a transparent rim. The Figma source frames were restored after export.
+The new body images each appear once. The café image sits in the project context; the two calling images sit in the new calling section between laptop extension and the result. The concept copy explicitly identifies the early interface as unshipped. The later product copy uses [Meta's September 2026 announcement](https://about.fb.com/news/2026/09/introducing-meta-vr-glasses-3d-movies-immersive-live-sports-100-grams/) for the claims about hologram calling, spatial audio, phones/computers, WhatsApp and Zoom. The official calling image is identified as later product imagery. Images have no visible captions or descriptive text beneath them; their alt text is stored in Sanity.
 
-Each Figma image and the keynote excerpt appears once in the body. The promo excerpt appears as the hero on the detail page and as the video cover on the Work and homepage cards; it does not repeat in body content. The earlier café still and product stills were removed. Old rounded exports and the superseded cover Mux asset remain unreferenced by this case study.
+The supplied concept PNG has a rectangular frame with no rounded cutout. The existing site media component applies corner radius. The café and official images are also rectangular. The pre-existing Figma exports remain in place and are not reused by the new section.
 
-## Sanity editing and project lists
+## Search and social
 
-The title, summary, body (`content`), slide-in panel (`panelContent`), cover/header media, metadata and SEO fields are editable on the case-study document in Sanity Studio. The homepage project selection is editable through `homePage.featuredWorkSection.projects`; this project is currently first. `featuredOrder` is 3, which places it in the shared “Keep exploring” list on the other published case studies. The page and panel use shared components and their usual interface labels.
+The Sanity `seoSettings` now hold the meta title, a description that includes calling, and the supplied social image. The existing page metadata code uses these fields for the canonical case-study URL, Open Graph article data and X/Twitter large-image card. The social image is separate from the body to avoid repeating it in the case study. See [the current copy snapshot](mixed-reality-productivity-copy.md) for exact text.
 
-The Sanity development document and Mux uploads are the live content and media source. This PR records the reviewed state for comparison; it does not copy content to the production dataset or deploy production code. Raw selects in `apps/web/.local-drafts/` are ignored local working files and are not used at runtime.
+## Video and visibility
+
+Recruiter-only visibility stays as requested. The work-card cover and case-study hero still reference the same public Mux asset, `meta-vr-productivity-cover-v2-2026-mux`; the keynote excerpt still references `meta-vr-productivity-connect-2026-mux`. These videos were already repaired in both Sanity datasets and are visible on the live site. This PR does not migrate new content to production or deploy production code.
