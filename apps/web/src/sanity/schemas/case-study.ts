@@ -44,13 +44,14 @@ export const caseStudy = defineType({
       title: 'Visibility',
       type: 'string',
       description:
-        'Public case studies are fully visible. Recruiter-only case studies show public cards but gate the detail page.',
+        'Public is open to everyone. Signed-in studies require a verified, unblocked account. Approval-required studies need a Sanity access grant. Cards and summaries stay public.',
       initialValue: 'public',
       options: {
         layout: 'radio',
         list: [
           { title: 'Public', value: 'public' },
-          { title: 'Recruiter-only', value: 'recruiter' },
+          { title: 'Available after sign-in', value: 'members' },
+          { title: 'Approval required', value: 'recruiter' },
         ],
       },
       validation: (Rule) => Rule.required(),

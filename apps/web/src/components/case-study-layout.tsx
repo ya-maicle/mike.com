@@ -1,5 +1,6 @@
 'use client'
 
+import type { StudyAccess } from '@/lib/study-access'
 import * as React from 'react'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
@@ -22,6 +23,7 @@ import type { StudyAccessSource } from '@/lib/analytics/events'
 interface CaseStudyLayoutProps {
   data: CaseStudy
   otherStudies?: ProjectCardData[]
+  access?: StudyAccess
   hasRecruiterAccess?: boolean
   accessSource?: StudyAccessSource
   companySlug?: string
@@ -30,6 +32,7 @@ interface CaseStudyLayoutProps {
 export function CaseStudyLayout({
   data,
   otherStudies,
+  access,
   hasRecruiterAccess = false,
   accessSource = 'none',
   companySlug,
@@ -128,6 +131,7 @@ export function CaseStudyLayout({
             {otherStudies && (
               <KeepExploringSection
                 projects={otherStudies}
+                access={access}
                 hasRecruiterAccess={hasRecruiterAccess}
               />
             )}

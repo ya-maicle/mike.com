@@ -175,11 +175,12 @@ export function LoginForm({
           aria-level={1}
           className={cn(isPage ? 'text-3xl leading-9 font-normal tracking-[-0.01em]' : 'text-xl')}
         >
-          {isPage ? 'Log in or sign up' : 'Sign in'}
+          Sign in to explore the work
         </CardTitle>
-        {!isPage ? (
-          <CardDescription>Use Google or get a magic link by email</CardDescription>
-        ) : null}
+        <CardDescription>
+          Read selected case studies and request access to private work. Some case studies require
+          approval.
+        </CardDescription>
       </CardHeader>
       <CardContent className={cn(isPage && 'px-0')}>
         <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">

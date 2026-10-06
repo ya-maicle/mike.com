@@ -1,5 +1,6 @@
 'use client'
 
+import { canReadStudy, studyAccessLabel, type StudyAccess } from '@/lib/study-access'
 import * as React from 'react'
 import Link from 'next/link'
 import { CoverMediaFill } from '@/components/cover-media-fill'
@@ -7,14 +8,13 @@ import { resolveCover } from '@/lib/cover-media'
 import type { CoverMedia, SanityImage as SanityImageType } from '@/sanity/queries'
 import { Icon } from '@/components/ui/icon'
 import * as Icons from '@/components/ui/icons'
-import { useLoginModal } from '@/components/providers/login-modal-provider'
 
 export type ProjectCardData = {
   _id: string
   title: string
   slug: { current: string }
   summary?: string
-  visibility?: 'public' | 'recruiter'
+  visibility?: 'public' | 'members' | 'recruiter'
   cover?: CoverMedia
   coverImage?: SanityImageType
   projectInfo?: {
@@ -27,11 +27,11 @@ export type ProjectCardData = {
 
 type ProjectCardProps = {
   project: ProjectCardData
+  access?: StudyAccess
   hasRecruiterAccess?: boolean
 }
 
-export function ProjectCard({ project, hasRecruiterAccess = false }: ProjectCardProps) {
-  const { openLogin } = useLoginModal()
+export function ProjectCard({ project, access, hasRecruiterAccess = false }: ProjectCardProps) {
   const formattedDate = project.publishedAt
     ? new Date(project.publishedAt).toLocaleDateString('en-US', {
         year: 'numeric',
@@ -40,7 +40,7 @@ export function ProjectCard({ project, hasRecruiterAccess = false }: ProjectCard
       })
     : undefined
   const href = `/work/${project.slug.current}`
-  const isLocked = project.visibility === 'recruiter' && !hasRecruiterAccess
+  const isLocked = !canReadStudy(project, access ?? { hasRecruiterAccess })
   const cover = resolveCover(project.cover, project.coverImage)
 
   const content = (
@@ -66,6 +66,9 @@ export function ProjectCard({ project, hasRecruiterAccess = false }: ProjectCard
           {project.title}
         </h3>
 
+        {isLocked ? (
+          <p className="text-sm text-muted-foreground">{studyAccessLabel(project.visibility)}</p>
+        ) : null}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
           {project.projectInfo?.sector && (
             <span>
@@ -84,18 +87,7 @@ export function ProjectCard({ project, hasRecruiterAccess = false }: ProjectCard
 
   return (
     <article className="group">
-      <Link
-        href={href}
-        className="block"
-        onClick={
-          isLocked
-            ? (event) => {
-                event.preventDefault()
-                openLogin({ returnTo: href, entryPoint: 'work_card' })
-              }
-            : undefined
-        }
-      >
+      <Link href={href} className="block">
         {content}
       </Link>
     </article>

@@ -1,5 +1,6 @@
 'use client'
 
+import { canReadStudy, studyAccessLabel, type StudyAccess } from '@/lib/study-access'
 import Link from 'next/link'
 
 import { SanityImage } from '@/components/sanity-image'
@@ -9,20 +10,19 @@ import { resolveCover } from '@/lib/cover-media'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
 import * as Icons from '@/components/ui/icons'
-import { useLoginModal } from '@/components/providers/login-modal-provider'
 import type { CaseStudy } from '@/sanity/queries'
 
 type WorkCaseStudyListProps = {
   caseStudies: CaseStudy[]
+  access?: StudyAccess
   hasRecruiterAccess?: boolean
 }
 
 export function WorkCaseStudyList({
   caseStudies,
+  access,
   hasRecruiterAccess = false,
 }: WorkCaseStudyListProps) {
-  const { openLogin } = useLoginModal()
-
   return (
     <div className="flex flex-col gap-8">
       {caseStudies.map((study, index) => {
@@ -36,7 +36,7 @@ export function WorkCaseStudyList({
           ? study.projectInfo.sector.join(', ')
           : null
         const year = study.projectInfo?.year ?? null
-        const isLocked = study.visibility === 'recruiter' && !hasRecruiterAccess
+        const isLocked = !canReadStudy(study, access ?? { hasRecruiterAccess })
 
         const article = (
           <article className="flex flex-col overflow-hidden lg:grid lg:grid-cols-5 lg:items-stretch lg:rounded-[12px] lg:border lg:border-border">
@@ -60,7 +60,7 @@ export function WorkCaseStudyList({
                 <Button asChild variant={isLocked ? 'secondary' : 'default'}>
                   <span aria-hidden="true">
                     {isLocked ? <Icon icon={Icons.Lock} size="sm" /> : null}
-                    {isLocked ? 'Log in' : 'View case study'}
+                    {isLocked ? studyAccessLabel(study.visibility) : 'View case study'}
                   </span>
                 </Button>
               </div>
@@ -112,19 +112,7 @@ export function WorkCaseStudyList({
           </article>
         )
 
-        return isLocked ? (
-          <Link
-            key={study._id}
-            className="group block w-full cursor-pointer text-left"
-            href={href}
-            onClick={(event) => {
-              event.preventDefault()
-              openLogin({ returnTo: href, entryPoint: 'work_card' })
-            }}
-          >
-            {article}
-          </Link>
-        ) : (
+        return (
           <Link key={study._id} href={href} className="group block cursor-pointer">
             {article}
           </Link>

@@ -1,3 +1,4 @@
+import { PublishAccessRequestAction } from '../../sanity/schemas/actions/publish-access-request'
 import { defineConfig } from 'sanity'
 import { structureTool } from 'sanity/structure'
 import { muxInput } from 'sanity-plugin-mux-input'
@@ -47,7 +48,40 @@ export default defineConfig({
               .title('Portfolio Access')
               .icon(() => '🔐')
               .child(
-                S.documentTypeList('portfolioAccessProfile').title('Portfolio Access Profiles'),
+                S.list()
+                  .title('Portfolio Access')
+                  .items([
+                    S.listItem()
+                      .title('Email notifications')
+                      .child(
+                        S.document()
+                          .schemaType('portfolioAccessSettings')
+                          .documentId('portfolioAccessSettings.config')
+                          .title('Access notifications'),
+                      ),
+                    S.listItem()
+                      .title('Company profiles and blocked domains')
+                      .child(
+                        S.documentTypeList('portfolioAccessProfile').title(
+                          'Company access profiles',
+                        ),
+                      ),
+                    S.listItem()
+                      .title('Awaiting review')
+                      .child(
+                        S.documentList()
+                          .title('Awaiting review')
+                          .schemaType('portfolioAccessRequest')
+                          .filter('_type == "portfolioAccessRequest" && status == "pending"'),
+                      ),
+                    S.listItem()
+                      .title('All requests and individual grants')
+                      .child(
+                        S.documentTypeList('portfolioAccessRequest').title(
+                          'Requests and individual grants',
+                        ),
+                      ),
+                  ]),
               ),
             // Pages section
             S.listItem()
@@ -91,6 +125,11 @@ export default defineConfig({
 
   document: {
     actions: (prev, context) => {
+      if (context.schemaType === 'portfolioAccessRequest') {
+        return prev
+          .filter((action) => action.action !== 'duplicate')
+          .map((action) => (action.action === 'publish' ? PublishAccessRequestAction : action))
+      }
       if (context.schemaType === 'blogPost' || context.schemaType === 'caseStudy') {
         return [...prev, GenerateBlogNarrationAction]
       }

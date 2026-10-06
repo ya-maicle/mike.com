@@ -1,3 +1,5 @@
+import { portfolioAccessSettings } from './portfolio-access-settings'
+import { portfolioAccessRequest } from './portfolio-access-request'
 import { caseStudy } from './case-study'
 import { page } from './page'
 import { imageBlock } from './image-block'
@@ -25,5 +27,7 @@ export const schemaTypes = [
   twoColumnImageBlock,
   legalPage,
   portfolioAccessProfile,
+  portfolioAccessRequest,
+  portfolioAccessSettings,
   deck,
 ]

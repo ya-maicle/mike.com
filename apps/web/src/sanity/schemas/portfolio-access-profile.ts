@@ -112,9 +112,10 @@ export const portfolioAccessProfile = defineType({
     }),
     defineField({
       name: 'allowedEmailDomains',
-      title: 'Allowed Email Domains',
+      title: 'Email Domains',
       type: 'array',
-      description: 'Corporate domains that can unlock recruiter-only case studies after login.',
+      description:
+        'Verified email domains covered by this profile. Blocked profiles deny additional access, including signed-in studies.',
       of: [{ type: 'string' }],
       options: { layout: 'tags' },
       validation: (Rule) =>
@@ -128,6 +129,34 @@ export const portfolioAccessProfile = defineType({
           if (invalid) return `Invalid email domain: ${invalid}`
           return true
         }),
+    }),
+    defineField({
+      name: 'accessScope',
+      title: 'Case study access',
+      type: 'string',
+      initialValue: 'all',
+      description:
+        'Applies to approved email domains and shared links. Existing profiles keep access to all approval-required studies.',
+      options: {
+        layout: 'radio',
+        list: [
+          { title: 'All approval-required case studies', value: 'all' },
+          { title: 'Selected case studies', value: 'selected' },
+        ],
+      },
+    }),
+    defineField({
+      name: 'allowedCaseStudies',
+      title: 'Selected case studies',
+      type: 'array',
+      of: [{ type: 'reference', to: [{ type: 'caseStudy' }] }],
+      hidden: ({ document }) => document?.accessScope !== 'selected',
+      validation: (Rule) =>
+        Rule.unique().custom((value, context) =>
+          context.document?.accessScope === 'selected' && !value?.length
+            ? 'Select at least one case study.'
+            : true,
+        ),
     }),
     defineField({
       name: 'expiresAt',

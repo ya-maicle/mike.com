@@ -133,6 +133,7 @@ export default async function Home() {
           heading={data.featuredWorkSection.heading}
           button={data.featuredWorkSection.button}
           projects={data.featuredWorkSection.projects}
+          access={accessState}
           hasRecruiterAccess={accessState.hasRecruiterAccess}
         />
       )}

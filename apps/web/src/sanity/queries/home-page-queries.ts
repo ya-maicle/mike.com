@@ -112,7 +112,7 @@ export type HomePage = {
       title: string
       slug: { current: string }
       summary: string
-      visibility?: 'public' | 'recruiter'
+      visibility?: 'public' | 'members' | 'recruiter'
       cover?: CoverMedia
       coverImage?: SanityImage
       projectInfo?: {

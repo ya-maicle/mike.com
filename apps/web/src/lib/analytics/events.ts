@@ -15,7 +15,7 @@ export type PageType =
   | 'legal'
   | 'other'
 
-export type StudyVisibility = 'public' | 'recruiter'
+export type StudyVisibility = 'public' | 'members' | 'recruiter'
 export type StudyViewState = 'locked' | 'unlocked'
 export type StudyAccessSource = 'none' | 'link' | 'login'
 export type PortfolioAuthMethod = 'google' | 'magic_link'
@@ -51,6 +51,7 @@ export type AnalyticsEventMap = {
     study_slug: string
     method: 'copy' | 'linkedin' | 'x'
   }
+  portfolio_access_requested: { study_slug: string }
   portfolio_access_started: {
     auth_method: PortfolioAuthMethod
     entry_point: PortfolioAccessEntryPoint
