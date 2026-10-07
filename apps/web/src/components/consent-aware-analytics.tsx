@@ -126,7 +126,7 @@ function ConsentAwareAnalyticsForPath({ analyticsEnabled }: { analyticsEnabled: 
 
   // The magic-link confirmation fragment contains a one-time bearer secret until
   // the confirmation UI removes it. Keep third-party scripts off auth callbacks.
-  if (isSensitiveAuthPath(pathname)) return null
+  if (isSensitiveAuthPath(pathname) || pathname === '/access') return null
 
   return (
     <>

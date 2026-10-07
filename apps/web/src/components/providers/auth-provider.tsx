@@ -8,7 +8,6 @@ import getSupabaseClient, {
 import type { Session, User } from '@supabase/supabase-js'
 import { upsertProfileFromUser } from '@/lib/profile'
 import { isValidReturnPath } from '@/lib/url-validation'
-import { isCaseStudyPath, withAccessDenied } from '@/lib/portfolio-access-client'
 import { captureAnalyticsEvent, resetAnalyticsIdentity } from '@/lib/analytics/client'
 import { consumePortfolioAccessContext } from '@/lib/analytics/portfolio-access'
 import { requestedStudySlugFromPath, type PortfolioAuthMethod } from '@/lib/analytics/events'
@@ -97,7 +96,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             accessToken: newSession.access_token,
-            path,
+            // Request continuation is encrypted but still private; never log it.
+            path: path?.startsWith('/access#') ? '/access' : path,
           }),
         })
         if (!res.ok) return { status: 'denied' } satisfies PortfolioClaimResult
@@ -182,19 +182,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       if (!safeReturnUrl || (!shouldCompleteAuth && claimStatus !== 'granted')) return
+      if (!shouldCompleteAuth && safeReturnUrl.startsWith('/access#request=')) return
 
       try {
         localStorage.removeItem('auth-return-url')
       } catch {}
 
-      if (claimStatus === 'granted' || !isCaseStudyPath(safeReturnUrl)) {
-        dlog('Redirecting to:', safeReturnUrl)
-        window.location.replace(safeReturnUrl)
-        return
-      }
-
-      dlog('Redirecting to restricted case study prompt:', safeReturnUrl)
-      window.location.replace(withAccessDenied(safeReturnUrl))
+      // The destination renders the current Sanity access or request state.
+      window.location.replace(safeReturnUrl)
     },
     [claimPortfolioAccess, dlog],
   )
@@ -392,6 +387,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const callbackError =
       !isSensitiveAuthEntry &&
       (callbackParams.has('error') || callbackParams.has('error_description'))
+    const requestReturn = callbackParams.get('auth_return_to')?.startsWith('/access#request=')
+    const failedSignInPath = requestReturn
+      ? '/access?signin=failed'
+      : '/auth/confirm?error=invalid_link'
 
     const { data: sub } = supabase.auth.onAuthStateChange((event, newSession) => {
       dlog('onAuthStateChange:', event, {
@@ -473,10 +472,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           if (!mounted) return
           dlog('OAuth code exchange exception:', error)
           setLoading(false)
-          window.location.replace('/auth/confirm?error=invalid_link')
+          window.location.replace(failedSignInPath)
         })
     } else if (callbackError) {
-      window.location.replace('/auth/confirm?error=invalid_link')
+      window.location.replace(failedSignInPath)
     }
 
     supabase.auth.getSession().then(({ data }) => {

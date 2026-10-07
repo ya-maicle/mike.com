@@ -25,7 +25,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
   const [desktopNavOpen, setDesktopNavOpen] = React.useState(false)
   const { open: mobileNavOpen, setOpen: setMobileNavOpen } = useMobileNavigation()
 
-  const { open: loginOpen, setOpen: setLoginOpen } = useLoginModal()
+  const { open: loginOpen, setOpen: setLoginOpen, requestAccess } = useLoginModal()
   const { user } = useAuth()
   const pathname = usePathname()
   const keepHeaderVisible = pathname === '/blog'
@@ -170,14 +170,9 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
               {user ? (
                 <UserMenu />
               ) : (
-                <Button
-                  className="hidden md:inline-flex"
-                  variant="secondary"
-                  size="default"
-                  asChild
-                >
-                  <Link href="/login" onClick={handleLoginNavigation}>
-                    Log in
+                <Button variant="secondary" size="default" asChild>
+                  <Link href="/access" onClick={handleLoginNavigation}>
+                    Portfolio access
                   </Link>
                 </Button>
               )}
@@ -249,8 +244,8 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
             {!user && (
               <div className="mt-auto flex justify-end md:hidden">
                 <Button variant="secondary" size="default" asChild>
-                  <Link href="/login" onClick={handleLoginNavigation}>
-                    Log in
+                  <Link href="/access" onClick={handleLoginNavigation}>
+                    Portfolio access
                   </Link>
                 </Button>
               </div>
@@ -305,7 +300,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
             className="sm:max-w-sm bg-transparent border-none shadow-none p-0"
           >
             <DialogTitle className="sr-only">Log in</DialogTitle>
-            <LoginForm onMagicLinkSent={() => setLoginOpen(false)} />
+            <LoginForm requestAccess={requestAccess} onMagicLinkSent={() => setLoginOpen(false)} />
           </DialogContent>
         </Dialog>
       )}

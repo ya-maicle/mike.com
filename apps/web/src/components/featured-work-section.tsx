@@ -1,5 +1,6 @@
 'use client'
 
+import type { StudyAccess } from '@/lib/study-access'
 import Link from 'next/link'
 import { gridCols } from '@/lib/grid-columns'
 import { ProjectGrid } from '@/components/project-grid'
@@ -11,6 +12,7 @@ type FeaturedWorkSectionProps = {
   heading?: string
   button?: { text?: string; link?: string }
   projects: ProjectCardData[]
+  access?: StudyAccess
   hasRecruiterAccess?: boolean
 }
 
@@ -19,6 +21,7 @@ export function FeaturedWorkSection({
   heading,
   button,
   projects,
+  access,
   hasRecruiterAccess = false,
 }: FeaturedWorkSectionProps) {
   if (!projects || projects.length === 0) return null
@@ -38,7 +41,7 @@ export function FeaturedWorkSection({
           </div>
         </div>
 
-        <ProjectGrid projects={projects} hasRecruiterAccess={hasRecruiterAccess} />
+        <ProjectGrid projects={projects} access={access} hasRecruiterAccess={hasRecruiterAccess} />
       </div>
     </section>
   )

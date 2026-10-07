@@ -138,7 +138,7 @@ export function MagicLinkSent() {
 
   function handleUseAnotherMethod() {
     clearPendingRequest()
-    router.replace('/login')
+    router.replace(request?.returnPath.startsWith('/access#request=') ? '/access' : '/login')
   }
 
   return (
@@ -188,6 +188,12 @@ export function MagicLinkSent() {
 
       <CardContent className="space-y-6 px-0">
         <div className="text-muted-foreground space-y-3 text-center text-sm leading-5 text-pretty">
+          {request?.returnPath.startsWith('/access#request=') ? (
+            <p className="mb-0">
+              Your portfolio request will be sent after you confirm your email. You won’t need to
+              fill in the form again.
+            </p>
+          ) : null}
           <p className="mb-0">
             Open the email link to continue. It works once and expires in{' '}
             {MAGIC_LINK_EXPIRY_MINUTES} minutes.

@@ -7,10 +7,15 @@ import { rememberPortfolioAccessEntryPoint } from '@/lib/analytics/portfolio-acc
 import type { PortfolioAccessEntryPoint } from '@/lib/analytics/events'
 
 type Mode = 'login' | 'signup'
-type OpenLoginOptions = { returnTo?: string; entryPoint?: PortfolioAccessEntryPoint }
+type OpenLoginOptions = {
+  returnTo?: string
+  entryPoint?: PortfolioAccessEntryPoint
+  requestAccess?: boolean
+}
 
 type LoginModalContextValue = {
   open: boolean
+  requestAccess: boolean
   setOpen: (open: boolean) => void
   mode: Mode
   setMode: (mode: Mode) => void
@@ -24,22 +29,29 @@ const LoginModalContext = React.createContext<LoginModalContextValue | undefined
 export function LoginModalProvider({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = React.useState(false)
   const [mode, setMode] = React.useState<Mode>('login')
+  const [requestAccess, setRequestAccess] = React.useState(false)
   const openLogin = React.useCallback((options?: OpenLoginOptions) => {
     if (typeof window !== 'undefined' && isValidReturnPath(options?.returnTo ?? null)) {
-      localStorage.setItem('auth-return-url', options!.returnTo!)
+      try {
+        localStorage.setItem('auth-return-url', options!.returnTo!)
+      } catch {
+        // The current URL remains a fallback when browser storage is unavailable.
+      }
     }
     rememberPortfolioAccessEntryPoint(options?.entryPoint ?? 'header', options?.returnTo)
+    setRequestAccess(options?.requestAccess ?? false)
     setMode('login')
     setOpen(true)
   }, [])
   const openSignup = React.useCallback(() => {
+    setRequestAccess(false)
     setMode('signup')
     setOpen(true)
   }, [])
   const closeLogin = React.useCallback(() => setOpen(false), [])
   const value = React.useMemo(
-    () => ({ open, setOpen, mode, setMode, openLogin, openSignup, closeLogin }),
-    [open, mode, openLogin, openSignup, closeLogin],
+    () => ({ open, setOpen, mode, setMode, openLogin, openSignup, closeLogin, requestAccess }),
+    [open, mode, openLogin, openSignup, closeLogin, requestAccess],
   )
   // Auto-close on successful sign-in
   React.useEffect(() => {

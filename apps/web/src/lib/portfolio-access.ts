@@ -6,14 +6,30 @@ import type { NextResponse } from 'next/server'
 import { sanityNoStoreFetch } from '@/sanity/client'
 import {
   ACTIVE_PORTFOLIO_ACCESS_PROFILE_BY_SLUG,
+  PORTFOLIO_ACCESS_PROFILES_WITH_DOMAINS,
   type PortfolioAccessProfile,
 } from '@/sanity/queries/portfolio-access-queries'
-import { getEmailDomain, isProfileActive, normalizeEmailDomain } from '@/lib/portfolio-access-model'
+import {
+  getEmailDomain,
+  isProfileActive,
+  normalizeEmailDomain,
+  profileMatchesDomain,
+  profileStudyAccess,
+} from '@/lib/portfolio-access-model'
 import {
   COOKIE_VERSION,
   signAccessPayload,
   verifyAccessPayload,
 } from '@/lib/portfolio-access-crypto'
+
+import {
+  getPortfolioIdentity,
+  PORTFOLIO_IDENTITY_COOKIE,
+  identityCookieOptions,
+} from '@/lib/portfolio-identity'
+import { getAccessRequests } from '@/lib/portfolio-requests'
+import { approvedStudyIds } from '@/lib/portfolio-request-model'
+import type { StudyAccess } from '@/lib/study-access'
 
 export const PORTFOLIO_LINK_ACCESS_COOKIE = 'portfolio_link_access'
 export const PORTFOLIO_LOGIN_ACCESS_COOKIE = 'portfolio_login_access'
@@ -37,17 +53,11 @@ type BlockedPayload = {
   exp: number
 }
 
-export type PortfolioAccessState =
-  | {
-      hasRecruiterAccess: true
-      source: 'link' | 'login'
-      companySlug: string
-    }
-  | {
-      hasRecruiterAccess: false
-      source?: 'blocked' | 'none'
-      blockedDomain?: string
-    }
+export type PortfolioAccessState = StudyAccess & {
+  isSignedIn?: boolean
+  source: 'link' | 'login' | 'blocked' | 'none'
+  companySlug?: string
+}
 
 export { getEmailDomain, isProfileActive, normalizeEmailDomain }
 
@@ -135,56 +145,88 @@ export function setPortfolioBlockedCookie(response: NextResponse, domain: string
 }
 
 export function clearPortfolioLoginCookies(response: NextResponse) {
+  response.cookies.set(PORTFOLIO_IDENTITY_COOKIE, '', { ...identityCookieOptions, maxAge: 0 })
   response.cookies.set(PORTFOLIO_LOGIN_ACCESS_COOKIE, '', cookieOptions(0))
   response.cookies.set(PORTFOLIO_BLOCKED_IDENTITY_COOKIE, '', cookieOptions(0))
 }
 
-async function isGrantStillActive(companySlug: string) {
-  const profile = await sanityNoStoreFetch<PortfolioAccessProfile | null>(
-    ACTIVE_PORTFOLIO_ACCESS_PROFILE_BY_SLUG,
-    { slug: companySlug },
+export async function resolveIdentityAccess(identity: {
+  id: string
+  email: string
+}): Promise<PortfolioAccessState> {
+  const profiles = await sanityNoStoreFetch<PortfolioAccessProfile[]>(
+    PORTFOLIO_ACCESS_PROFILES_WITH_DOMAINS,
   )
-  return isProfileActive(profile)
+  const matching = profiles.filter((profile) =>
+    profileMatchesDomain(profile, getEmailDomain(identity.email)),
+  )
+  if (matching.some((profile) => profile.accessStatus === 'blocked')) {
+    return {
+      hasRecruiterAccess: false,
+      hasMemberAccess: false,
+      isSignedIn: true,
+      source: 'blocked',
+    }
+  }
+  const access = profileStudyAccess(matching)
+  const requests = await getAccessRequests(identity.id, identity.email)
+  return {
+    ...access,
+    allowedStudyIds: [
+      ...new Set([...access.allowedStudyIds, ...requests.flatMap(approvedStudyIds)]),
+    ],
+    hasMemberAccess: true,
+    isSignedIn: true,
+    source: 'login',
+    companySlug: matching.find(isProfileActive)?.slug,
+  }
 }
 
 export async function getPortfolioAccessState(): Promise<PortfolioAccessState> {
   const cookieStore = await cookies()
-  const blocked = verifyPayload<BlockedPayload>(
-    cookieStore.get(PORTFOLIO_BLOCKED_IDENTITY_COOKIE)?.value,
-    'blocked',
-  )
-
-  if (blocked) {
-    return {
-      hasRecruiterAccess: false,
-      source: 'blocked',
-      blockedDomain: blocked.domain,
+  const identityToken = cookieStore.get(PORTFOLIO_IDENTITY_COOKIE)?.value
+  const identity = await getPortfolioIdentity()
+  let access: PortfolioAccessState = { hasRecruiterAccess: false, source: 'none' }
+  try {
+    if (identity) {
+      access = await resolveIdentityAccess(identity)
+      if (access.source === 'blocked') return access
+    } else if (identityToken) {
+      // An expired or revoked identity cannot fall back to a shared link.
+      return access
+    } else if (
+      verifyPayload<BlockedPayload>(
+        cookieStore.get(PORTFOLIO_BLOCKED_IDENTITY_COOKIE)?.value,
+        'blocked',
+      )
+    ) {
+      return { ...access, source: 'blocked' }
     }
-  }
-
-  const loginGrant = verifyPayload<GrantPayload>(
-    cookieStore.get(PORTFOLIO_LOGIN_ACCESS_COOKIE)?.value,
-    'login',
-  )
-  if (loginGrant && (await isGrantStillActive(loginGrant.companySlug))) {
-    return {
-      hasRecruiterAccess: true,
-      source: 'login',
-      companySlug: loginGrant.companySlug,
+    const link = verifyPayload<GrantPayload>(
+      cookieStore.get(PORTFOLIO_LINK_ACCESS_COOKIE)?.value,
+      'link',
+    )
+    if (link) {
+      const profile = await sanityNoStoreFetch<PortfolioAccessProfile | null>(
+        ACTIVE_PORTFOLIO_ACCESS_PROFILE_BY_SLUG,
+        { slug: link.companySlug },
+      )
+      if (isProfileActive(profile)) {
+        const grant = profileStudyAccess([profile!])
+        return {
+          ...access,
+          hasRecruiterAccess: access.hasRecruiterAccess || grant.hasRecruiterAccess,
+          allowedStudyIds: [
+            ...new Set([...(access.allowedStudyIds ?? []), ...grant.allowedStudyIds]),
+          ],
+          source: identity ? 'login' : 'link',
+          companySlug: access.companySlug ?? profile!.slug,
+        }
+      }
     }
+    return access
+  } catch {
+    // No cached permission fallback when the access rules cannot be checked.
+    return { hasRecruiterAccess: false, source: 'none', isSignedIn: !!identity }
   }
-
-  const linkGrant = verifyPayload<GrantPayload>(
-    cookieStore.get(PORTFOLIO_LINK_ACCESS_COOKIE)?.value,
-    'link',
-  )
-  if (linkGrant && (await isGrantStillActive(linkGrant.companySlug))) {
-    return {
-      hasRecruiterAccess: true,
-      source: 'link',
-      companySlug: linkGrant.companySlug,
-    }
-  }
-
-  return { hasRecruiterAccess: false, source: 'none' }
 }

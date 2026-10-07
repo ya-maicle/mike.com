@@ -1,6 +1,9 @@
 'use client'
 
 import * as React from 'react'
+import Link from 'next/link'
+import { usePortfolioRequest } from '@/components/providers/portfolio-request-provider'
+import { Badge } from '@/components/ui/badge'
 import { useAuth } from '@/components/providers/auth-provider'
 import { ProfileEditDialog } from '@/components/profile-edit-dialog'
 import getSupabaseClient from '@/lib/supabase'
@@ -26,11 +29,12 @@ import {
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu'
 import { Icon } from '@/components/ui/icon'
-import { LogOut, UserRoundPen } from 'lucide-react'
+import { LogOut, UserRoundPen, LockKeyhole } from 'lucide-react'
 // no router needed here; logout stays on current page
 
 export function UserMenu() {
   const { user, signOut } = useAuth()
+  const { state: access } = usePortfolioRequest()
   const supabase = getSupabaseClient()
   const userId = user?.id
   const userEmail = user?.email
@@ -183,6 +187,17 @@ export function UserMenu() {
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
+          <DropdownMenuItem asChild>
+            <Link href="/access" className="flex items-center gap-2">
+              <Icon icon={LockKeyhole} size="md" className="text-muted-foreground" />
+              <span>Portfolio access</span>
+              {access?.status === 'pending' || access?.status === 'approved' ? (
+                <Badge variant="secondary">
+                  {access.status === 'pending' ? 'Pending' : 'Approved'}
+                </Badge>
+              ) : null}
+            </Link>
+          </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={() => setProfileEditorOpen(true)}
             className="flex items-center gap-2"

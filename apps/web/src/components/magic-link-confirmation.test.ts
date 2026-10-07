@@ -87,6 +87,19 @@ describe('MagicLinkConfirmation', () => {
     return replaceState
   }
 
+  it('explains that confirming the email sends the already completed portfolio request', async () => {
+    await renderAt(
+      '/auth/confirm#auth_return_to=%2Faccess%23request%3Dencrypted-context&token_hash=one-time-secret&type=email',
+    )
+    expect(container.textContent).toContain('Confirm your portfolio request')
+    expect(authActions.completeMagicLink).not.toHaveBeenCalled()
+    await click(buttonNamed('Confirm and send request'))
+    expect(authActions.completeMagicLink).toHaveBeenCalledExactlyOnceWith({
+      kind: 'token_hash',
+      tokenHash: 'one-time-secret',
+    })
+  })
+
   function buttonNamed(name: string) {
     const button = Array.from(container.querySelectorAll('button')).find(
       (candidate) => candidate.textContent?.trim() === name,

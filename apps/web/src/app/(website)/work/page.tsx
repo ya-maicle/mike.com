@@ -6,6 +6,7 @@ import type { CaseStudy } from '@/sanity/queries'
 import { WorkCaseStudyList } from '@/components/work-case-study-list'
 import { HomeLogoStrip } from '@/components/home-logo-strip'
 import { getPortfolioAccessState } from '@/lib/portfolio-access'
+import { PortfolioAccessSummary } from '@/components/portfolio-access-summary'
 
 export const dynamic = 'force-dynamic'
 
@@ -22,7 +23,12 @@ export const metadata: Metadata = createPageMetadata({
   },
 })
 
-export default async function WorkPage() {
+export default async function WorkPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ view?: string }>
+}) {
+  const publicOnly = (await searchParams).view === 'public'
   const [caseStudies, accessState] = await Promise.all([
     sanityFetch<CaseStudy[]>(PUBLISHED_CASE_STUDIES, {}, { tag: 'caseStudies' }),
     getPortfolioAccessState(),
@@ -41,14 +47,20 @@ export default async function WorkPage() {
           <HomeLogoStrip hideLeaves />
           <h1>Case Studies</h1>
           <p className="text-xl text-foreground leading-relaxed max-w-prose mt-2">
-            An archive of projects completed
+            {publicOnly ? 'Public work. ' : ''}An archive of projects completed
             {earliestYear ? ` between ${earliestYear} and` : ' through'} {currentYear}.
           </p>
         </header>
       </div>
 
+      <PortfolioAccessSummary />
       <WorkCaseStudyList
-        caseStudies={caseStudies}
+        caseStudies={
+          publicOnly
+            ? caseStudies.filter((study) => !study.visibility || study.visibility === 'public')
+            : caseStudies
+        }
+        access={accessState}
         hasRecruiterAccess={accessState.hasRecruiterAccess}
       />
     </div>

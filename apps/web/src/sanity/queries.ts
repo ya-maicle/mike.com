@@ -111,7 +111,7 @@ export type CaseStudy = {
   _type: 'caseStudy'
   title: string
   summary?: string
-  visibility?: 'public' | 'recruiter'
+  visibility?: 'public' | 'members' | 'recruiter'
   slug: { current: string }
   publishedAt?: string
   cover?: CoverMedia

@@ -1,11 +1,7 @@
 'use client'
 
 import { PageTemplate } from '@/components/page-template'
-import { Button } from '@/components/ui/button'
-import { Icon } from '@/components/ui/icon'
-import * as Icons from '@/components/ui/icons'
 import { gridCols } from '@/lib/grid-columns'
-import { useLoginModal } from '@/components/providers/login-modal-provider'
 import { resolveStudyCoverMedia } from '@/lib/cover-media'
 import type { CaseStudy } from '@/sanity/queries'
 import { CaseStudyAnalytics } from '@/components/case-study-analytics'
@@ -13,25 +9,26 @@ import { CaseStudyByline } from '@/components/case-study-byline'
 import { ContentActions } from '@/components/blog-article-actions'
 import type { StudyAccessSource } from '@/lib/analytics/events'
 
+import { CaseStudyAccessPanel } from '@/components/case-study-access-panel'
+import { Button } from '@/components/ui/button'
+
 type CaseStudyAccessGateProps = {
   study: CaseStudy
-  denied?: boolean
+  blocked?: boolean
   accessSource?: StudyAccessSource
 }
 
 export function CaseStudyAccessGate({
   study,
-  denied = false,
+  blocked = false,
   accessSource = 'none',
 }: CaseStudyAccessGateProps) {
-  const { openLogin } = useLoginModal()
-  const href = `/work/${study.slug.current}`
   const coverMedia = resolveStudyCoverMedia(study.headerMedia, study.cover, study.coverImage)
 
   return (
     <CaseStudyAnalytics
       studySlug={study.slug.current}
-      studyVisibility="recruiter"
+      studyVisibility={study.visibility ?? 'recruiter'}
       viewState="locked"
       accessSource={accessSource}
     >
@@ -46,7 +43,16 @@ export function CaseStudyAccessGate({
           ].filter(Boolean) as string[]
         }
         subtitle={study.summary}
-        byline={<CaseStudyByline />}
+        byline={
+          <div className="space-y-5">
+            <CaseStudyByline />
+            <Button variant="secondary" asChild>
+              <a href="#request-access">
+                {study.visibility === 'members' ? 'Sign in to read' : 'Portfolio access'}
+              </a>
+            </Button>
+          </div>
+        }
         coverMedia={coverMedia}
         className="pb-0"
         headerActions={
@@ -58,29 +64,11 @@ export function CaseStudyAccessGate({
         }
       >
         <section data-nosnippet className={`${gridCols.narrow} py-16 md:py-24`}>
-          <div className="mx-auto flex max-w-[592px] flex-col items-center gap-6 text-center">
-            <div className="flex size-12 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
-              <Icon icon={Icons.Lock} size="md" />
-            </div>
-            <div className="space-y-3">
-              <h2 className="m-0 text-3xl font-normal">Log in to view this case study</h2>
-              <p className="m-0 text-base text-muted-foreground">
-                Some case studies are shared with hiring teams and trusted reviewers.
-              </p>
-            </div>
-            {denied ? (
-              <p className="m-0 text-sm text-muted-foreground" role="status" aria-live="polite">
-                This email does not currently have access to the full case study.
-              </p>
-            ) : null}
-            <Button
-              size="lg"
-              onClick={() => openLogin({ returnTo: href, entryPoint: 'case_study_gate' })}
-            >
-              <Icon icon={Icons.Lock} size="sm" />
-              Log in
-            </Button>
-          </div>
+          <CaseStudyAccessPanel
+            studySlug={study.slug.current}
+            visibility={study.visibility}
+            blocked={blocked}
+          />
         </section>
       </PageTemplate>
     </CaseStudyAnalytics>

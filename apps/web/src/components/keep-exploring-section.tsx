@@ -1,3 +1,4 @@
+import type { StudyAccess } from '@/lib/study-access'
 import Link from 'next/link'
 import { gridCols } from '@/lib/grid-columns'
 import { ProjectGrid } from '@/components/project-grid'
@@ -5,11 +6,13 @@ import type { ProjectCardData } from '@/components/project-card'
 
 type KeepExploringSectionProps = {
   projects: ProjectCardData[]
+  access?: StudyAccess
   hasRecruiterAccess?: boolean
 }
 
 export function KeepExploringSection({
   projects,
+  access,
   hasRecruiterAccess = false,
 }: KeepExploringSectionProps) {
   if (!projects || projects.length === 0) return null
@@ -27,7 +30,7 @@ export function KeepExploringSection({
           </Link>
         </div>
 
-        <ProjectGrid projects={projects} hasRecruiterAccess={hasRecruiterAccess} />
+        <ProjectGrid projects={projects} access={access} hasRecruiterAccess={hasRecruiterAccess} />
       </div>
     </section>
   )

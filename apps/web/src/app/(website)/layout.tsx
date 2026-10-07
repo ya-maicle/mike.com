@@ -1,5 +1,6 @@
 import { ThemeProvider } from '@/components/theme-provider'
 import { AuthProvider } from '@/components/providers/auth-provider'
+import { PortfolioRequestProvider } from '@/components/providers/portfolio-request-provider'
 import { LoginModalProvider } from '@/components/providers/login-modal-provider'
 import { CookiePreferencesProvider } from '@/components/providers/cookie-preferences-provider'
 import { MobileNavigationProvider } from '@/components/providers/mobile-navigation-provider'
@@ -12,20 +13,22 @@ export default function WebsiteLayout({
 }>) {
   return (
     <AuthProvider>
-      <LoginModalProvider>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <MobileNavigationProvider>
-            <CookiePreferencesProvider>
-              <HeaderWithNavLayout>{children}</HeaderWithNavLayout>
-            </CookiePreferencesProvider>
-          </MobileNavigationProvider>
-        </ThemeProvider>
-      </LoginModalProvider>
+      <PortfolioRequestProvider>
+        <LoginModalProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <MobileNavigationProvider>
+              <CookiePreferencesProvider>
+                <HeaderWithNavLayout>{children}</HeaderWithNavLayout>
+              </CookiePreferencesProvider>
+            </MobileNavigationProvider>
+          </ThemeProvider>
+        </LoginModalProvider>
+      </PortfolioRequestProvider>
     </AuthProvider>
   )
 }

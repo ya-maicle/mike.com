@@ -17,60 +17,30 @@ import {
 } from '@/lib/magic-link'
 import getSupabaseClient, { createSupabaseMagicLinkClient } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
-import { isValidReturnPath } from '@/lib/url-validation'
+import {
+  getSiteOrigin,
+  getReturnPath,
+  rememberReturnPath,
+  getOAuthRedirectUrl,
+  magicLinkErrorMessage,
+} from '@/lib/auth-navigation'
 
 type LoginFormProps = React.ComponentProps<'div'> & {
   presentation?: 'card' | 'page'
+  requestAccess?: boolean
   onMagicLinkSent?: () => void
-}
-
-function getSiteOrigin() {
-  const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim()
-  const candidate = typeof window !== 'undefined' ? window.location.origin : configuredUrl
-  if (!candidate) throw new Error('The site URL is not configured.')
-  return new URL(candidate).origin
-}
-
-function getReturnPath() {
-  if (typeof window === 'undefined') return '/'
-
-  try {
-    const rememberedPath = localStorage.getItem('auth-return-url')
-    if (isValidReturnPath(rememberedPath)) return rememberedPath!
-  } catch {
-    // Storage can be unavailable in privacy modes; the current URL is a safe fallback.
-  }
-
-  const currentPath = `${window.location.pathname}${window.location.search}${window.location.hash}`
-  return isValidReturnPath(currentPath) ? currentPath : '/'
-}
-
-function rememberReturnPath(returnPath: string) {
-  try {
-    localStorage.setItem('auth-return-url', returnPath)
-  } catch {
-    // The return path is also carried in the provider redirect, so storage is optional.
-  }
-}
-
-function getOAuthRedirectUrl(origin: string, returnPath: string) {
-  const url = new URL(origin)
-  if (returnPath !== '/' && isValidReturnPath(returnPath)) {
-    url.searchParams.set('auth_return_to', returnPath)
-  }
-  return url.toString()
-}
-
-function magicLinkErrorMessage(error: { message?: string; status?: number }) {
-  if (error.status === 429 || /rate|seconds|too many/i.test(error.message ?? '')) {
-    return 'Please wait a minute before requesting another sign-in link.'
-  }
-  return 'We could not send the sign-in link. Please check the address and try again.'
+  beforeSignIn?: (method: 'google' | 'magic_link', email?: string) => Promise<string>
+  returnTo?: string
+  requestFields?: React.ReactNode
 }
 
 export function LoginForm({
   presentation = 'card',
+  requestAccess = false,
   onMagicLinkSent,
+  beforeSignIn,
+  returnTo,
+  requestFields,
   className,
   ...props
 }: LoginFormProps) {
@@ -78,13 +48,18 @@ export function LoginForm({
   const isPage = presentation === 'page'
   const [email, setEmail] = React.useState('')
   const [pending, setPending] = React.useState(false)
+  const [method, setMethod] = React.useState<'google' | 'magic_link'>('google')
   const [errorMsg, setErrorMsg] = React.useState<string | null>(null)
 
   const handleGoogleLogin = async () => {
+    setMethod('google')
     setErrorMsg(null)
+    setPending(true)
+    let prepared = false
     try {
       const supabase = getSupabaseClient()
-      const returnPath = getReturnPath()
+      const returnPath = beforeSignIn ? await beforeSignIn('google') : (returnTo ?? getReturnPath())
+      prepared = true
       const redirectTo = getOAuthRedirectUrl(getSiteOrigin(), returnPath)
 
       rememberReturnPath(returnPath)
@@ -96,20 +71,31 @@ export function LoginForm({
       })
       if (error) throw error
     } catch (error) {
-      setErrorMsg('Google sign-in could not be started. Please try again.')
-      console.error('[AUTH] Google OAuth error:', error)
+      setErrorMsg(
+        !prepared && error instanceof Error
+          ? error.message
+          : 'Google sign-in could not be started. Please try again.',
+      )
+      if (prepared) console.error('[AUTH] Google sign-in could not be started.')
+    } finally {
+      setPending(false)
     }
   }
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    setMethod('magic_link')
     setErrorMsg(null)
     setPending(true)
 
     const normalizedEmail = email.trim()
+    let prepared = false
 
     try {
-      const returnPath = getReturnPath()
+      const returnPath = beforeSignIn
+        ? await beforeSignIn('magic_link', normalizedEmail)
+        : (returnTo ?? getReturnPath())
+      prepared = true
       const emailRedirectTo = buildMagicLinkEmailRedirectUrl(getSiteOrigin(), returnPath)
       rememberReturnPath(returnPath)
 
@@ -157,7 +143,11 @@ export function LoginForm({
       onMagicLinkSent?.()
       router.push(MAGIC_LINK_SENT_PATH)
     } catch (error) {
-      setErrorMsg('We could not send the sign-in link. Please try again.')
+      setErrorMsg(
+        !prepared && error instanceof Error
+          ? error.message
+          : 'We could not send the sign-in link. Please try again.',
+      )
       console.error('[AUTH] Magic link exception:', error)
     } finally {
       setPending(false)
@@ -175,24 +165,45 @@ export function LoginForm({
           aria-level={1}
           className={cn(isPage ? 'text-3xl leading-9 font-normal tracking-[-0.01em]' : 'text-xl')}
         >
-          {isPage ? 'Log in or sign up' : 'Sign in'}
+          {requestAccess ? 'Request portfolio access' : 'Sign in to explore the work'}
         </CardTitle>
-        {!isPage ? (
-          <CardDescription>Use Google or get a magic link by email</CardDescription>
-        ) : null}
+        <CardDescription>
+          {requestAccess
+            ? 'One request for the private portfolio. Continue with Google or verify your email to send it. I’ll email you when I’ve reviewed it.'
+            : 'Read selected case studies and request access to private work. Some case studies require approval.'}
+        </CardDescription>
       </CardHeader>
       <CardContent className={cn(isPage && 'px-0')}>
         <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-          {pending ? 'Sending your sign-in link…' : ''}
+          {pending
+            ? method === 'google'
+              ? 'Continuing to Google…'
+              : 'Sending your sign-in link…'
+            : ''}
         </p>
         <form
           onSubmit={onSubmit}
           aria-busy={pending}
           className={cn(isPage ? 'flex flex-col gap-4' : 'grid gap-6')}
         >
+          {requestFields ? (
+            <fieldset disabled={pending} className="min-w-0">
+              {requestFields}
+            </fieldset>
+          ) : null}
+          {errorMsg ? (
+            <p
+              id="login-error"
+              className="text-destructive text-sm"
+              role="alert"
+              aria-live="polite"
+            >
+              {errorMsg}
+            </p>
+          ) : null}
           <Button
             type="button"
-            variant="outline"
+            variant={requestAccess ? 'default' : 'outline'}
             size={isPage ? 'lg' : 'default'}
             className={cn(
               'w-full',
@@ -258,24 +269,20 @@ export function LoginForm({
               ) : null}
             </div>
 
-            {errorMsg ? (
-              <p
-                id="login-error"
-                className={cn('text-destructive text-sm', isPage && 'mb-0 text-center')}
-                role="alert"
-                aria-live="polite"
-              >
-                {errorMsg}
-              </p>
-            ) : null}
-
             <Button
               type="submit"
+              variant={requestAccess ? 'outline' : 'default'}
               size={isPage ? 'lg' : 'default'}
               className={cn('w-full', isPage && 'h-13 text-base font-medium')}
               disabled={pending || !email.trim()}
             >
-              {pending ? 'Sending…' : isPage ? 'Continue' : 'Send magic link'}
+              {pending
+                ? 'Continuing…'
+                : requestAccess
+                  ? 'Continue with email'
+                  : isPage
+                    ? 'Continue'
+                    : 'Send magic link'}
             </Button>
           </div>
         </form>

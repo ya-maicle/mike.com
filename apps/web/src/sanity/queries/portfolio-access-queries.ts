@@ -7,6 +7,8 @@ export const PORTFOLIO_ACCESS_PROFILE_BY_SLUG = groq`
     "slug": slug.current,
     accessStatus,
     allowedEmailDomains,
+    accessScope,
+    "allowedStudyIds": allowedCaseStudies[]._ref,
     expiresAt
   }
 `
@@ -18,6 +20,8 @@ export const PORTFOLIO_ACCESS_PROFILES_BY_DOMAIN = groq`
     "slug": slug.current,
     accessStatus,
     allowedEmailDomains,
+    accessScope,
+    "allowedStudyIds": allowedCaseStudies[]._ref,
     expiresAt
   }
 `
@@ -29,6 +33,8 @@ export const PORTFOLIO_ACCESS_PROFILES_WITH_DOMAINS = groq`
     "slug": slug.current,
     accessStatus,
     allowedEmailDomains,
+    accessScope,
+    "allowedStudyIds": allowedCaseStudies[]._ref,
     expiresAt
   }
 `
@@ -45,6 +51,8 @@ export const ACTIVE_PORTFOLIO_ACCESS_PROFILE_BY_SLUG = groq`
     "slug": slug.current,
     accessStatus,
     allowedEmailDomains,
+    accessScope,
+    "allowedStudyIds": allowedCaseStudies[]._ref,
     expiresAt,
     linkToken
   }
@@ -56,6 +64,8 @@ export type PortfolioAccessProfile = {
   slug: string
   accessStatus?: 'enabled' | 'blocked' | 'disabled'
   allowedEmailDomains?: string[]
+  accessScope?: 'all' | 'selected'
+  allowedStudyIds?: string[]
   expiresAt?: string
   linkToken?: string
 }

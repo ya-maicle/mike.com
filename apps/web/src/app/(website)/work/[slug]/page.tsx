@@ -1,7 +1,8 @@
+import { canReadStudy } from '@/lib/study-access'
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
-import { sanityFetch } from '@/sanity/client'
+import { sanityFetch, sanityNoStoreFetch } from '@/sanity/client'
 import {
   CASE_STUDY_TEASER_BY_SLUG,
   CASE_STUDY_WITH_BLOCKS,
@@ -60,22 +61,17 @@ export async function generateMetadata(props: PageProps): Promise<Metadata> {
 
 export default async function CaseStudyPage(props: PageProps) {
   const { slug } = await props.params
-  const searchParams = await props.searchParams
   const [teaser, accessState] = await Promise.all([
-    sanityFetch<CaseStudy | null>(
-      CASE_STUDY_TEASER_BY_SLUG,
-      { slug },
-      { tag: `caseStudy:${slug}` },
-    ),
+    sanityNoStoreFetch<CaseStudy | null>(CASE_STUDY_TEASER_BY_SLUG, { slug }),
     getPortfolioAccessState(),
   ])
   if (!teaser) return notFound()
 
-  if (teaser.visibility === 'recruiter' && !accessState.hasRecruiterAccess) {
+  if (!canReadStudy(teaser, accessState)) {
     return (
       <CaseStudyAccessGate
         study={teaser}
-        denied={searchParams?.access === 'denied'}
+        blocked={accessState.source === 'blocked'}
         accessSource="none"
       />
     )
@@ -93,8 +89,13 @@ export default async function CaseStudyPage(props: PageProps) {
     <CaseStudyLayout
       data={attachMuxTokens(data)}
       otherStudies={otherStudies}
+      access={accessState}
       hasRecruiterAccess={accessState.hasRecruiterAccess}
-      accessSource={accessState.hasRecruiterAccess ? accessState.source : 'none'}
+      accessSource={
+        accessState.source === 'login' || accessState.source === 'link'
+          ? accessState.source
+          : 'none'
+      }
       companySlug={accessState.hasRecruiterAccess ? accessState.companySlug : undefined}
     />
   )
