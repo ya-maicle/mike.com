@@ -1,140 +1,99 @@
 'use client'
 
 import Link from 'next/link'
-import { useCallback, useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Icon } from '@/components/ui/icon'
-import * as Icons from '@/components/ui/icons'
+import { Lock } from '@/components/ui/icons'
 import { useAuth } from '@/components/providers/auth-provider'
 import { useLoginModal } from '@/components/providers/login-modal-provider'
-import { PortfolioAccessRequestForm } from '@/components/portfolio-access-request-form'
+import { usePortfolioRequest } from '@/components/providers/portfolio-request-provider'
 
 type Props = { studySlug: string; visibility?: string; blocked?: boolean }
 
 export function CaseStudyAccessPanel({ studySlug, visibility, blocked = false }: Props) {
   const { session, loading } = useAuth()
   const { openLogin } = useLoginModal()
-  const [status, setStatus] = useState('loading')
-  const [error, setError] = useState('')
-  const [checking, setChecking] = useState(false)
-  const token = session?.access_token
-  const href = `/work/${studySlug}`
+  const { state, error, checking, refresh } = usePortfolioRequest()
   const members = visibility === 'members'
-  const checkStatus = useCallback(async () => {
-    if (!token) return
-    setChecking(true)
-    setError('')
-    try {
-      const response = await fetch(
-        `/api/portfolio-access/request?study=${encodeURIComponent(studySlug)}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          cache: 'no-store',
-        },
-      )
-      const result = await response.json()
-      if (!response.ok) throw new Error(result.error || 'Please try again.')
-      setStatus(result.status)
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Please try again.')
-    } finally {
-      setChecking(false)
-    }
-  }, [token, studySlug])
-
-  useEffect(() => {
-    setStatus('loading')
-    setError('')
-    if (token) void checkStatus()
-  }, [token, checkStatus])
-
-  const unavailable = blocked || status === 'blocked' || status === 'declined'
-  const pending = status === 'pending'
-  const available = status === 'available' || status === 'approved'
+  const unavailable = blocked || ['blocked', 'declined', 'revoked'].includes(state?.status ?? '')
+  const pending = state?.status === 'pending'
+  const approved = state?.status === 'approved'
+  const available = state?.studies.some((study) => study.slug === studySlug)
+  const waiting = loading || (session && !state && !error)
   const title = unavailable
     ? 'This case study isn’t available to this account'
-    : available
-      ? 'Your access is ready'
-      : pending
-        ? 'Your request is awaiting review'
+    : pending
+      ? 'Your portfolio request is awaiting review'
+      : approved
+        ? available
+          ? 'Your access is ready'
+          : 'This case study is shared separately'
         : members
           ? 'Sign in to read this case study'
-          : 'Request access to this case study'
+          : 'Explore more of the portfolio'
   const description = unavailable
-    ? 'You can still explore the public case studies below.'
-    : available
-      ? 'You can now continue to the full case study.'
-      : pending
-        ? 'Your request has been saved. You can check its status here while you explore the public work.'
+    ? 'You can still explore the public case studies.'
+    : pending
+      ? `I’ll email ${state.email} when I’ve reviewed it. Your existing request covers the portfolio; no extra request is needed.`
+      : approved
+        ? available
+          ? 'Continue to the full case study.'
+          : 'Your portfolio access is active. Visit your access page to see the work shared with you.'
         : members
-          ? 'A verified account gives you access to selected case studies. Some work requires separate approval.'
-          : status === 'expired'
-            ? 'Your previous access has ended. You can submit a new request for review.'
-            : token
-              ? 'You’re signed in. Tell me a little about your interest in this work so I can review your request.'
-              : 'Sign in, then tell me a little about your interest. I’ll review your request before sharing this work.'
+          ? 'A verified account gives you access to selected case studies. Private work requires approval.'
+          : 'Send one request for the private portfolio. Add your affiliation and continue with Google or email; I’ll email you when it’s reviewed.'
 
   return (
     <div
       id="request-access"
-      className="mx-auto flex w-full max-w-[480px] scroll-mt-24 flex-col items-center gap-6 text-center"
+      className="mx-auto flex w-full max-w-lg scroll-mt-24 flex-col items-center gap-6 text-center"
     >
       <div className="flex size-12 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
-        <Icon icon={Icons.Lock} size="md" />
+        <Icon icon={Lock} size="md" />
       </div>
       <div className="space-y-3" aria-live="polite">
         <h2 className="m-0 text-3xl font-normal">{title}</h2>
-        <p className="m-0 text-base text-muted-foreground">{description}</p>
+        <p className="m-0 break-words text-base text-muted-foreground">{description}</p>
       </div>
-      {!unavailable && (loading || (token && status === 'loading' && !error)) ? (
+      {waiting ? (
         <p role="status">Checking your access…</p>
-      ) : null}
-      {!loading && !token && !unavailable ? (
-        <div className="flex flex-col items-center gap-3">
-          <Button
-            size="lg"
-            onClick={() =>
-              openLogin({
-                returnTo: `${href}#request-access`,
-                entryPoint: 'case_study_gate',
-                requestAccess: !members,
-              })
-            }
-          >
-            {members ? 'Sign in to read' : 'Request access'}
+      ) : error ? (
+        <div className="space-y-3">
+          <p role="alert" className="text-sm text-destructive">
+            {error}
+          </p>
+          <Button variant="outline" disabled={checking} onClick={() => void refresh()}>
+            Try again
           </Button>
-          {!members ? (
+        </div>
+      ) : !unavailable ? (
+        <div className="flex flex-col items-center gap-3">
+          {members && !session ? (
             <Button
-              variant="link"
-              onClick={() => openLogin({ returnTo: href, entryPoint: 'case_study_gate' })}
+              size="lg"
+              onClick={() =>
+                openLogin({ returnTo: `/work/${studySlug}`, entryPoint: 'case_study_gate' })
+              }
             >
-              Already approved? Sign in
+              Sign in to read
+            </Button>
+          ) : available ? (
+            <Button size="lg" onClick={() => window.location.reload()}>
+              Read case study
+            </Button>
+          ) : (
+            <Button size="lg" asChild>
+              <Link href="/access">
+                {pending || approved ? 'View portfolio access' : 'Request portfolio access'}
+              </Link>
+            </Button>
+          )}
+          {!session && !members ? (
+            <Button variant="link" asChild>
+              <Link href="/access?signin=1">Already requested or approved? Sign in</Link>
             </Button>
           ) : null}
         </div>
-      ) : null}
-      {token && !unavailable && available ? (
-        <Button size="lg" onClick={() => window.location.replace(href)}>
-          Read case study
-        </Button>
-      ) : null}
-      {token && !unavailable && (status === 'none' || status === 'expired') && !members ? (
-        <PortfolioAccessRequestForm
-          studySlug={studySlug}
-          email={session?.user.email}
-          token={token}
-          onStatus={setStatus}
-        />
-      ) : null}
-      {error ? (
-        <p role="alert" className="text-sm text-destructive">
-          {error}
-        </p>
-      ) : null}
-      {token && !unavailable && (pending || error) ? (
-        <Button variant="outline" onClick={checkStatus} disabled={checking}>
-          {checking ? 'Checking…' : 'Check request status'}
-        </Button>
       ) : null}
       <Button variant="link" asChild>
         <Link href="/work?view=public">Explore public case studies</Link>

@@ -4,11 +4,11 @@ import { sanityClient } from '@/sanity/client'
 import type { AccessRequest } from '@/lib/portfolio-request-model'
 
 export const requestProjection = `{
-  _id, userId, email, status, expiresAt,
+  _id, userId, email, status, expiresAt, scope, requestedAt,
   "studyId": study._ref, "allowedStudyIds": allowedCaseStudies[]._ref
 }`
 
-export function accessRequestId(userId: string, studyId: string) {
+export function accessRequestId(userId: string, studyId = 'portfolio') {
   // The dot makes this a private Sanity document, even on a public dataset.
   return `portfolioAccessRequest.${createHash('sha256').update(`${userId}:${studyId}`).digest('hex')}`
 }

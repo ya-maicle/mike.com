@@ -170,14 +170,9 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
               {user ? (
                 <UserMenu />
               ) : (
-                <Button
-                  className="hidden md:inline-flex"
-                  variant="secondary"
-                  size="default"
-                  asChild
-                >
-                  <Link href="/login" onClick={handleLoginNavigation}>
-                    Log in
+                <Button variant="secondary" size="default" asChild>
+                  <Link href="/access" onClick={handleLoginNavigation}>
+                    Portfolio access
                   </Link>
                 </Button>
               )}
@@ -249,8 +244,8 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
             {!user && (
               <div className="mt-auto flex justify-end md:hidden">
                 <Button variant="secondary" size="default" asChild>
-                  <Link href="/login" onClick={handleLoginNavigation}>
-                    Log in
+                  <Link href="/access" onClick={handleLoginNavigation}>
+                    Portfolio access
                   </Link>
                 </Button>
               </div>

@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 const mocks = vi.hoisted(() => ({ fetch: vi.fn(), set: vi.fn(), commit: vi.fn(), access: vi.fn() }))
 vi.mock('server-only', () => ({}))
 vi.mock('./portfolio-requests', () => ({
@@ -12,10 +12,12 @@ const request = {
   userId: 'user',
   company: 'Example',
   role: 'Reviewer',
-  status: 'approved',
+  status: 'pending',
   requestedAt: '2026-10-01',
   allowedCaseStudies: [{ _ref: 'study' }],
-  study: { _id: 'study', slug: 'case-study', title: 'Private work', visibility: 'recruiter' },
+  approvedStudies: [
+    { _id: 'study', slug: 'case-study', title: 'Private work', visibility: 'recruiter' },
+  ],
 }
 const settings = {
   enabled: true,
@@ -26,6 +28,8 @@ const settings = {
 beforeEach(() => {
   vi.clearAllMocks()
   vi.stubEnv('RESEND_API_KEY', 'test-key')
+  vi.stubEnv('VERCEL_ENV', '')
+  vi.stubEnv('VERCEL_BRANCH_URL', '')
   mocks.set.mockReturnValue({ commit: mocks.commit })
   mocks.commit.mockResolvedValue({})
   mocks.fetch.mockImplementation(async (query: string) =>
@@ -33,7 +37,33 @@ beforeEach(() => {
   )
   mocks.access.mockResolvedValue({ hasRecruiterAccess: false, allowedStudyIds: ['study'] })
 })
+afterEach(() => {
+  vi.unstubAllGlobals()
+  vi.unstubAllEnvs()
+})
+function decision(status: string) {
+  mocks.fetch.mockImplementation(async (query: string) =>
+    query.includes('portfolioAccessSettings') ? settings : { ...request, status },
+  )
+}
 describe('access emails', () => {
+  it.each([
+    ['preview', 'feature.example.test', 'https://feature.example.test'],
+    ['production', 'feature.example.test', 'https://preview.example.test'],
+    ['preview', 'feature.example.test/invalid', 'https://preview.example.test'],
+  ])('uses the matching email destination for %s and %s', async (environment, branch, origin) => {
+    vi.stubEnv('VERCEL_ENV', environment)
+    vi.stubEnv('VERCEL_BRANCH_URL', branch)
+    const send = vi
+      .fn()
+      .mockResolvedValue({ ok: true, json: async () => ({ id: 'email-preview' }) })
+    vi.stubGlobal('fetch', send)
+    await notifyAccessRequest(request._id, 'admin')
+    expect(JSON.parse(send.mock.calls[0][1].body).text).toContain(`${origin}/studio/intent/edit/`)
+    decision('approved')
+    await notifyAccessRequest(request._id, 'visitor')
+    expect(JSON.parse(send.mock.calls[1][1].body).text).toContain(`${origin}/access?signin=1`)
+  })
   it('sends a review link to the configured administrator without granting access', async () => {
     const send = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ id: 'email-1' }) })
     vi.stubGlobal('fetch', send)
@@ -47,12 +77,13 @@ describe('access emails', () => {
       }),
     )
   })
-  it('emails only a published approval that actually unlocks the requested study', async () => {
+  it('emails a portfolio approval with a direct returning-sign-in path only when access is effective', async () => {
+    decision('approved')
     const send = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ id: 'email-2' }) })
     vi.stubGlobal('fetch', send)
     expect(await notifyAccessRequest(request._id, 'visitor')).toBe('sent')
     expect(JSON.parse(send.mock.calls[0][1].body).text).toContain(
-      'https://preview.example.test/work/case-study',
+      'https://preview.example.test/access?signin=1',
     )
     mocks.access.mockResolvedValue({ hasRecruiterAccess: false, source: 'blocked' })
     send.mockClear()
@@ -60,12 +91,31 @@ describe('access emails', () => {
     expect(send).not.toHaveBeenCalled()
   })
   it('preserves a saved decision when email fails and records a retryable failure', async () => {
+    decision('approved')
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('offline')))
     expect(await notifyAccessRequest(request._id, 'visitor')).toBe('failed')
     expect(mocks.set).toHaveBeenCalledWith({
       visitorNotification: expect.objectContaining({ state: 'failed' }),
     })
   })
+  it.each(['members', 'public'])(
+    'does not send an approval for work that is now %s',
+    async (visibility) => {
+      mocks.fetch.mockImplementation(async (query: string) =>
+        query.includes('portfolioAccessSettings')
+          ? settings
+          : {
+              ...request,
+              status: 'approved',
+              approvedStudies: [{ ...request.approvedStudies[0], visibility }],
+            },
+      )
+      const send = vi.fn()
+      vi.stubGlobal('fetch', send)
+      expect(await notifyAccessRequest(request._id, 'visitor')).toBe('skipped')
+      expect(send).not.toHaveBeenCalled()
+    },
+  )
   it('records provider authentication failures without saving sensitive response text', async () => {
     vi.stubGlobal(
       'fetch',
@@ -130,5 +180,37 @@ describe('access emails', () => {
     vi.stubGlobal('fetch', send)
     expect(await notifyAccessRequest(request._id, 'admin')).toBe('disabled')
     expect(send).not.toHaveBeenCalled()
+  })
+  it.each(['declined', 'revoked'])(
+    'notifies a %s decision without promising private access',
+    async (status) => {
+      decision(status)
+      const send = vi
+        .fn()
+        .mockResolvedValue({ ok: true, json: async () => ({ id: 'email-decision' }) })
+      vi.stubGlobal('fetch', send)
+      expect(await notifyAccessRequest(request._id, 'visitor')).toBe('sent')
+      const body = JSON.parse(send.mock.calls[0][1].body)
+      expect(body.to).toEqual([request.email])
+      expect(body.text).toContain('/work?view=public')
+      expect(body.text).not.toContain('access is approved')
+    },
+  )
+  it('changes the provider key for a subsequent explicit approval', async () => {
+    decision('approved')
+    const send = vi
+      .fn()
+      .mockResolvedValue({ ok: true, json: async () => ({ id: 'email-approval' }) })
+    vi.stubGlobal('fetch', send)
+    await notifyAccessRequest(request._id, 'visitor')
+    mocks.fetch.mockImplementation(async (query: string) =>
+      query.includes('portfolioAccessSettings')
+        ? settings
+        : { ...request, status: 'approved', decisionVersion: 'next-decision' },
+    )
+    await notifyAccessRequest(request._id, 'visitor')
+    expect(send.mock.calls[0][1].headers['Idempotency-Key']).not.toBe(
+      send.mock.calls[1][1].headers['Idempotency-Key'],
+    )
   })
 })

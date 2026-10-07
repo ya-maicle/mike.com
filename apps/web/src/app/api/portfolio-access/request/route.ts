@@ -1,121 +1,115 @@
-import { notifyAccessRequest } from '@/lib/portfolio-notifications'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse, after } from 'next/server'
 import { z } from 'zod'
 import { verifyPortfolioIdentity, setPortfolioIdentity } from '@/lib/portfolio-identity'
-import { resolveIdentityAccess } from '@/lib/portfolio-access'
-import { canReadStudy } from '@/lib/study-access'
-import {
-  accessRequestSchema,
-  requestStatus,
-  type AccessRequest,
-} from '@/lib/portfolio-request-model'
-import { accessRequestClient, accessRequestId, requestProjection } from '@/lib/portfolio-requests'
-import { sanityNoStoreFetch } from '@/sanity/client'
+import { accessRequestSchema } from '@/lib/portfolio-request-model'
+import { accessRequestClient, accessRequestId } from '@/lib/portfolio-requests'
+import { portfolioRequestContext } from '@/lib/portfolio-request-context'
+import { readRequestIntent, REQUEST_INTENT_COOKIE } from '@/lib/portfolio-request-intent'
+import { notifyAccessRequest } from '@/lib/portfolio-notifications'
 
-const studySlugSchema = z
-  .string()
-  .min(1)
-  .max(96)
-  .regex(/^[a-z0-9-]+$/)
 const json = (body: object, status = 200) =>
   NextResponse.json(body, {
     status,
     headers: { 'Cache-Control': 'private, no-store' },
   })
 
-async function context(request: NextRequest, slug: string) {
+async function identityFor(request: NextRequest) {
   const token = request.headers.get('authorization')?.match(/^Bearer (.+)$/)?.[1]
-  const identity = await verifyPortfolioIdentity(token)
-  if (!identity) return { error: json({ error: 'Please sign in again to continue.' }, 401) }
-  const access = await resolveIdentityAccess(identity)
-  if (access.source === 'blocked') return { error: json({ status: 'blocked' }) }
-  const study = await sanityNoStoreFetch<{ _id: string; visibility?: string } | null>(
-    '*[_type == "caseStudy" && slug.current == $slug][0]{_id, visibility}',
-    { slug },
-  )
-  if (!study) return { error: json({ error: 'Case study not found.' }, 404) }
-  if (canReadStudy(study, access)) {
-    const response = json({ status: 'available' })
-    setPortfolioIdentity(response, token!)
-    return { error: response }
-  }
-  if (study.visibility !== 'recruiter')
-    return { error: json({ error: 'Access is unavailable.' }, 403) }
-  return { identity, study, id: accessRequestId(identity.id, study._id) }
+  return { token, identity: await verifyPortfolioIdentity(token) }
 }
 
 export async function GET(request: NextRequest) {
-  const parsed = studySlugSchema.safeParse(request.nextUrl.searchParams.get('study'))
-  if (!parsed.success) return json({ error: 'Choose a case study.' }, 400)
+  const { token, identity } = await identityFor(request)
+  if (!identity) return json({ error: 'Please sign in again to check your access.' }, 401)
   try {
-    const ctx = await context(request, parsed.data)
-    if (ctx.error) return ctx.error
-    const existing = await accessRequestClient().fetch<AccessRequest | null>(
-      `*[_id == $id && email == $email][0]${requestProjection}`,
-      { id: ctx.id, email: ctx.identity.email },
-      { cache: 'no-store' },
-    )
-    return json({ status: requestStatus(existing) })
+    const { state } = await portfolioRequestContext(identity)
+    const response = json(state)
+    setPortfolioIdentity(response, token!)
+    return response
   } catch {
-    return json({ error: 'We could not check your request. Please try again.' }, 503)
+    return json({ error: 'We could not check your access. Please try again.' }, 503)
   }
 }
 
 export async function POST(request: NextRequest) {
-  if (Number(request.headers.get('content-length') ?? 0) > 8192)
+  if (Number(request.headers.get('content-length') ?? 0) > 12288)
     return json({ error: 'Request too large.' }, 413)
-  const parsed = accessRequestSchema.safeParse(await request.json().catch(() => null))
+  const { token, identity } = await identityFor(request)
+  if (!identity) return json({ error: 'Please sign in again to send your request.' }, 401)
+  const body = await request.json().catch(() => null)
+  const intent = z
+    .object({ intent: z.string().max(8000) })
+    .strict()
+    .safeParse(body)
+  const details = intent.success
+    ? readRequestIntent(
+        intent.data.intent,
+        identity,
+        request.cookies.get(REQUEST_INTENT_COOKIE)?.value,
+        process.env.PORTFOLIO_ACCESS_SECRET ?? '',
+      )
+    : body
+  const parsed = accessRequestSchema.safeParse(details)
   if (!parsed.success)
     return json(
-      { error: 'Please complete all fields. Use at least 10 characters for your reason.' },
+      {
+        error: intent.success
+          ? 'This request has expired or belongs to another account. Please start a new portfolio request.'
+          : 'Please enter your company or affiliation. Role and note are optional.',
+      },
       400,
     )
   try {
-    const ctx = await context(request, parsed.data.studySlug)
-    if (ctx.error) return ctx.error
+    const context = await portfolioRequestContext(identity)
+    if (!['none', 'expired'].includes(context.state.status)) return json(context.state)
     const client = accessRequestClient(true)
-    const existing = await client.fetch<(AccessRequest & { _rev: string }) | null>(
-      `*[_id == $id][0]{...${requestProjection}, _rev}`,
-      { id: ctx.id },
-      { cache: 'no-store' },
-    )
+    const id = context.current?._id ?? accessRequestId(`${identity.id}:${identity.email}`)
     const fields = {
-      userId: ctx.identity.id,
-      email: ctx.identity.email,
-      company: parsed.data.company,
-      role: parsed.data.role,
-      reason: parsed.data.reason,
-      study: { _type: 'reference', _ref: ctx.study._id },
-      allowedCaseStudies: [{ _type: 'reference', _key: 'requested', _ref: ctx.study._id }],
+      ...parsed.data,
+      userId: identity.id,
+      email: identity.email,
+      ...(identity.name ? { name: identity.name } : {}),
+      scope: 'portfolio',
       status: 'pending',
       requestedAt: new Date().toISOString(),
+      adminNotification: { state: 'pending' },
+      allowedCaseStudies: context.standard.map((_ref, index) => ({
+        _type: 'reference',
+        _key: `study-${index}`,
+        _ref,
+      })),
     }
-    // Deterministic IDs prevent duplicate submissions and preserve reviewer decisions.
-    if (
-      existing &&
-      (requestStatus(existing) === 'expired' || existing.email !== ctx.identity.email)
-    ) {
+    if (context.current) {
+      const existing = await client.fetch<{ _rev: string; status: string; expiresAt?: string }>(
+        '*[_id == $id][0]{_rev,status,expiresAt}',
+        { id },
+      )
+      if (
+        existing.status !== 'approved' ||
+        !existing.expiresAt ||
+        Date.parse(existing.expiresAt) > Date.now()
+      )
+        return json((await portfolioRequestContext(identity)).state)
       await client
-        .patch(ctx.id)
+        .patch(id)
         .ifRevisionId(existing._rev)
         .set(fields)
-        .unset(['expiresAt'])
+        .unset(['expiresAt', 'study', 'visitorNotification'])
         .commit()
-    } else if (!existing) {
-      await client.createIfNotExists({ _id: ctx.id, _type: 'portfolioAccessRequest', ...fields })
+    } else {
+      await client.createIfNotExists({ _id: id, _type: 'portfolioAccessRequest', ...fields })
     }
-    // A notification failure must not erase or misreport a saved request.
-    try {
-      await notifyAccessRequest(ctx.id, 'admin')
-    } catch {
-      /* visible in the Sanity review queue */
-    }
-    const saved = await client.fetch<AccessRequest>(
-      `*[_id == $id][0]${requestProjection}`,
-      { id: ctx.id },
-      { cache: 'no-store' },
-    )
-    return json({ status: requestStatus(saved) })
+    // Persist first; a failed notification never loses the request.
+    after(async () => {
+      try {
+        await notifyAccessRequest(id, 'admin')
+      } catch {
+        /* Still in the review queue. */
+      }
+    })
+    const response = json((await portfolioRequestContext(identity)).state)
+    setPortfolioIdentity(response, token!)
+    return response
   } catch {
     return json({ error: 'We could not save your request. Please try again.' }, 503)
   }

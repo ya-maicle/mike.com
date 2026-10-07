@@ -1,6 +1,6 @@
 'use client'
 
-import { canReadStudy, studyAccessLabel, type StudyAccess } from '@/lib/study-access'
+import { canReadStudy, type StudyAccess } from '@/lib/study-access'
 import Link from 'next/link'
 
 import { SanityImage } from '@/components/sanity-image'
@@ -60,7 +60,7 @@ export function WorkCaseStudyList({
                 <Button asChild variant={isLocked ? 'secondary' : 'default'}>
                   <span aria-hidden="true">
                     {isLocked ? <Icon icon={Icons.Lock} size="sm" /> : null}
-                    {isLocked ? studyAccessLabel(study.visibility) : 'View case study'}
+                    {isLocked ? 'Preview case study' : 'View case study'}
                   </span>
                 </Button>
               </div>
@@ -113,7 +113,12 @@ export function WorkCaseStudyList({
         )
 
         return (
-          <Link key={study._id} href={href} className="group block cursor-pointer">
+          <Link
+            key={study._id}
+            href={href}
+            aria-label={`${isLocked ? 'Preview' : 'View'} ${study.title}${isLocked ? ' — full case study requires access' : ''}`}
+            className="group block cursor-pointer"
+          >
             {article}
           </Link>
         )

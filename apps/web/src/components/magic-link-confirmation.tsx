@@ -53,6 +53,7 @@ export function MagicLinkConfirmation() {
   const [switchDetails, setSwitchDetails] = React.useState<AccountSwitchDetails | null>(null)
   const [takingLonger, setTakingLonger] = React.useState(false)
   const [showSuccessFallback, setShowSuccessFallback] = React.useState(false)
+  const [requestAccess, setRequestAccess] = React.useState(false)
 
   const finishSignIn = React.useCallback(
     async (credential: MagicLinkCredential) => {
@@ -87,6 +88,7 @@ export function MagicLinkConfirmation() {
   React.useEffect(() => {
     function processMagicLinkLocation() {
       const entry = parseMagicLinkEntry(window.location.href)
+      setRequestAccess(entry.returnPath?.startsWith('/access#request=') ?? false)
       rememberReturnPath(entry.returnPath)
       const cleanUrl = getCleanMagicLinkUrl(window.location.href)
       window.history.replaceState({}, '', cleanUrl.toString())
@@ -240,7 +242,9 @@ export function MagicLinkConfirmation() {
                   : state === 'switch'
                     ? 'Switch accounts?'
                     : state === 'ready'
-                      ? 'Finish signing in'
+                      ? requestAccess
+                        ? 'Confirm your portfolio request'
+                        : 'Finish signing in'
                       : 'Checking your link'}
           </CardTitle>
           <CardDescription className="min-h-18 text-base leading-6 text-pretty sm:min-h-12">
@@ -275,7 +279,11 @@ export function MagicLinkConfirmation() {
                 . Choose whether to switch.
               </>
             ) : state === 'ready' ? (
-              'Continue to securely use this one-time link. This extra step prevents email scanners from using it before you do.'
+              requestAccess ? (
+                'Confirm your email and send the portfolio request you started. I’ll email you when it’s reviewed.'
+              ) : (
+                'Continue to securely use this one-time link. This extra step prevents email scanners from using it before you do.'
+              )
             ) : takingLonger ? (
               'This is taking longer than usual. Keep this page open while we finish signing you in.'
             ) : (
@@ -293,7 +301,7 @@ export function MagicLinkConfirmation() {
             className="h-13 w-full text-base font-medium"
             onClick={confirmSignIn}
           >
-            Continue to {SITE_HOSTNAME}
+            {requestAccess ? 'Confirm and send request' : `Continue to ${SITE_HOSTNAME}`}
           </Button>
         ) : null}
 
@@ -343,7 +351,7 @@ export function MagicLinkConfirmation() {
         {isError ? (
           <>
             <Button asChild size="lg" className="h-13 w-full text-base font-medium">
-              <Link href="/login">Request a new link</Link>
+              <Link href={requestAccess ? '/access' : '/login'}>Request a new link</Link>
             </Button>
             <Button asChild variant="ghost" size="lg" className="h-11 w-full">
               <Link href="/">Return home</Link>

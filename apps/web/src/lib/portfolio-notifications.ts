@@ -55,24 +55,44 @@ type NoticeRequest = {
   userId: string
   company: string
   role: string
+  reason?: string
+  name?: string
+  decisionVersion?: string
   status: string
   requestedAt: string
   expiresAt?: string
   allowedCaseStudies?: { _ref: string }[]
-  study: { _id: string; title: string; slug: string; visibility?: string }
+  study?: { _id: string; title: string; slug: string; visibility?: string }
+  approvedStudies?: { _id: string; title: string; slug: string; visibility?: string }[]
   adminNotification?: Notice
   visitorNotification?: Notice
+}
+
+function emailOrigin(configuredUrl: string) {
+  const branch = process.env.VERCEL_BRANCH_URL
+  // Vercel supplies this hostname, so preview links stay with the code that sent them.
+  if (process.env.VERCEL_ENV === 'preview' && branch) {
+    try {
+      const preview = new URL(`https://${branch}`)
+      if (preview.host === branch && !preview.username && !preview.password) return preview.origin
+    } catch {
+      // Local development and other hosts use the editable Sanity URL.
+    }
+  }
+  return new URL(configuredUrl).origin
 }
 
 export async function notifyAccessRequest(id: string, kind: 'admin' | 'visitor') {
   const client = accessRequestClient(true)
   const record = await client.fetch<NoticeRequest | null>(
-    '*[_id == $id && _type == "portfolioAccessRequest"][0]{..., study->{_id,title,"slug":slug.current,visibility}}',
+    '*[_id == $id && _type == "portfolioAccessRequest"][0]{..., study->{_id,title,"slug":slug.current,visibility}, "approvedStudies": allowedCaseStudies[]->{_id,title,"slug":slug.current,visibility}}',
     { id },
     { cache: 'no-store' },
   )
-  if (!record?.study) throw new Error('Request or case study not found.')
-  if (kind === 'visitor' && record.status !== 'approved') return 'skipped'
+  if (!record) throw new Error('Request not found.')
+  if (kind === 'visitor' && !['approved', 'declined', 'revoked'].includes(record.status))
+    return 'skipped'
+  if (kind === 'admin' && record.status !== 'pending') return 'skipped'
   const field = kind === 'admin' ? 'adminNotification' : 'visitorNotification'
   const key = createHash('sha256')
     .update(
@@ -80,7 +100,9 @@ export async function notifyAccessRequest(id: string, kind: 'admin' | 'visitor')
         record._id,
         kind,
         record.requestedAt,
-        ...(kind === 'visitor' ? [record.allowedCaseStudies, record.expiresAt] : []),
+        ...(kind === 'visitor'
+          ? [record.status, record.decisionVersion, record.allowedCaseStudies, record.expiresAt]
+          : []),
       ]),
     )
     .digest('hex')
@@ -104,20 +126,28 @@ export async function notifyAccessRequest(id: string, kind: 'admin' | 'visitor')
       .commit()
     return 'disabled'
   }
-  if (kind === 'visitor') {
+  if (kind === 'visitor' && record.status === 'approved') {
     const access = await resolveIdentityAccess({ id: record.userId, email: record.email })
-    if (!canReadStudy(record.study, access)) return 'skipped'
+    const studies = record.approvedStudies ?? (record.study ? [record.study] : [])
+    if (
+      access.source === 'blocked' ||
+      !studies.some((study) => study?.visibility === 'recruiter' && canReadStudy(study, access))
+    )
+      return 'skipped'
   }
   const settings = parsed.data
-  const site = new URL(settings.siteUrl).origin
+  const site = emailOrigin(settings.siteUrl)
   const link =
     kind === 'admin'
       ? `${site}/studio/intent/edit/id=${encodeURIComponent(id)};type=portfolioAccessRequest`
-      : `${site}/work/${encodeURIComponent(record.study.slug)}`
+      : `${site}/access?signin=1`
+  const approved = record.status === 'approved'
   const text =
     kind === 'admin'
-      ? `A verified visitor requested access to ${record.study.title}.\n\nEmail: ${record.email}\nCompany: ${record.company}\nRole: ${record.role}\n\nReview the request privately in Sanity:\n${link}`
-      : `Your access to ${record.study.title} has been approved.\n\nSign in with ${record.email} to read the case study:\n${link}${record.expiresAt ? `\n\nAccess expires: ${new Date(record.expiresAt).toISOString()}` : ''}`
+      ? `A verified visitor requested portfolio access.\n\n${record.name ? `Name: ${record.name}\n` : ''}Email: ${record.email}\nCompany or affiliation: ${record.company}${record.role ? `\nRole: ${record.role}` : ''}${record.reason ? `\n\nNote: ${record.reason}` : ''}\n\nCompany, role and note are supplied by the visitor.\n\nReview the request privately in Sanity:\n${link}`
+      : approved
+        ? `Your portfolio access is approved.\n\nView your portfolio access and available case studies:\n${link}\n\nIf asked to sign in, use ${record.email}. You do not need to request access again.${record.expiresAt ? `\n\nAccess expires: ${new Date(record.expiresAt).toISOString()}` : ''}`
+        : `Thank you for your interest in my work. ${record.status === 'revoked' ? 'Your portfolio access has changed. Check your access page for the work currently available to you.' : 'Your portfolio request wasn’t approved at this time.'}\n\nYou can still explore the public case studies:\n${site}/work?view=public\n\nView your access status:\n${link}`
   let errorCode = 'network_error'
   let providerStatus: number | undefined
   try {
@@ -133,7 +163,11 @@ export async function notifyAccessRequest(id: string, kind: 'admin' | 'visitor')
         from: settings.senderEmail,
         to: [kind === 'admin' ? settings.adminEmail : record.email],
         subject:
-          kind === 'admin' ? 'New portfolio access request' : 'Your case-study access is ready',
+          kind === 'admin'
+            ? 'New portfolio access request'
+            : approved
+              ? 'Your portfolio access is ready'
+              : 'An update on your portfolio access',
         text,
       }),
     })

@@ -10,6 +10,7 @@ import { ContentActions } from '@/components/blog-article-actions'
 import type { StudyAccessSource } from '@/lib/analytics/events'
 
 import { CaseStudyAccessPanel } from '@/components/case-study-access-panel'
+import { Button } from '@/components/ui/button'
 
 type CaseStudyAccessGateProps = {
   study: CaseStudy
@@ -42,7 +43,16 @@ export function CaseStudyAccessGate({
           ].filter(Boolean) as string[]
         }
         subtitle={study.summary}
-        byline={<CaseStudyByline />}
+        byline={
+          <div className="space-y-5">
+            <CaseStudyByline />
+            <Button variant="secondary" asChild>
+              <a href="#request-access">
+                {study.visibility === 'members' ? 'Sign in to read' : 'Portfolio access'}
+              </a>
+            </Button>
+          </div>
+        }
         coverMedia={coverMedia}
         className="pb-0"
         headerActions={

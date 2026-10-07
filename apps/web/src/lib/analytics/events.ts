@@ -51,7 +51,7 @@ export type AnalyticsEventMap = {
     study_slug: string
     method: 'copy' | 'linkedin' | 'x'
   }
-  portfolio_access_requested: { study_slug: string }
+  portfolio_access_requested: { scope: 'portfolio' }
   portfolio_access_started: {
     auth_method: PortfolioAuthMethod
     entry_point: PortfolioAccessEntryPoint

@@ -14,5 +14,5 @@ export function canReadStudy(study: { _id: string; visibility?: string }, access
 }
 
 export function studyAccessLabel(visibility?: string) {
-  return visibility === 'members' ? 'Sign in to read' : 'Request access'
+  return visibility === 'members' ? 'Sign-in required' : 'Approval required'
 }

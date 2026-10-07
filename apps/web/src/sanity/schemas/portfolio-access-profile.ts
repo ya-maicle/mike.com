@@ -2,6 +2,7 @@ import { defineField, defineType } from 'sanity'
 
 const RESERVED_ROOT_SLUGS = new Set([
   'api',
+  'access',
   'debug',
   'login',
   'privacy',

@@ -15,14 +15,15 @@ export const PublishAccessRequestAction: DocumentActionComponent = (props) => {
   const { isSyncing } = useSyncState(props.id, props.type)
   const { isValidating, validation } = useValidationStatus(props.id, props.type)
   const [working, setWorking] = useState(false)
+  const [message, setMessage] = useState<string | null>(null)
   const waiting = useRef(false)
   const lastEvent = useRef(event)
   const record = props.draft ?? props.published
 
-  async function notify() {
+  async function notify(newDecision = false) {
     setWorking(true)
     try {
-      const kind = record?.status === 'approved' ? 'visitor' : 'admin'
+      const kind = record?.status === 'pending' ? 'admin' : 'visitor'
       const proof = crypto.randomUUID()
       const digest = Array.from(
         new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(proof))),
@@ -34,6 +35,9 @@ export const PublishAccessRequestAction: DocumentActionComponent = (props) => {
       await client
         .patch(props.id)
         .set({
+          ...(newDecision
+            ? { decisionVersion: crypto.randomUUID(), visitorNotification: { state: 'pending' } }
+            : {}),
           notificationProof: {
             digest,
             kind,
@@ -55,24 +59,40 @@ export const PublishAccessRequestAction: DocumentActionComponent = (props) => {
       const result = await response.json()
       if (!response.ok) throw new Error(result.error)
       if (result.status === 'disabled')
-        window.alert(
-          'Decision saved. Email is not configured: check Access notifications in Sanity and the server RESEND_API_KEY.',
+        setMessage(
+          'Decision saved. Email is not configured: check Portfolio access settings and the server RESEND_API_KEY.',
         )
       if (result.status === 'failed')
-        window.alert('Decision saved, but email failed. Use Retry notification on this request.')
+        setMessage('Decision saved, but email failed. Use Retry notification on this request.')
       if (result.status === 'skipped' && record?.status === 'approved')
-        window.alert(
-          'Decision saved. No approval email was sent because this account cannot currently read the requested study. Check company blocks, selected studies and expiry.',
+        setMessage(
+          'Decision saved. No approval email was sent because this account cannot currently read the selected portfolio work. Check company blocks, selected studies and expiry.',
         )
-      props.onComplete()
+      if (result.status === 'sent')
+        setMessage(
+          'Saved. The email provider has accepted the notification. The delivery receipt is shown on this request.',
+        )
+      if (result.status === 'skipped' && record?.status !== 'approved') props.onComplete()
     } catch (error) {
-      window.alert(
-        error instanceof Error ? error.message : 'Notification failed. Your decision is saved.',
+      setMessage(
+        `Your decision is saved, but the notification could not be completed. Use Retry notification. ${error instanceof Error ? error.message : ''}`,
       )
     } finally {
       setWorking(false)
     }
   }
+
+  const dialog = message
+    ? {
+        type: 'dialog' as const,
+        header: 'Portfolio notification',
+        content: message,
+        onClose: () => {
+          setMessage(null)
+          props.onComplete()
+        },
+      }
+    : undefined
 
   useEffect(() => {
     if (event === lastEvent.current) return
@@ -83,7 +103,7 @@ export const PublishAccessRequestAction: DocumentActionComponent = (props) => {
       setWorking(false)
       return
     }
-    if (record?.status === 'approved') void notify()
+    if (['approved', 'declined', 'revoked'].includes(String(record?.status))) void notify(true)
     else {
       setWorking(false)
       props.onComplete()
@@ -93,19 +113,26 @@ export const PublishAccessRequestAction: DocumentActionComponent = (props) => {
   }, [event])
 
   if (!props.draft) {
-    if (props.published?.status !== 'approved' && props.published?.status !== 'pending') return null
+    if (!['approved', 'pending', 'declined', 'revoked'].includes(String(props.published?.status)))
+      return null
     return {
+      dialog,
       label: working ? 'Sending…' : 'Retry notification',
       disabled: working,
       onHandle: () => void notify(),
     }
   }
   return {
+    dialog,
     label: working
       ? 'Saving…'
       : record?.status === 'approved'
-        ? 'Approve and notify'
-        : 'Publish decision',
+        ? 'Approve portfolio access and notify'
+        : record?.status === 'declined'
+          ? 'Decline and notify'
+          : record?.status === 'revoked'
+            ? 'Revoke access and notify'
+            : 'Save pending request',
     disabled:
       working ||
       !!publish.disabled ||

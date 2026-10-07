@@ -10,7 +10,7 @@ export const MAGIC_LINK_REQUEST_TTL_MS = 30 * 60_000
 
 const DEFAULT_RETURN_PATH = '/'
 const MAX_EMAIL_LENGTH = 320
-const MAX_RETURN_PATH_LENGTH = 2_048
+const MAX_RETURN_PATH_LENGTH = 8_192
 const MAX_SECRET_LENGTH = 16_384
 
 const pendingMagicLinkRequestSchema = z

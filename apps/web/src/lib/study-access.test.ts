@@ -73,7 +73,6 @@ describe('per-study authorization', () => {
   })
   it('rejects grant escalation and invalid request input', () => {
     const valid = {
-      studySlug: 'a-study',
       company: 'Example',
       role: 'Recruiter',
       reason: 'Reviewing this project for a role.',
@@ -83,6 +82,7 @@ describe('per-study authorization', () => {
     expect(
       accessRequestSchema.safeParse({ ...valid, email: 'somebody@example.test' }).success,
     ).toBe(false)
-    expect(accessRequestSchema.safeParse({ ...valid, reason: 'short' }).success).toBe(false)
+    expect(accessRequestSchema.safeParse({ ...valid, company: '' }).success).toBe(false)
+    expect(accessRequestSchema.safeParse({ company: 'Independent' }).success).toBe(true)
   })
 })

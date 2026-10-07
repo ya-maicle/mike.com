@@ -52,12 +52,12 @@ export default defineConfig({
                   .title('Portfolio Access')
                   .items([
                     S.listItem()
-                      .title('Email notifications')
+                      .title('Settings and standard selection')
                       .child(
                         S.document()
                           .schemaType('portfolioAccessSettings')
                           .documentId('portfolioAccessSettings.config')
-                          .title('Access notifications'),
+                          .title('Portfolio access settings'),
                       ),
                     S.listItem()
                       .title('Company profiles and blocked domains')
@@ -80,6 +80,16 @@ export default defineConfig({
                         S.documentTypeList('portfolioAccessRequest').title(
                           'Requests and individual grants',
                         ),
+                      ),
+                    S.listItem()
+                      .title('Emails need attention')
+                      .child(
+                        S.documentList()
+                          .title('Emails need attention')
+                          .schemaType('portfolioAccessRequest')
+                          .filter(
+                            '_type == "portfolioAccessRequest" && ((status == "pending" && coalesce(adminNotification.state, "pending") != "sent") || (status in ["approved", "declined", "revoked"] && coalesce(visitorNotification.state, "pending") != "sent"))',
+                          ),
                       ),
                   ]),
               ),

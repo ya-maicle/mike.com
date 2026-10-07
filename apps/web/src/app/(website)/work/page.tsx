@@ -6,6 +6,7 @@ import type { CaseStudy } from '@/sanity/queries'
 import { WorkCaseStudyList } from '@/components/work-case-study-list'
 import { HomeLogoStrip } from '@/components/home-logo-strip'
 import { getPortfolioAccessState } from '@/lib/portfolio-access'
+import { PortfolioAccessSummary } from '@/components/portfolio-access-summary'
 
 export const dynamic = 'force-dynamic'
 
@@ -52,6 +53,7 @@ export default async function WorkPage({
         </header>
       </div>
 
+      <PortfolioAccessSummary />
       <WorkCaseStudyList
         caseStudies={
           publicOnly

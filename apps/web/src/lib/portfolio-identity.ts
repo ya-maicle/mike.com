@@ -22,7 +22,12 @@ export async function verifyPortfolioIdentity(token?: string) {
     const { data, error } = await client.auth.getUser(token)
     const user = data.user
     if (error || !user?.email || !user.email_confirmed_at || user.is_anonymous) return null
-    return { id: user.id, email: user.email.trim().toLowerCase() }
+    const name = user.user_metadata?.full_name ?? user.user_metadata?.name
+    return {
+      id: user.id,
+      email: user.email.trim().toLowerCase(),
+      ...(typeof name === 'string' && name.trim() ? { name: name.trim().slice(0, 120) } : {}),
+    }
   } catch {
     return null
   }
