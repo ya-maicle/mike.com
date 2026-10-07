@@ -27,6 +27,8 @@ export const portfolioAccessRequest = defineType({
         fields: [
           defineField({ name: 'state', title: 'Delivery state', type: 'string' }),
           defineField({ name: 'providerId', title: 'Provider receipt', type: 'string' }),
+          defineField({ name: 'errorCode', title: 'Delivery issue', type: 'string' }),
+          defineField({ name: 'providerStatus', title: 'Provider HTTP status', type: 'number' }),
           defineField({ name: 'key', type: 'string', hidden: true }),
         ],
       }),

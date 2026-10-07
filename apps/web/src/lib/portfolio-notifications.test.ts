@@ -66,6 +66,54 @@ describe('access emails', () => {
       visitorNotification: expect.objectContaining({ state: 'failed' }),
     })
   })
+  it('records provider authentication failures without saving sensitive response text', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 401,
+        json: async () => ({ name: 'invalid_api_key', message: 'secret-provider-details' }),
+      }),
+    )
+    expect(await notifyAccessRequest(request._id, 'admin')).toBe('failed')
+    expect(mocks.set).toHaveBeenCalledWith({
+      adminNotification: expect.objectContaining({
+        state: 'failed',
+        errorCode: 'invalid_api_key',
+        providerStatus: 401,
+      }),
+    })
+    expect(JSON.stringify(mocks.set.mock.calls)).not.toContain('secret-provider-details')
+  })
+  it('handles non-JSON provider errors without losing the HTTP status', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: false,
+        status: 502,
+        json: async () => {
+          throw new Error('not JSON')
+        },
+      }),
+    )
+    expect(await notifyAccessRequest(request._id, 'admin')).toBe('failed')
+    expect(mocks.set).toHaveBeenCalledWith({
+      adminNotification: expect.objectContaining({
+        errorCode: 'provider_error',
+        providerStatus: 502,
+      }),
+    })
+  })
+  it('does not record acceptance when the provider returns no receipt', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => ({}) }),
+    )
+    expect(await notifyAccessRequest(request._id, 'admin')).toBe('failed')
+    expect(mocks.set).toHaveBeenCalledWith({
+      adminNotification: expect.objectContaining({ errorCode: 'invalid_provider_response' }),
+    })
+  })
   it('does not resend an already recorded email, and uses a stable provider idempotency key', async () => {
     const send = vi.fn().mockResolvedValue({ ok: true, json: async () => ({ id: 'email-3' }) })
     vi.stubGlobal('fetch', send)
