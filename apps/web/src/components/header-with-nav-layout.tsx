@@ -25,7 +25,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
   const [desktopNavOpen, setDesktopNavOpen] = React.useState(false)
   const { open: mobileNavOpen, setOpen: setMobileNavOpen } = useMobileNavigation()
 
-  const { open: loginOpen, setOpen: setLoginOpen } = useLoginModal()
+  const { open: loginOpen, setOpen: setLoginOpen, requestAccess } = useLoginModal()
   const { user } = useAuth()
   const pathname = usePathname()
   const keepHeaderVisible = pathname === '/blog'
@@ -305,7 +305,7 @@ export function HeaderWithNavLayout({ children }: { children: React.ReactNode })
             className="sm:max-w-sm bg-transparent border-none shadow-none p-0"
           >
             <DialogTitle className="sr-only">Log in</DialogTitle>
-            <LoginForm onMagicLinkSent={() => setLoginOpen(false)} />
+            <LoginForm requestAccess={requestAccess} onMagicLinkSent={() => setLoginOpen(false)} />
           </DialogContent>
         </Dialog>
       )}

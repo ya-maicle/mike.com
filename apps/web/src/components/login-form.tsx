@@ -21,6 +21,7 @@ import { isValidReturnPath } from '@/lib/url-validation'
 
 type LoginFormProps = React.ComponentProps<'div'> & {
   presentation?: 'card' | 'page'
+  requestAccess?: boolean
   onMagicLinkSent?: () => void
 }
 
@@ -70,6 +71,7 @@ function magicLinkErrorMessage(error: { message?: string; status?: number }) {
 
 export function LoginForm({
   presentation = 'card',
+  requestAccess = false,
   onMagicLinkSent,
   className,
   ...props
@@ -175,11 +177,12 @@ export function LoginForm({
           aria-level={1}
           className={cn(isPage ? 'text-3xl leading-9 font-normal tracking-[-0.01em]' : 'text-xl')}
         >
-          Sign in to explore the work
+          {requestAccess ? 'Sign in to request access' : 'Sign in to explore the work'}
         </CardTitle>
         <CardDescription>
-          Read selected case studies and request access to private work. Some case studies require
-          approval.
+          {requestAccess
+            ? 'First, confirm your email. Next, you’ll go straight to a short request form for this project.'
+            : 'Read selected case studies and request access to private work. Some case studies require approval.'}
         </CardDescription>
       </CardHeader>
       <CardContent className={cn(isPage && 'px-0')}>

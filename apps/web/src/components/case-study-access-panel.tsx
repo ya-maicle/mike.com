@@ -17,7 +17,6 @@ export function CaseStudyAccessPanel({ studySlug, visibility, blocked = false }:
   const [status, setStatus] = useState('loading')
   const [error, setError] = useState('')
   const [checking, setChecking] = useState(false)
-  const [requesting, setRequesting] = useState(false)
   const token = session?.access_token
   const href = `/work/${studySlug}`
   const members = visibility === 'members'
@@ -73,10 +72,13 @@ export function CaseStudyAccessPanel({ studySlug, visibility, blocked = false }:
             ? 'Your previous access has ended. You can submit a new request for review.'
             : token
               ? 'You’re signed in. Tell me a little about your interest in this work so I can review your request.'
-              : 'This work is shared with approved hiring teams and trusted reviewers. Sign in to request access or use an existing approval.'
+              : 'Sign in, then tell me a little about your interest. I’ll review your request before sharing this work.'
 
   return (
-    <div className="mx-auto flex w-full max-w-[480px] flex-col items-center gap-6 text-center">
+    <div
+      id="request-access"
+      className="mx-auto flex w-full max-w-[480px] scroll-mt-24 flex-col items-center gap-6 text-center"
+    >
       <div className="flex size-12 items-center justify-center rounded-full bg-secondary text-secondary-foreground">
         <Icon icon={Icons.Lock} size="md" />
       </div>
@@ -91,7 +93,13 @@ export function CaseStudyAccessPanel({ studySlug, visibility, blocked = false }:
         <div className="flex flex-col items-center gap-3">
           <Button
             size="lg"
-            onClick={() => openLogin({ returnTo: href, entryPoint: 'case_study_gate' })}
+            onClick={() =>
+              openLogin({
+                returnTo: `${href}#request-access`,
+                entryPoint: 'case_study_gate',
+                requestAccess: !members,
+              })
+            }
           >
             {members ? 'Sign in to read' : 'Request access'}
           </Button>
@@ -111,18 +119,12 @@ export function CaseStudyAccessPanel({ studySlug, visibility, blocked = false }:
         </Button>
       ) : null}
       {token && !unavailable && (status === 'none' || status === 'expired') && !members ? (
-        requesting ? (
-          <PortfolioAccessRequestForm
-            studySlug={studySlug}
-            email={session?.user.email}
-            token={token}
-            onStatus={setStatus}
-          />
-        ) : (
-          <Button size="lg" onClick={() => setRequesting(true)}>
-            Request access
-          </Button>
-        )
+        <PortfolioAccessRequestForm
+          studySlug={studySlug}
+          email={session?.user.email}
+          token={token}
+          onStatus={setStatus}
+        />
       ) : null}
       {error ? (
         <p role="alert" className="text-sm text-destructive">

@@ -117,7 +117,7 @@ describe('LoginForm magic-link flow', () => {
 
   it('stores a short-lived request and opens the check-email page after a successful send', async () => {
     mocks.signInWithOtp.mockResolvedValue({ error: null })
-    localStorage.setItem('auth-return-url', '/work/private?tab=overview')
+    localStorage.setItem('auth-return-url', '/work/private?tab=overview#request-access')
     const onMagicLinkSent = await renderForm()
 
     await enterEmailAndSubmit('  person@example.com  ')
@@ -139,18 +139,35 @@ describe('LoginForm magic-link flow', () => {
     expect(callbackUrl.pathname).toBe('/auth/confirm')
     expect(callbackUrl.search).toBe('')
     expect(new URLSearchParams(callbackUrl.hash.slice(1)).get('auth_return_to')).toBe(
-      '/work/private?tab=overview',
+      '/work/private?tab=overview#request-access',
     )
     expect(mocks.stopAutoRefresh).toHaveBeenCalledOnce()
     expect(
       JSON.parse(sessionStorage.getItem(MAGIC_LINK_REQUEST_STORAGE_KEY) ?? '{}'),
     ).toMatchObject({
       email: 'person@example.com',
-      returnPath: '/work/private?tab=overview',
+      returnPath: '/work/private?tab=overview#request-access',
     })
-    expect(mocks.captureStarted).toHaveBeenCalledWith('magic_link', '/work/private?tab=overview')
+    expect(mocks.captureStarted).toHaveBeenCalledWith(
+      'magic_link',
+      '/work/private?tab=overview#request-access',
+    )
     expect(onMagicLinkSent).toHaveBeenCalledOnce()
     expect(mocks.push).toHaveBeenCalledWith(MAGIC_LINK_SENT_PATH)
+  })
+
+  it('explains the next step and preserves the form destination through Google sign-in', async () => {
+    mocks.signInWithOAuth.mockResolvedValue({ error: null })
+    localStorage.setItem('auth-return-url', '/work/private#request-access')
+    await act(async () => root.render(React.createElement(LoginForm, { requestAccess: true })))
+    expect(container.textContent).toContain('Sign in to request access')
+    expect(container.textContent).toContain('straight to a short request form')
+    const google = Array.from(container.querySelectorAll('button')).find((b) =>
+      b.textContent?.includes('Continue with Google'),
+    )!
+    await act(async () => google.click())
+    const redirect = new URL(mocks.signInWithOAuth.mock.calls[0][0].options.redirectTo)
+    expect(redirect.searchParams.get('auth_return_to')).toBe('/work/private#request-access')
   })
 
   it('shows a friendly rate-limit error without leaving the form', async () => {
